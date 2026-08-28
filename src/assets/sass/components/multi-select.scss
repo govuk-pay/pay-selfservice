@@ -1,3 +1,7 @@
+@use 'govuk-frontend/dist/govuk' as *;
+
+$hover-background: #b1b4b6;
+
 .multi-select {
   @extend .govuk-clearfix;
   position: relative;
@@ -6,7 +10,7 @@
 
 .multi-select__title {
   width: 100%;
-  border: 2px solid $govuk-text-colour;
+  border: 2px solid govuk-functional-colour(text);
   padding: 5px 5px;
   border-radius: 0;
   min-height: 34px;
@@ -34,7 +38,7 @@
 
   &:focus {
     box-shadow: inset 0 0 0 $govuk-border-width-form-element;
-    outline: 3px solid $govuk-focus-colour;
+    outline: 3px solid govuk-functional-colour(focus);
     outline-offset: 0;
 
     div {
@@ -69,7 +73,7 @@
     padding: 5px 5px;
     @include govuk-font($size: 19);
     &:hover {
-      background-color: #b1b4b6;
+      background-color: $hover-background;
     }
   }
 
@@ -98,16 +102,58 @@
       label {
         width: 100%;
         padding-left: 5px;
+        max-width: calc(100% - 74px);
       }
       &:hover {
-        background: #b1b4b6;
+        background: $hover-background;
         cursor: pointer;
       }
     }
   }
 
   &:focus {
-    outline: 3px solid $govuk-focus-colour;
+    outline: 3px solid govuk-functional-colour(focus);
     outline-offset: 0;
+  }
+
+  // need to override the forced update govuk has done to small checkboxes by using the same code but changing the background colour on hover
+  .govuk-checkboxes__input:not(:disabled):hover + .govuk-checkboxes__label::before {
+    // Forced colours modes tend to ignore box-shadow.
+    // Apply an outline for those modes to use instead.
+    outline: $govuk-focus-width dashed transparent;
+    outline-offset: 1px;
+    box-shadow: 0 0 0 $govuk-hover-width $hover-background;
+  }
+
+  // Because we've overridden the border-shadow provided by the focus state,
+  // we need to redefine that too.
+  //
+  // We use two box shadows, one that restores the original focus state [1]
+  // and another that then applies the hover state [2].
+  .govuk-checkboxes__input:focus:hover + .govuk-checkboxes__label::before {
+    // Set different HCM colour when we have both hover/focus applied at once
+    @media screen and (forced-colors: active), (-ms-high-contrast: active) {
+      outline-color: Highlight;
+    }
+    // prettier-ignore
+    box-shadow:
+    0 0 0 $govuk-focus-width govuk-functional-colour(focus), // 1
+    0 0 0 $govuk-hover-width $hover-background // 2
+  }
+
+  // For devices that explicitly don't support hover, don't provide a hover
+  // state (e.g. on touch devices like iOS).
+  //
+  // We can't use `@media (hover: hover)` because we wouldn't get the hover
+  // state in browsers that don't support `@media (hover)` (like Internet
+  // Explorer) – so we have to 'undo' the hover state instead.
+  @media (hover: none), (pointer: coarse) {
+    .govuk-checkboxes__input:not(:disabled):hover + .govuk-checkboxes__label::before {
+      box-shadow: initial;
+    }
+
+    .govuk-checkboxes__input:focus:hover + .govuk-checkboxes__label::before {
+      box-shadow: 0 0 0 $govuk-focus-width govuk-functional-colour(focus);
+    }
   }
 }
