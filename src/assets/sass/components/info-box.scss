@@ -1,7 +1,8 @@
-@use "sass:color";
+@use 'govuk-frontend/dist/govuk' as *;
+@use 'sass:color';
 .pay-info-warning-box {
   @extend .govuk-inset-text;
 
-  border-left-color: govuk-colour("yellow");
-  background-color: color.adjust(govuk-colour("yellow"), $alpha: -.75);
+  border-left-color: govuk-colour('yellow');
+  background-color: color.adjust(govuk-colour('yellow'), $alpha: -0.75);
 }

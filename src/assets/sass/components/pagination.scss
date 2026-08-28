@@ -1,3 +1,5 @@
+@use 'govuk-frontend/dist/govuk' as *;
+
 .pagination {
   margin-bottom: govuk-spacing(3);
 
@@ -6,52 +8,52 @@
 
     button {
       background: inherit;
-      border: 1px solid $govuk-border-colour;
+      border: 1px solid govuk-functional-colour(border);
       border-right: none;
       padding: govuk-spacing(1) govuk-spacing(2);
       vertical-align: middle;
-      color: $govuk-link-colour;
+      color: govuk-functional-colour(link);
       cursor: pointer;
-      @include govuk-font($size: 14);
+      @include govuk-font($size: 16);
 
       &:hover {
-        color: $govuk-text-colour;
-        background-color: $govuk-focus-colour;
+        color: govuk-functional-colour(text);
+        background-color: govuk-functional-colour(focus);
       }
 
       &.active {
-        background-color: govuk-colour("blue");
-        border-color: govuk-colour("blue");
-        color: govuk-colour("white");
+        background-color: govuk-colour('blue');
+        border-color: govuk-colour('blue');
+        color: govuk-colour('white');
 
         &:active {
-          color: govuk-colour("white");
+          color: govuk-colour('white');
         }
       }
     }
 
     &:last-child button {
-      border: 1px solid $govuk-border-colour;
+      border: 1px solid govuk-functional-colour(border);
     }
 
     /* Buttons for the next or previous set or either end of the whole lot */
     &.first button:before {
-      content:"\00AB";
+      content: '\00AB';
       margin-right: 0.25em;
     }
 
     &.previous button:before {
-      content:"\2039";
+      content: '\2039';
       margin-right: 0.25em;
     }
 
     &.next button:after {
-      content:"\203A";
+      content: '\203A';
       margin-left: 0.25em;
     }
 
     &.last button:after {
-      content:"\00BB";
+      content: '\00BB';
       margin-left: 0.25em;
     }
   }

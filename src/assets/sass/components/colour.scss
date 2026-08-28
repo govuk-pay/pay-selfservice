@@ -1,15 +1,17 @@
+@use 'govuk-frontend/dist/govuk' as *;
+
 .pay-text-grey {
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
 }
 
 .pay-text-black {
-  color: $govuk-text-colour;
+  color: govuk-functional-colour(text);
 }
 
 .pay-link-text-red {
-  color: govuk-colour("red") !important;
+  color: govuk-colour('red') !important;
 }
 
 .pay-link-text-red:hover {
-  color: govuk-colour("red") !important;
+  color: govuk-colour('red') !important;
 }

@@ -5,57 +5,59 @@
   Resend security code - GOV.UK Pay
 {% endblock %}
 
-{% block beforeContent %}
+{% block containerStart %}
   {{ super() }}
   {{
-  govukBackLink({
-    text: "My profile",
-    href: routes.user.profile.index
-  })
+    govukBackLink({
+      text: "My profile",
+      href: routes.user.profile.index
+    })
   }}
 {% endblock %}
 
 {% block mainContent %}
   <div class="govuk-grid-column-two-thirds">
-    {{ errorSummary ({
-      errors: errors,
-      hrefs: {
-        phone: '#phone'
-      }
-    }) }}
+    {{
+      errorSummary ({
+        errors: errors,
+        hrefs: {
+          phone: '#phone'
+        }
+      })
+    }}
 
     <h1 class="form-title govuk-heading-l">Check your mobile number</h1>
     <p class="govuk-body">Check your mobile phone number is correct, then resend the security code.</p>
     <form class="form" method="post" novalidate>
-      <input id="csrf" name="csrfToken" type="hidden" value="{{csrf}}" />
+      <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
       {{
-      govukInput({
-        id: "phone",
-        name: "phone",
-        type: "tel",
-        autocomplete: "mobile tel",
-        classes: "govuk-input--width-20",
-        label: {
-          text: "Mobile number",
-          classes: "govuk-label--s"
-        },
-        value: phone,
-        errorMessage: { text: errors.phone } if errors.phone else false
-      })
+        govukInput({
+          id: "phone",
+          name: "phone",
+          type: "tel",
+          autocomplete: "mobile tel",
+          classes: "govuk-input--width-20",
+          label: {
+            text: "Mobile number",
+            classes: "govuk-label--s"
+          },
+          value: phone,
+          errorMessage: { text: errors.phone } if errors.phone else false
+        })
       }}
       {{
-      govukButton({
-        text: "Resend security code",
-        classes: "button",
-        attributes: {
-          id: "resend-code"
-        }
-      })
+        govukButton({
+          text: "Resend security code",
+          classes: "button",
+          attributes: {
+            id: "resend-code"
+          }
+        })
       }}
     </form>
 
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{routes.user.profile.twoFactorAuth.index}}">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ routes.user.profile.twoFactorAuth.index }}">
         Cancel
       </a>
     </p>

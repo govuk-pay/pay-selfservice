@@ -1,21 +1,22 @@
+@use 'govuk-frontend/dist/govuk' as *;
 
-.reporting-columns{
+.reporting-columns {
   margin: 1rem 0;
 }
 
-.reporting-columns__keypair{
+.reporting-columns__keypair {
   display: inline-block;
-  border: 2px solid $govuk-border-colour;
+  border: 2px solid govuk-functional-colour(border);
   margin: 1rem 10px 0 0;
 }
 
-.reporting-columns__key{
-  background: govuk-colour("light-grey");
+.reporting-columns__key {
+  background: govuk-colour('black', $variant: 'tint-95');
   padding: 10px 5px;
-  border-bottom: 2px solid $govuk-border-colour;
+  border-bottom: 2px solid govuk-functional-colour(border);
 }
 
-.reporting-columns__value{
+.reporting-columns__value {
   margin-inline-start: 0;
   padding: 10px 5px;
   margin-left: 0;

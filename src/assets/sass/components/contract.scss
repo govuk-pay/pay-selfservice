@@ -1,4 +1,6 @@
-.contract-download-container{
+@use 'govuk-frontend/dist/govuk' as *;
+
+.contract-download-container {
   @media print {
     display: none;
   }

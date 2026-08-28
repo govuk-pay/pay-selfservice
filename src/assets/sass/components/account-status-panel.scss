@@ -1,13 +1,15 @@
+@use 'govuk-frontend/dist/govuk' as *;
+
 .account-status-panel {
-  border: 5px solid govuk-colour("blue");
+  border: 5px solid govuk-colour('blue');
   padding: 20px;
   margin: 0 15px;
 
-  .govuk-grid-column-two-thirds{
+  .govuk-grid-column-two-thirds {
     padding: 0;
   }
 
-  &--restricted{
-    border: 5px solid govuk-colour("red"); 
-  } 
+  &--restricted {
+    border: 5px solid govuk-colour('red');
+  }
 }

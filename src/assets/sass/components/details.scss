@@ -1,5 +1,6 @@
-.govuk-details {
+@use 'govuk-frontend/dist/govuk' as *;
 
+.govuk-details {
   &.small-arrow {
     margin-bottom: 0;
 

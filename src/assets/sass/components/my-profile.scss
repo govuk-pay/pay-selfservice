@@ -1,23 +1,23 @@
-.profile-settings{
+.profile-settings {
   display: table;
 
   &__row {
     display: table-row;
   }
 
-  &__setting{
+  &__setting {
     display: table-cell;
   }
 
-  &__value{
+  &__value {
     display: table-cell;
   }
 
-  &__change-link{
+  &__change-link {
     float: right;
   }
 
   dd {
-    overflow-wrap: anywhere
+    overflow-wrap: anywhere;
   }
 }
