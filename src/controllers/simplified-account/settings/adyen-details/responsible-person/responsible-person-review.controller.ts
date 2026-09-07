@@ -41,6 +41,8 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     switchingCredentialId
   )
 
+  const dateOfBirth = `${currentSession.dobYear}-${currentSession.dobMonth}-${currentSession.dobDay}`
+
   return response(req, res, 'simplified-account/settings/adyen-details/responsible-person/check-your-answers', {
     hasAddressLine2: currentSession.addressLine2?.length,
     detailsLink,
@@ -48,6 +50,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     addressLink,
     backLink: contactDetailsLink,
     currentSession,
+    dateOfBirth
   })
 }
 
