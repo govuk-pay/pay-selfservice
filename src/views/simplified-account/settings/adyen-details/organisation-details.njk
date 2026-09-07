@@ -3,7 +3,6 @@
 {% set settingsPageTitle = "Organisation details" %}
 
 {% block settingsContent %}
-
   <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
 
   <form id="organisation-details-form" method="post">
@@ -11,7 +10,10 @@
 
     {% set organisationNameHint %}
       <div>
-        <p>Do not enter the name of a local office or individual department unless that is the organisation's official name.</p>
+        <p
+          >Do not enter the name of a local office or individual department unless that is the organisation's official
+          name.</p
+        >
       </div>
     {% endset %}
 

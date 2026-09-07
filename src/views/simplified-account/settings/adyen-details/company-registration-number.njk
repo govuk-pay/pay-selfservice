@@ -3,16 +3,18 @@
 {% set settingsPageTitle = "Tell us your company registration number" %}
 
 {% block settingsContent %}
-
   <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
 
   <form id="company-registration-number-form" method="post">
     <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
 
     {% set companyRegistrationNumberHint %}
-      <p>You can find the registration number on the
-        <a class="govuk-link" href="{{ companiesHouseLink }}" target="_blank" rel="noopener noreferrer">Companies House register (opens in new tab)</a>,
-        your certificate of incorporation or official letters from Companies House.</p>
+      <p
+        >You can find the registration number on the
+        <a class="govuk-link" href="{{ companiesHouseLink }}" target="_blank" rel="noopener noreferrer"
+          >Companies House register (opens in new tab)</a
+        >, your certificate of incorporation or official letters from Companies House.</p
+      >
     {% endset %}
 
     {{
