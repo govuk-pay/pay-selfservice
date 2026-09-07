@@ -45,7 +45,7 @@ export = (account: GatewayAccount, service: Service, currentUrl: string, permiss
       hasPermission: UserPermissions.any,
     })
     .add({
-      id: 'organisation-details',
+      id: ['settings', 'organisation-details'],
       name: 'organisation details',
       path: formatServiceAndAccountPathsFor(
         paths.simplifiedAccount.settings.organisationDetails.index,

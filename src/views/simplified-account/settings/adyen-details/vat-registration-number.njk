@@ -1,0 +1,39 @@
+{% extends "../settings-layout.njk" %}
+
+{% set settingsPageTitle = "Tell us your VAT registration number" %}
+
+{% block settingsContent %}
+
+  <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
+
+  <form id="vat-registration-number-form" method="post">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+
+    {{
+      govukInput({
+        label: {
+          text: "VAT registration number",
+          classes: "govuk-visually-hidden"
+        },
+        hint: {
+          text: "This is usually 9 numbers and may start with GB. For example, 123456789 or GB123456789. You can find it on your VAT registration certificate."
+        },
+        classes: "govuk-!-width-one-third",
+        id: "vat-registration-number",
+        name: "vatRegistrationNumber",
+        errorMessage: { text: errors.formErrors['vatRegistrationNumber'] } if errors.formErrors['vatRegistrationNumber'] else false,
+        value: vatRegistrationNumber
+      })
+    }}
+
+    {{
+      govukButton({
+        text: "Continue",
+        attributes: {
+          id: "vat-registration-number-submit"
+        },
+        preventDoubleClick: true
+      })
+    }}
+  </form>
+{% endblock %}

@@ -1013,6 +1013,51 @@ simplifiedAccount.post(
 )
 
 simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.get
+)
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.companyRegistration.get
+)
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.companyRegistration.post
+)
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.vatRegistration.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.vatRegistration.post
+)
+
+simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.reasonForTakingPayments,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
