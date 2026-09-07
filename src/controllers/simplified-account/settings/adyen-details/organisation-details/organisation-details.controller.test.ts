@@ -6,6 +6,10 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
+// @ts-expect-error js commons is not updated for typescript support yet
+import { utils } from '@govuk-pay/pay-js-commons'
+
+const { countries } = utils as { countries: { govukFrontendFormatted: (selected: string) => unknown[] } }
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -42,12 +46,13 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
       )
     })
 
-    it('should call the response method with the organisation details, countries and backLink', async () => {
+    it('should call the response method with the organisation details, hasCompanyRegistrationNumber, countries and backLink', async () => {
       await call('get')
 
       mockResponse.should.have.been.calledOnce
       const context = mockResponse.firstCall.lastArg as {
         organisationDetails: object
+        hasCompanyRegistrationNumber: string
         countries: unknown[]
         backLink: string
       }
@@ -60,7 +65,8 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           addressPostcode: '',
           addressCountry: 'GB',
         },
-        countries: [],
+        hasCompanyRegistrationNumber: '',
+        countries: countries.govukFrontendFormatted('GB'),
         backLink: formatServiceAndAccountPathsFor(
           paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
           SERVICE_EXTERNAL_ID,
