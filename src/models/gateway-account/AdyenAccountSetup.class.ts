@@ -3,16 +3,7 @@ import { AdyenAccountSetupData } from '@models/gateway-account/dto/AdyenAccountS
 export class AdyenAccountSetup {
   readonly serviceExternalId: string
   readonly credentialExternalId: string
-  readonly tasks: Record<
-    | 'bankAccount'
-    | 'responsiblePerson'
-    | 'vatNumber'
-    | 'companyNumber'
-    | 'director'
-    | 'governmentEntityDocument'
-    | 'organisationDetails',
-    AdyenAccountSetupTask
-  >
+  readonly tasks: Record<AdyenAccountSetupTaskName, AdyenAccountSetupTask>
 
   constructor(data: AdyenAccountSetupData) {
     this.serviceExternalId = data.service_id
@@ -39,3 +30,11 @@ export const AdyenAccountSetupTaskStatus = {
 } as const
 
 export type AdyenAccountSetupTaskStatus = 'COMPLETED' | 'NOT_STARTED'
+export type AdyenAccountSetupTaskName =
+  | 'bankAccount'
+  | 'responsiblePerson'
+  | 'vatNumber'
+  | 'companyNumber'
+  | 'director'
+  | 'governmentEntityDocument'
+  | 'organisationDetails'
