@@ -50,7 +50,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     addressLink,
     backLink: contactDetailsLink,
     currentSession,
-    dateOfBirth
+    dateOfBirth,
   })
 }
 
