@@ -20,6 +20,8 @@ import { ChargeRefundRequestData } from '@models/charge/dto/ChargeRefundRequest.
 import { GatewayAccountSearchParams } from '@models/gateway-account/GatewayAccountSearchParams.class'
 import { AdyenAccountSetupData } from '@models/gateway-account/dto/AdyenAccountSetup.dto'
 import { AdyenAccountSetup } from '@models/gateway-account/AdyenAccountSetup.class'
+import { AdyenAccountSetupUpdateRequest } from '@models/gateway-account/AdyenAccountSetupUpdateRequest.class'
+import { AdyenAccountSetupUpdate } from '@models/gateway-account/dto/AdyenAccountSetupUpdate.dto'
 
 const SERVICE_NAME = 'connector'
 const SERVICE_BASE_URL = process.env.CONNECTOR_URL!
@@ -180,6 +182,24 @@ class ConnectorClient extends BaseClient {
 
           const response = await this.get<AdyenAccountSetupData>(path, 'get adyen account onboarding progress')
           return new AdyenAccountSetup(response.data)
+        },
+
+        patch: async (
+          serviceExternalId: string,
+          accountType: string,
+          credentialExternalId: string,
+          updateRequest: AdyenAccountSetupUpdateRequest
+        ) => {
+          const path = '/v1/api/service/{serviceExternalId}/account/{accountType}/adyen-setup/{credentialExternalId}'
+            .replace('{serviceExternalId}', encodeURIComponent(serviceExternalId))
+            .replace('{accountType}', encodeURIComponent(accountType))
+            .replace('{credentialExternalId}', encodeURIComponent(credentialExternalId))
+
+          await this.patch<AdyenAccountSetupUpdate[], void>(
+            path,
+            updateRequest.toJson(),
+            'update adyen account onboarding progress'
+          )
         },
       },
 

@@ -1,4 +1,4 @@
-type AdyenAccountSetupTaskNames =
+export type AdyenAccountSetupTaskNameData =
   | 'bank_account'
   | 'responsible_person'
   | 'vat_number'
@@ -10,7 +10,7 @@ type AdyenAccountSetupTaskNames =
 export interface AdyenAccountSetupData {
   service_id: string
   credential_external_id: string
-  tasks: Record<AdyenAccountSetupTaskNames, AdyenAccountSetupTaskData>
+  tasks: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTaskData>
 }
 
 export interface AdyenAccountSetupTaskData {
