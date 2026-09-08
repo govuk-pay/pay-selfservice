@@ -1,6 +1,6 @@
 {% extends "../../settings-layout.njk" %}
 
-{% set settingsPageTitle = "Responsible person's address" %}
+{% set settingsPageTitle = "Responsible person’s address" %}
 
 {% block settingsContent %}
   <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
@@ -12,6 +12,10 @@
       >
       {% include "simplified-account/settings/partials/_address.njk" %}
     {% endcall %}
-    {{ govukButton({ text: "Continue" }) }}
+    {{
+      govukButton({ id: "responsible-person-address-submit",
+      text: "Continue",
+      preventDoubleClick: true })
+    }}
   </form>
 {% endblock %}
