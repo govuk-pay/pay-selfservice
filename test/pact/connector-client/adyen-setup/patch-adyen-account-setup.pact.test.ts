@@ -34,7 +34,6 @@ describe('connector client - patch adyen account setup', () => {
       .addInteraction()
       .given('an adyen gateway account exists')
       .uponReceiving('a valid adyen account setup update request')
-      .pending()
       .withRequest(
         'PATCH',
         `/v1/api/service/${SERVICE_EXTERNAL_ID}/account/${ACCOUNT_TYPE}/adyen-setup/${CREDENTIAL_EXTERNAL_ID}`,
@@ -77,7 +76,6 @@ describe('connector client - patch adyen account setup', () => {
     await provider
       .addInteraction()
       .uponReceiving('an adyen account setup update request for a non-existent gateway account')
-      .pending()
       .withRequest(
         'PATCH',
         `/v1/api/service/${SERVICE_EXTERNAL_ID}/account/${ACCOUNT_TYPE}/adyen-setup/${CREDENTIAL_EXTERNAL_ID}`,
@@ -111,7 +109,6 @@ describe('connector client - patch adyen account setup', () => {
       .addInteraction()
       .given('an adyen gateway account exists')
       .uponReceiving('an adyen account setup update request for a non-existent credential')
-      .pending()
       .withRequest(
         'PATCH',
         `/v1/api/service/${SERVICE_EXTERNAL_ID}/account/${ACCOUNT_TYPE}/adyen-setup/this-credential-does-not-exist`,
@@ -145,7 +142,6 @@ describe('connector client - patch adyen account setup', () => {
       .addInteraction()
       .given('a stripe gateway account with external id 42 exists in the database')
       .uponReceiving('an adyen account setup update request for the stripe gateway account')
-      .pending()
       .withRequest(
         'PATCH',
         `/v1/api/service/${SERVICE_EXTERNAL_ID}/account/${ACCOUNT_TYPE}/adyen-setup/${CREDENTIAL_EXTERNAL_ID}`,
