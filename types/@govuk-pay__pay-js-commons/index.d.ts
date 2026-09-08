@@ -46,3 +46,17 @@ declare module '@govuk-pay/pay-js-commons/lib/logging/keys' {
   export const SERVICE_EXTERNAL_ID = 'service_external_id'
   export const PRODUCT_EXTERNAL_ID = 'product_external_id'
 }
+
+declare module '@govuk-pay/pay-js-commons' {
+  export interface PayJsCommonsCountry {
+    selected: boolean
+    value: string
+    text: string
+  }
+
+  export const utils: {
+    countries: {
+      govukFrontendFormatted: (selectedCountry: string) => PayJsCommonsCountry[]
+    }
+  }
+}

@@ -6,10 +6,9 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
-// @ts-expect-error js commons is not updated for typescript support yet
 import { utils } from '@govuk-pay/pay-js-commons'
 
-const { countries } = utils as { countries: { govukFrontendFormatted: (selected: string) => unknown[] } }
+const { countries } = utils
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
