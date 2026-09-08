@@ -107,11 +107,27 @@ describe(`Responsible person - check your answers`, () => {
 
         checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
         cy.get('h1').should('contain.text', `Check your answers`)
-        cy.get('.govuk-back-link').should('have.attr', 'href', RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH + fromReviewQueryString)
+        cy.get('.govuk-back-link').should(
+          'have.attr',
+          'href',
+          RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH + fromReviewQueryString
+        )
 
-        cy.get(`[data-cy='edit-responsible-person-details']`).should('have.attr', 'href', RESPONSIBLE_PERSON_DETAILS_PATH + fromReviewQueryString)
-        cy.get(`[data-cy='edit-responsible-person-address']`).should('have.attr', 'href', RESPONSIBLE_PERSON_ADDRESS_PATH + fromReviewQueryString)
-        cy.get(`[data-cy='edit-responsible-person-contact-details']`).should('have.attr', 'href', RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH + fromReviewQueryString)
+        cy.get(`[data-cy='edit-responsible-person-details']`).should(
+          'have.attr',
+          'href',
+          RESPONSIBLE_PERSON_DETAILS_PATH + fromReviewQueryString
+        )
+        cy.get(`[data-cy='edit-responsible-person-address']`).should(
+          'have.attr',
+          'href',
+          RESPONSIBLE_PERSON_ADDRESS_PATH + fromReviewQueryString
+        )
+        cy.get(`[data-cy='edit-responsible-person-contact-details']`).should(
+          'have.attr',
+          'href',
+          RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH + fromReviewQueryString
+        )
       })
 
       it('should redirect to the migration task page when confirm and = continue is pressed', () => {
