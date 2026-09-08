@@ -1,6 +1,6 @@
 {% extends "../../settings-layout.njk" %}
 
-{% set settingsPageTitle = "Responsible person's contact details" %}
+{% set settingsPageTitle = "Responsible person’s contact details" %}
 
 {% block settingsContent %}
   <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
@@ -42,6 +42,10 @@
       })
     }}
 
-    {{ govukButton({ text: "Continue" }) }}
+    {{
+      govukButton({ id: "responsible-person-contact-details-submit",
+      text: "Continue",
+      preventDoubleClick: true })
+    }}
   </form>
 {% endblock %}

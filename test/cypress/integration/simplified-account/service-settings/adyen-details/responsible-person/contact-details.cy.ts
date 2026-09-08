@@ -16,6 +16,7 @@ const TASK_LIST_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_T
 const RESPONSIBLE_PERSON_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/details`
 const RESPONSIBLE_PERSON_ADDRESS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/address`
 const RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/contact-details`
+const RESPONSIBLE_PERSON_REVIEW_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/check-your-answers`
 
 const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
   PaymentProvider.STRIPE,
@@ -48,7 +49,7 @@ const setStubs = (additionalStubs = []) => {
   ])
 }
 
-describe(`Responsible person - address`, () => {
+describe(`Responsible person - contact details`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
@@ -62,13 +63,13 @@ describe(`Responsible person - address`, () => {
       it('should redirect to the migration tasks page', () => {
         setStubs()
 
-        cy.visit(RESPONSIBLE_PERSON_ADDRESS_PATH)
+        cy.visit(RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH)
 
         cy.location('pathname').should('eq', TASK_LIST_PATH)
       })
     })
 
-    describe('when navigating from the details page with fields populated', () => {
+    describe('when navigating from the address page with fields populated', () => {
       beforeEach(() => {
         setStubs()
         cy.visit(RESPONSIBLE_PERSON_DETAILS_PATH)
@@ -81,6 +82,13 @@ describe(`Responsible person - address`, () => {
 
         cy.get('#responsible-person-details-submit').click()
 
+        cy.get('#address-line1').type('7 Green Lane')
+        cy.get('#address-line2').type('Greenfield')
+        cy.get('#address-city').type('Greencity')
+        cy.get('#address-postcode').type('GR3 3NY')
+
+        cy.get('#responsible-person-address-submit').click()
+
         it('accessibility check', () => {
           setStubs()
           cy.a11yCheck()
@@ -91,26 +99,22 @@ describe(`Responsible person - address`, () => {
         setStubs()
 
         checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
-        cy.get('h1').should('contain.text', `Responsible person’s address`)
-        cy.get('.govuk-back-link').should('have.attr', 'href', RESPONSIBLE_PERSON_DETAILS_PATH)
+        cy.get('h1').should('contain.text', `Responsible person’s contact details`)
+        cy.get('.govuk-back-link').should('have.attr', 'href', RESPONSIBLE_PERSON_ADDRESS_PATH)
 
-        cy.get('#address-line1').should('exist')
-        cy.get('#address-line2').should('exist')
-        cy.get('#address-city').should('exist')
-        cy.get('#address-postcode').should('exist')
+        cy.get('#telephone-number').should('exist')
+        cy.get('#email').should('exist')
       })
 
-      it('should redirect to the responsible person contact details page when continue is pressed', () => {
+      it('should redirect to the check your answers page when continue is pressed', () => {
         setStubs()
 
-        cy.get('#address-line1').type('7 Green Lane')
-        cy.get('#address-line2').type('Greenfield')
-        cy.get('#address-city').type('Greencity')
-        cy.get('#address-postcode').type('GR3 3NY')
+        cy.get('#telephone-number').type('07700 700900')
+        cy.get('#email').type('sam@example.com')
 
-        cy.get('#responsible-person-address-submit').click()
+        cy.get('#responsible-person-contact-details-submit').click()
 
-        cy.location('pathname').should('eq', RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH)
+        cy.location('pathname').should('eq', RESPONSIBLE_PERSON_REVIEW_PATH)
       })
     })
   })
@@ -150,9 +154,9 @@ describe(`Responsible person - address`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to view responsible person address', () => {
+      it('should return a 404 when attempting to view responsible contact details', () => {
         cy.request({
-          url: RESPONSIBLE_PERSON_ADDRESS_PATH,
+          url: RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH,
           failOnStatusCode: false,
         }).then((response) => {
           expect(response.status).to.eq(404)
@@ -182,9 +186,9 @@ describe(`Responsible person - address`, () => {
         ])
       })
 
-      it('should return a 404 when attempting view responsible person address', () => {
+      it('should return a 404 when attempting view responsible contact details', () => {
         cy.request({
-          url: RESPONSIBLE_PERSON_ADDRESS_PATH,
+          url: RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH,
           failOnStatusCode: false,
         }).then((response) => {
           expect(response.status).to.eq(404)
