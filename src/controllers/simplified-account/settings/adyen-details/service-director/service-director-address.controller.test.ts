@@ -70,7 +70,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-a
 
         await call('get')
       })
-      it('should call the response function with the template path', async () => {
+      it('should call the response function with the template path', () => {
         mockResponse.should.have.been.calledOnce
         mockResponse.should.have.been.calledWith(
           sinon.match.any,
@@ -87,7 +87,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-a
         sinon.assert.match(addressValues.addressPostcode, 'W1 2AB')
       })
 
-      it('should call the response method with the backLink set to details page', async () => {
+      it('should call the response method with the backLink set to details page', () => {
         mockResponse.should.have.been.calledOnce
         const context = mockResponse.firstCall.lastArg as { backLink: string }
         sinon.assert.match(context, {
@@ -160,7 +160,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-a
 
       await call('post')
     })
-    it('should redirect to service director check your answers page', async () => {
+    it('should redirect to service director check your answers page', () => {
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(

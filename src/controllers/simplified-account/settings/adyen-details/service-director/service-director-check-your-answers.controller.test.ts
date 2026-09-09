@@ -7,7 +7,6 @@ import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { ServiceDirectorSession } from './constants'
-import Service from '@models/service/Service.class'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -72,7 +71,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-c
         await call('get')
       })
 
-      it('should call the response function with req, res, and the template path', async () => {
+      it('should call the response function the template path', () => {
         mockResponse.should.have.been.calledOnce
         mockResponse.should.have.been.calledWith(
           sinon.match.any,
@@ -95,7 +94,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-c
         sinon.assert.match(submittedAnswers.addressPostcode, 'W1 2AB')
       })
 
-      it('should call the response method with the back and change links', async () => {
+      it('should call the response method with the back and change links', () => {
         mockResponse.should.have.been.calledOnce
         const context = mockResponse.firstCall.lastArg as { backLink: string }
         const fromReviewParam = '?fromReview=true'
