@@ -103,6 +103,17 @@ describe('the links are displayed correctly on the dashboard', () => {
       cy.get('#provider-change-to-adyen-link').should('exist')
     })
 
+    it('should display "Your provider is changing to Adyen" link for a Stripe test account', () => {
+      cy.task(
+        'setupStubs',
+        getStubsForDashboard(gatewayAccountId, GatewayAccountType.TEST, PaymentProviders.STRIPE, GoLiveStage.NOT_STARTED)
+      )
+
+      cy.visit(dashboardUrl(GatewayAccountType.TEST))
+
+      cy.get('#provider-change-to-adyen-link').should('exist')
+    })
+
     it('should display 3 links for a test sandbox account created since onboarding flow changed on 29/08/2024', () => {
       cy.task(
         'setupStubs',
@@ -118,6 +129,7 @@ describe('the links are displayed correctly on the dashboard', () => {
 
       cy.visit(dashboardUrl(GatewayAccountType.TEST))
       cy.get('.links__box').should('have.length', 3)
+
 
       cy.get('#demo-payment-link').should('exist')
       cy.get('#demo-payment-link').should('have.class', 'flex-grid--column-third')
@@ -183,7 +195,7 @@ describe('the links are displayed correctly on the dashboard', () => {
       cy.get('#provider-change-to-adyen-link').should('not.exist')
     })
 
-    it('should display 3 links (demo payment, test with users and request to go live) for a Stripe test account', () => {
+    it('should display 3 links (switch to adyen, demo payment, test with users, request to go live) for a Stripe test account', () => {
       cy.task(
         'setupStubs',
         getStubsForDashboard(
@@ -195,18 +207,21 @@ describe('the links are displayed correctly on the dashboard', () => {
       )
 
       cy.visit(dashboardUrl(GatewayAccountType.TEST))
-      cy.get('.links__box').should('have.length', 3)
+      cy.get('.links__box').should('have.length', 4)
+
+      cy.get('#provider-change-to-adyen-link').should('exist')
+
+      cy.get('#switch-to-adyen-info').should('exist')
+      cy.get('#switch-to-adyen-info').should('have.class', 'links__box')
 
       cy.get('#demo-payment-link').should('exist')
-      cy.get('#demo-payment-link').should('have.class', 'flex-grid--column-third')
+      cy.get('#demo-payment-link').should('have.class', 'links__box')
 
       cy.get('#test-payment-link-link').should('exist')
-      cy.get('#test-payment-link-link').should('have.class', 'flex-grid--column-third')
+      cy.get('#test-payment-link-link').should('have.class', 'links__box')
 
       cy.get('#request-to-go-live-link').should('exist')
-      cy.get('#request-to-go-live-link').should('have.class', 'flex-grid--column-third')
-
-      cy.get('#provider-change-to-adyen-link').should('not.exist')
+      cy.get('#request-to-go-live-link').should('have.class', 'links__box')
     })
   })
 })
