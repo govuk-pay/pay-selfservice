@@ -106,7 +106,12 @@ describe('the links are displayed correctly on the dashboard', () => {
     it('should display "Your provider is changing to Adyen" link for a Stripe test account', () => {
       cy.task(
         'setupStubs',
-        getStubsForDashboard(gatewayAccountId, GatewayAccountType.TEST, PaymentProviders.STRIPE, GoLiveStage.NOT_STARTED)
+        getStubsForDashboard(
+          gatewayAccountId,
+          GatewayAccountType.TEST,
+          PaymentProviders.STRIPE,
+          GoLiveStage.NOT_STARTED
+        )
       )
 
       cy.visit(dashboardUrl(GatewayAccountType.TEST))
@@ -129,7 +134,6 @@ describe('the links are displayed correctly on the dashboard', () => {
 
       cy.visit(dashboardUrl(GatewayAccountType.TEST))
       cy.get('.links__box').should('have.length', 3)
-
 
       cy.get('#demo-payment-link').should('exist')
       cy.get('#demo-payment-link').should('have.class', 'flex-grid--column-third')

@@ -17,7 +17,8 @@ const SERVICE_NAME = {
 const LIVE_ACCOUNT_TYPE = 'live'
 const GATEWAY_ACCOUNT_ID = 10
 
-const PROVIDER_CHANGE_TO_ADYEN = (accountType) => `/service/${SERVICE_EXTERNAL_ID}/account/${accountType}/settings/switch-psp/switch-to-adyen/provider-change-to-adyen`
+const PROVIDER_CHANGE_TO_ADYEN = (accountType) =>
+  `/service/${SERVICE_EXTERNAL_ID}/account/${accountType}/settings/switch-psp/switch-to-adyen/provider-change-to-adyen`
 
 const setStubs = (opts = {}, additionalStubs = []) => {
   cy.task('setupStubs', [
