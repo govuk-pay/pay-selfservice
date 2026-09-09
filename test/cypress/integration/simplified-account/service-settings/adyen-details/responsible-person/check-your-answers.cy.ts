@@ -95,11 +95,11 @@ describe(`Responsible person - check your answers`, () => {
         cy.get('#email').type('sam@example.com')
 
         cy.get('#responsible-person-contact-details-submit').click()
+      })
 
-        it('accessibility check', () => {
-          setStubs()
-          cy.a11yCheck()
-        })
+      it('accessibility check', () => {
+        setStubs()
+        cy.a11yCheck()
       })
 
       it('should display correct page content', () => {

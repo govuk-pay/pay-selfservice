@@ -88,11 +88,11 @@ describe(`Responsible person - contact details`, () => {
         cy.get('#address-postcode').type('GR3 3NY')
 
         cy.get('#responsible-person-address-submit').click()
+      })
 
-        it('accessibility check', () => {
-          setStubs()
-          cy.a11yCheck()
-        })
+      it('accessibility check', () => {
+        setStubs()
+        cy.a11yCheck()
       })
 
       it('should display correct page content', () => {
