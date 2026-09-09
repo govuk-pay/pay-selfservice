@@ -28,7 +28,10 @@
             text: "First name"
           },
           value: {
-            html: "Sam"
+            html: currentSession.firstName,
+            attributes: {
+            data-cy: "first-name-row"
+          }
           }
         },
         {
@@ -36,7 +39,10 @@
             text: "Last name"
           },
           value: {
-            html: "Person"
+            html: currentSession.lastName,
+            attributes: {
+            data-cy: "last-name-row"
+          }
           }
         },
         {
@@ -44,16 +50,23 @@
             text: "Date of birth"
           },
           value: {
-            html: "01 January 1970"
+            html: dateOfBirth | govukDate,
+            attributes: {
+            data-cy: "dob-row"
+          },
+          },
           }
-        },
         {
           key: {
             text: "Work email address"
           },
           value: {
-            html: "S.person@example.gov.uk"
+            html: currentSession.email,
+            attributes: {
+            data-cy: "email-row"
           }
+          }
+
         }
       ]
     })
@@ -82,7 +95,10 @@
             text: "Address line 1"
           },
           value: {
-            html: "29 Acacia Road"
+            html: currentSession.addressLine1,
+            attributes: {
+            data-cy: "address-1-row"
+          }
           }
         },
         {
@@ -90,7 +106,10 @@
             text: "Address line 2"
           },
           value: {
-            html: "Mitcham"
+            html: currentSession.addressLine2,
+            attributes: {
+            data-cy: "address-2-row"
+          }
           }
         } if hasAddressLine2,
         {
@@ -98,7 +117,10 @@
             text: "Town or city"
           },
           value: {
-            html: "London"
+            html: currentSession.addressCity,
+            attributes: {
+            data-cy: "town-city-row"
+          }
           }
         },
         {
@@ -106,8 +128,11 @@
             text: "Postcode"
           },
           value: {
-            html: "SW16 1AB"
+            html: currentSession.addressPostcode,
+            attributes: {
+            data-cy: "postcode-row"
           }
+          },
         }
       ]
     })
