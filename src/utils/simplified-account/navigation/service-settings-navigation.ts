@@ -113,7 +113,6 @@ export = (account: GatewayAccount, service: Service, currentUrl: string, permiss
       hasPermission: UserPermissions.settings.stripe.stripeAccountDetailsUpdate,
       conditions:
         account.paymentProvider === STRIPE &&
-        account.type === GatewayAccountType.LIVE &&
         Features.isProviderChangeToAdyenLinkEnabled(),
     })
     .add({

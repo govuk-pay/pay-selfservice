@@ -105,14 +105,6 @@ const getTelephonePaymentLink = async (user: User, service: Service, gatewayAcco
   return undefined
 }
 
-function isALiveStripeServiceAndAdminUser(service: Service, account: GatewayAccount, user: User) {
-  return (
-    account.type === GatewayAccountType.LIVE &&
-    account.paymentProvider === PaymentProvider.STRIPE &&
-    user.hasPermission(service.externalId, 'stripe-account-details:update')
-  )
-}
-
 const getActionsToDisplay = (
   service: Service,
   account: GatewayAccount,
@@ -144,7 +136,7 @@ const getActionsToDisplay = (
     actionsToDisplay.push(possibleActions.switchMode)
   }
 
-  if (isALiveStripeServiceAndAdminUser(service, account, user) && Features.isProviderChangeToAdyenLinkEnabled()) {
+  if (account.paymentProvider === PaymentProvider.STRIPE && Features.isProviderChangeToAdyenLinkEnabled()) {
     actionsToDisplay.push(possibleActions.displayProviderChangeToAdyen)
   }
 
