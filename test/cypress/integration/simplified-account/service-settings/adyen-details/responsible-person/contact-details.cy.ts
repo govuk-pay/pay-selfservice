@@ -13,8 +13,10 @@ const GATEWAY_ACCOUNT_ID = 12
 const ADYEN_CREDENTIAL_EXTERNAL_ID = 'adyen-credential-123-abc'
 
 const TASK_LIST_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/switch-psp/switch-to-adyen`
-const SERVICE_DIRECTOR_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/service-director/details`
-const SERVICE_DIRECTOR_ADDRESS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/service-director/address`
+const RESPONSIBLE_PERSON_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/details`
+const RESPONSIBLE_PERSON_ADDRESS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/address`
+const RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/contact-details`
+const RESPONSIBLE_PERSON_REVIEW_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/check-your-answers`
 
 const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
   PaymentProvider.STRIPE,
@@ -47,68 +49,73 @@ const setStubs = (additionalStubs = []) => {
   ])
 }
 
-describe(`Service director - details`, () => {
+describe(`Responsible person - contact details`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
 
-  it('accessibility check', () => {
-    setStubs()
-
-    cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
-    cy.a11yCheck()
-  })
-
-  it('should display correct page title and headings', () => {
-    setStubs()
-
-    cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
-
-    checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
-    cy.get('h1').should('contain.text', `Service director details`)
-  })
-
   describe('for a service that is migrating to adyen', () => {
-    it('should display a back link to the switch-to-adyen task list', () => {
-      setStubs()
+    describe('when navigating to the page directly', () => {
+      beforeEach(() => {
+        setStubs()
+      })
 
-      cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
+      it('should redirect to the migration tasks page', () => {
+        setStubs()
 
-      cy.get('.govuk-back-link').should('have.attr', 'href', TASK_LIST_PATH)
+        cy.visit(RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH)
+
+        cy.location('pathname').should('eq', TASK_LIST_PATH)
+      })
     })
 
-    it('should display first name, last name, date of birth and work email address inputs', () => {
-      setStubs()
+    describe('when navigating from the address page with fields populated', () => {
+      beforeEach(() => {
+        setStubs()
+        cy.visit(RESPONSIBLE_PERSON_DETAILS_PATH)
+        cy.get('#first-name').type('John')
+        cy.get('#last-name').type('McClane')
 
-      cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
+        cy.get('#dob-day').type('25')
+        cy.get('#dob-month').type('12')
+        cy.get('#dob-year').type('1960')
 
-      cy.get('#first-name').should('exist')
-      cy.get('#last-name').should('exist')
+        cy.get('#responsible-person-details-submit').click()
 
-      cy.get('#dob-day').should('exist')
-      cy.get('#dob-month').should('exist')
-      cy.get('#dob-year').should('exist')
+        cy.get('#address-line1').type('7 Green Lane')
+        cy.get('#address-line2').type('Greenfield')
+        cy.get('#address-city').type('Greencity')
+        cy.get('#address-postcode').type('GR3 3NY')
 
-      cy.get('#email').should('exist')
-    })
+        cy.get('#responsible-person-address-submit').click()
+      })
 
-    it('should redirect to the service director address page when continue is pressed', () => {
-      setStubs()
+      it('accessibility check', () => {
+        setStubs()
+        cy.a11yCheck()
+      })
 
-      cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
+      it('should display correct page content', () => {
+        setStubs()
 
-      cy.get('#first-name').type('John')
-      cy.get('#last-name').type('McClane')
+        checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
+        cy.get('h1').should('contain.text', `Responsible person’s contact details`)
+        cy.get('.govuk-back-link').should('have.attr', 'href', RESPONSIBLE_PERSON_ADDRESS_PATH)
 
-      cy.get('#dob-day').type('25')
-      cy.get('#dob-month').type('12')
-      cy.get('#dob-year').type('1960')
+        cy.get('#telephone-number').should('exist')
+        cy.get('#email').should('exist')
+      })
 
-      cy.get('#email').type('yippeekiyay@example.gov.uk')
+      it('should redirect to the check your answers page when continue is pressed', () => {
+        setStubs()
 
-      cy.get('#service-director-details-submit').click()
+        cy.get('#telephone-number').type('07700 700900')
+        cy.get('#email').type('sam@example.com')
 
-      cy.location('pathname').should('eq', SERVICE_DIRECTOR_ADDRESS_PATH)
+        cy.get('#responsible-person-contact-details-submit').click()
+
+        cy.location('pathname').should('eq', RESPONSIBLE_PERSON_REVIEW_PATH)
+      })
     })
   })
 
@@ -147,9 +154,9 @@ describe(`Service director - details`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to view service director details', () => {
+      it('should return a 404 when attempting to view responsible contact details', () => {
         cy.request({
-          url: SERVICE_DIRECTOR_DETAILS_PATH,
+          url: RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH,
           failOnStatusCode: false,
         }).then((response) => {
           expect(response.status).to.eq(404)
@@ -179,9 +186,9 @@ describe(`Service director - details`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to view service director details', () => {
+      it('should return a 404 when attempting view responsible contact details', () => {
         cy.request({
-          url: SERVICE_DIRECTOR_DETAILS_PATH,
+          url: RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH,
           failOnStatusCode: false,
         }).then((response) => {
           expect(response.status).to.eq(404)
