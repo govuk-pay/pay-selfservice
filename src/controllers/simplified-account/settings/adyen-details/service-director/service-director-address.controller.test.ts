@@ -148,7 +148,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-a
       nextRequest({
         session: {
           pageData: {
-            responsiblePerson: {},
+            serviceDirector: {},
           },
         },
         body: {

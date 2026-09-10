@@ -28,10 +28,7 @@
             text: "First name"
           },
           value: {
-            html: currentSession.firstName,
-            attributes: {
-            data-cy: "first-name-row"
-          }
+            html: currentSession.firstName
           }
         },
         {
@@ -39,10 +36,7 @@
             text: "Last name"
           },
           value: {
-            html: currentSession.lastName,
-            attributes: {
-            data-cy: "last-name-row"
-          }
+            html: currentSession.lastName
           }
         },
         {
@@ -50,23 +44,16 @@
             text: "Date of birth"
           },
           value: {
-            html: dateOfBirth | govukDate,
-            attributes: {
-            data-cy: "dob-row"
-          },
-          },
+            html: dateOfBirth | govukDate
           }
+        },
         {
           key: {
             text: "Work email address"
           },
           value: {
-            html: currentSession.email,
-            attributes: {
-            data-cy: "email-row"
+            html: currentSession.email
           }
-          }
-
         }
       ]
     })
@@ -95,10 +82,7 @@
             text: "Address line 1"
           },
           value: {
-            html: currentSession.addressLine1,
-            attributes: {
-            data-cy: "address-1-row"
-          }
+            html: currentSession.addressLine1
           }
         },
         {
@@ -106,10 +90,7 @@
             text: "Address line 2"
           },
           value: {
-            html: currentSession.addressLine2,
-            attributes: {
-            data-cy: "address-2-row"
-          }
+            html: currentSession.addressLine2
           }
         } if hasAddressLine2,
         {
@@ -117,10 +98,7 @@
             text: "Town or city"
           },
           value: {
-            html: currentSession.addressCity,
-            attributes: {
-            data-cy: "town-city-row"
-          }
+            html: currentSession.addressCity
           }
         },
         {
@@ -128,11 +106,8 @@
             text: "Postcode"
           },
           value: {
-            html: currentSession.addressPostcode,
-            attributes: {
-            data-cy: "postcode-row"
+            html: currentSession.addressPostcode
           }
-          },
         }
       ]
     })
