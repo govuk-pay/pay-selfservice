@@ -1,5 +1,3 @@
-import { GATEWAY_ACCOUNT_TYPE } from '@govuk-pay/pay-js-commons/lib/logging/keys'
-
 const checkSettingsNavigation = require('@test/cypress/integration/simplified-account/service-settings/helpers/check-settings-nav')
 const userStubs = require('@test/cypress/stubs/user-stubs')
 const gatewayAccountStubs = require('@test/cypress/stubs/gateway-account-stubs')
