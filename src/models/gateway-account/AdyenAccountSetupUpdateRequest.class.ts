@@ -15,32 +15,28 @@ export class AdyenAccountSetupUpdateRequest {
 
   replace(): Record<AdyenAccountSetupTaskName, (value: AdyenAccountSetupTaskStatus) => this> {
     return {
-      bankAccount: (value: AdyenAccountSetupTaskStatus) => {
-        return this.#op('replace', 'bank_account', value)
+      organisationDetails: (value: AdyenAccountSetupTaskStatus) => {
+        return this.#op('replace', 'organisation_details', value)
+      },
+
+      legalTerms: (value: AdyenAccountSetupTaskStatus) => {
+        return this.#op('replace', 'legal_terms', value)
+      },
+
+      bankDetails: (value: AdyenAccountSetupTaskStatus) => {
+        return this.#op('replace', 'bank_details', value)
       },
 
       responsiblePerson: (value: AdyenAccountSetupTaskStatus) => {
         return this.#op('replace', 'responsible_person', value)
       },
 
-      vatNumber: (value: AdyenAccountSetupTaskStatus) => {
-        return this.#op('replace', 'vat_number', value)
-      },
-
-      companyNumber: (value: AdyenAccountSetupTaskStatus) => {
-        return this.#op('replace', 'company_number', value)
-      },
-
       director: (value: AdyenAccountSetupTaskStatus) => {
         return this.#op('replace', 'director', value)
       },
 
-      governmentEntityDocument: (value: AdyenAccountSetupTaskStatus) => {
-        return this.#op('replace', 'government_entity_document', value)
-      },
-
-      organisationDetails: (value: AdyenAccountSetupTaskStatus) => {
-        return this.#op('replace', 'organisation_details', value)
+      reasonForTakingPayments: (value: AdyenAccountSetupTaskStatus) => {
+        return this.#op('replace', 'reason_for_taking_payments', value)
       },
     }
   }
