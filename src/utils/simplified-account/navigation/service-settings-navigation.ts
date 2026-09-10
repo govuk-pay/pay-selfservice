@@ -111,10 +111,7 @@ export = (account: GatewayAccount, service: Service, currentUrl: string, permiss
         account.type
       ),
       hasPermission: UserPermissions.settings.stripe.stripeAccountDetailsUpdate,
-      conditions:
-        account.paymentProvider === STRIPE &&
-        account.type === GatewayAccountType.LIVE &&
-        Features.isProviderChangeToAdyenLinkEnabled(),
+      conditions: account.paymentProvider === STRIPE && Features.isProviderChangeToAdyenLinkEnabled(),
     })
     .add({
       id: 'switch-psp', // sits under settings/switch-psp/switch-to-adyen

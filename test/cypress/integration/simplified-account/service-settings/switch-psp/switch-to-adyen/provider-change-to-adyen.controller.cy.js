@@ -15,7 +15,8 @@ const SERVICE_NAME = {
 const LIVE_ACCOUNT_TYPE = 'live'
 const GATEWAY_ACCOUNT_ID = 10
 
-const PROVIDER_CHANGE_TO_ADYEN = `/service/${SERVICE_EXTERNAL_ID}/account/live/settings/switch-psp/switch-to-adyen/provider-change-to-adyen`
+const PROVIDER_CHANGE_TO_ADYEN = (accountType) =>
+  `/service/${SERVICE_EXTERNAL_ID}/account/${accountType}/settings/switch-psp/switch-to-adyen/provider-change-to-adyen`
 
 const setStubs = (opts = {}, additionalStubs = []) => {
   cy.task('setupStubs', [
@@ -46,52 +47,59 @@ describe('Switch to Adyen info', () => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
   describe('Your provider is changing to Adyen page', () => {
+    const providerChangeUrlForLive = PROVIDER_CHANGE_TO_ADYEN(GatewayAccountType.LIVE)
     describe('Stripe live account', () => {
       it('should show Your provider is changing page to admin user', () => {
         setStubs({
           role: 'admin',
         })
-        cy.visit(PROVIDER_CHANGE_TO_ADYEN, { failOnStatusCode: false })
+        cy.visit(providerChangeUrlForLive, { failOnStatusCode: false })
         cy.title().should('contain', 'Your provider is changing to Adyen')
 
-        const PROVIDER_CHANGE_TO_ADYEN_URL = `/service/${SERVICE_EXTERNAL_ID}/account/live/settings/switch-psp/switch-to-adyen/provider-change-to-adyen`
-        checkSettingsNavigation('Your provider is changing to Adyen', PROVIDER_CHANGE_TO_ADYEN_URL)
+        checkSettingsNavigation('Your provider is changing to Adyen', providerChangeUrlForLive)
       })
+
       it('should show error page to non-admin user', () => {
         setStubs({
           role: 'view-and-refund',
         })
-        cy.visit(PROVIDER_CHANGE_TO_ADYEN, { failOnStatusCode: false })
+        cy.visit(providerChangeUrlForLive, { failOnStatusCode: false })
         cy.title().should('eq', 'An error occurred - GOV.UK Pay')
         cy.get('h1').should('contain.text', 'An error occurred')
       })
     })
+
     describe('Stripe test account', () => {
-      it('should show page not found error to admin user', () => {
+      const providerChangeUrlForTest = PROVIDER_CHANGE_TO_ADYEN(GatewayAccountType.TEST)
+      it('should show Your provider is changing page to admin user', () => {
         setStubs({
           role: 'admin',
           gatewayAccountType: GatewayAccountType.TEST,
         })
-        cy.visit(PROVIDER_CHANGE_TO_ADYEN, { failOnStatusCode: false })
-        cy.title().should('contain', 'Page not found')
+        cy.visit(providerChangeUrlForTest, { failOnStatusCode: false })
+        cy.title().should('contain', 'Your provider is changing to Adyen')
+
+        checkSettingsNavigation('Your provider is changing to Adyen', providerChangeUrlForTest)
       })
-      it('should show page not found error to non-admin user', () => {
+
+      it('should show show error page to non-admin user', () => {
         setStubs({
           role: 'view-and-refund',
           gatewayAccountType: GatewayAccountType.TEST,
         })
-        cy.visit(PROVIDER_CHANGE_TO_ADYEN, { failOnStatusCode: false })
-        cy.title().should('eq', 'Page not found - GOV.UK Pay')
-        cy.get('h1').should('contain.text', 'Page not found')
+        cy.visit(providerChangeUrlForTest, { failOnStatusCode: false })
+        cy.title().should('eq', 'An error occurred - GOV.UK Pay')
+        cy.get('h1').should('contain.text', 'An error occurred')
       })
     })
+
     describe('Worldpay live account', () => {
       it('should show error page to admin user', () => {
         setStubs({
           role: 'admin',
           paymentProvider: WORLDPAY,
         })
-        cy.visit(PROVIDER_CHANGE_TO_ADYEN, { failOnStatusCode: false })
+        cy.visit(PROVIDER_CHANGE_TO_ADYEN(GatewayAccountType.LIVE), { failOnStatusCode: false })
         cy.title().should('eq', 'Page not found - GOV.UK Pay')
         cy.get('h1').should('contain.text', 'Page not found')
       })
