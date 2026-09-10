@@ -9,13 +9,12 @@ export class AdyenAccountSetup {
     this.serviceExternalId = data.service_id
     this.credentialExternalId = data.credential_external_id
     this.tasks = {
-      bankAccount: data.tasks.bank_account,
-      responsiblePerson: data.tasks.responsible_person,
-      vatNumber: data.tasks.vat_number,
-      companyNumber: data.tasks.company_number,
-      director: data.tasks.director,
-      governmentEntityDocument: data.tasks.government_entity_document,
       organisationDetails: data.tasks.organisation_details,
+      legalTerms: data.tasks.legal_terms,
+      bankDetails: data.tasks.bank_details,
+      responsiblePerson: data.tasks.responsible_person,
+      director: data.tasks.director,
+      reasonForTakingPayments: data.tasks.reason_for_taking_payments,
     }
   }
 }
@@ -31,10 +30,4 @@ export const AdyenAccountSetupTaskStatus = {
 
 export type AdyenAccountSetupTaskStatus = 'COMPLETED' | 'NOT_STARTED'
 export type AdyenAccountSetupTaskName =
-  | 'bankAccount'
-  | 'responsiblePerson'
-  | 'vatNumber'
-  | 'companyNumber'
-  | 'director'
-  | 'governmentEntityDocument'
-  | 'organisationDetails'
+  'organisationDetails' | 'legalTerms' | 'bankDetails' | 'responsiblePerson' | 'director' | 'reasonForTakingPayments'
