@@ -199,7 +199,7 @@ describe('the links are displayed correctly on the dashboard', () => {
       cy.get('#provider-change-to-adyen-link').should('not.exist')
     })
 
-    it('should display 3 links (switch to adyen, demo payment, test with users, request to go live) for a Stripe test account', () => {
+    it('should display 4 links (switch to adyen, demo payment, test with users, request to go live) for a Stripe test account', () => {
       cy.task(
         'setupStubs',
         getStubsForDashboard(
