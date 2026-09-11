@@ -1012,6 +1012,55 @@ simplifiedAccount.post(
   serviceSettingsController.adyenDetails.legalTerms.post
 )
 
+// organisation details
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.index.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.index.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.post
+)
+
 simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.reasonForTakingPayments,
   enforceLiveAccountOnly,

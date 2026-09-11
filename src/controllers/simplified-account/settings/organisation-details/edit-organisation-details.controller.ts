@@ -11,22 +11,9 @@ import {
 } from '@utils/simplified-account/validation/organisation-details.schema'
 import { ServiceUpdateRequest } from '@models/service/ServiceUpdateRequest.class'
 import { updateService } from '@services/service.service'
-// @ts-expect-error js commons is not updated for typescript support yet
 import { utils } from '@govuk-pay/pay-js-commons'
 
-interface PayJsCommonsUtils {
-  countries: {
-    govukFrontendFormatted: (selectedCountry: string) => PayJsCommonsCountry[]
-  }
-}
-
-interface PayJsCommonsCountry {
-  selected: boolean
-  value: string
-  text: string
-}
-
-const { countries } = utils as PayJsCommonsUtils
+const { countries } = utils
 
 function get(req: ServiceRequest, res: ServiceResponse) {
   const organisationDetails = {
