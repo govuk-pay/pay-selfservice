@@ -21,24 +21,24 @@ const accountSetup = new AdyenAccountSetup({
   credential_external_id: 'something',
   tasks: {
     bank_details: {
-      status: 'NOT_STARTED'
+      status: 'NOT_STARTED',
     },
     director: {
-      status: 'NOT_STARTED'
+      status: 'NOT_STARTED',
     },
     responsible_person: {
-      status: 'COMPLETED'
+      status: 'COMPLETED',
     },
     legal_terms: {
-      status: 'COMPLETED'
+      status: 'COMPLETED',
     },
     reason_for_taking_payments: {
-      status: 'COMPLETED'
+      status: 'COMPLETED',
     },
     organisation_details: {
-      status: 'COMPLETED'
-    }
-  }
+      status: 'COMPLETED',
+    },
+  },
 })
 
 const mockAdyenSetupService = {
@@ -57,7 +57,7 @@ const { req, res, call } = new ControllerTestBuilder(
   .withUser(UserFixture.asServiceAdmin([serviceFixture]).toUser())
   .withStubs({
     '@utils/response': { response: mockResponse },
-    '@services/adyen-setup.service': mockAdyenSetupService
+    '@services/adyen-setup.service': mockAdyenSetupService,
   })
   .build()
 

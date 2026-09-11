@@ -5,7 +5,10 @@ import { PaymentProvider } from '@models/constants/payment-provider'
 import { getUser } from '@test/cypress/stubs/simplified-account/user-stubs'
 import * as GatewayAccountStubs from '@test/cypress/stubs/simplified-account/gateway-account-stubs'
 import { checkServiceNavigation } from '@test/cypress/integration/simplified-account/common/assertions'
-import { AdyenAccountSetupTaskData, AdyenAccountSetupTaskNameData } from '@models/gateway-account/dto/AdyenAccountSetup.dto'
+import {
+  AdyenAccountSetupTaskData,
+  AdyenAccountSetupTaskNameData,
+} from '@models/gateway-account/dto/AdyenAccountSetup.dto'
 
 const USER_EXTERNAL_ID = 'user-123-abc'
 const SERVICE_EXTERNAL_ID = 'service456def'
@@ -36,23 +39,23 @@ const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: U
 
 const tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTaskData> = {
   bank_details: {
-    status: 'NOT_STARTED'
+    status: 'NOT_STARTED',
   },
   director: {
-    status: 'NOT_STARTED'
+    status: 'NOT_STARTED',
   },
   responsible_person: {
-    status: 'COMPLETED'
+    status: 'COMPLETED',
   },
   legal_terms: {
-    status: 'COMPLETED'
+    status: 'COMPLETED',
   },
   reason_for_taking_payments: {
-    status: 'COMPLETED'
+    status: 'COMPLETED',
   },
   organisation_details: {
-    status: 'COMPLETED'
-  }
+    status: 'COMPLETED',
+  },
 }
 
 const setStubs = (additionalStubs = []) => {
@@ -61,7 +64,12 @@ const setStubs = (additionalStubs = []) => {
     GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
       gatewayAccountFixture
     ),
-    GatewayAccountStubs.getAdyenSetpTasks(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE, ADYEN_CREDENTIAL_EXTERNAL_ID, tasksWithStatus).success(),
+    GatewayAccountStubs.getAdyenSetpTasks(
+      SERVICE_EXTERNAL_ID,
+      LIVE_ACCOUNT_TYPE,
+      ADYEN_CREDENTIAL_EXTERNAL_ID,
+      tasksWithStatus
+    ).success(),
     ...additionalStubs,
   ])
 }

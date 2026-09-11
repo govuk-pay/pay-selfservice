@@ -12,7 +12,11 @@ class AdyenTask extends Task {
     super(linkText, id, href)
   }
 
-  static organisationDetailsTask(service: Service, gatewayAccount: GatewayAccount, adyenAccountSetup: AdyenAccountSetup) {
+  static organisationDetailsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    adyenAccountSetup: AdyenAccountSetup
+  ) {
     return new AdyenTask(
       'Organisation details',
       AdyenTaskIdentifier.ORG_DETAILS,
@@ -76,7 +80,11 @@ class AdyenTask extends Task {
     ).setStatus(adyenAccountSetup.tasks.director.status)
   }
 
-  static reasonForTakingPaymentsTask(service: Service, gatewayAccount: GatewayAccount, adyenAccountSetup: AdyenAccountSetup) {
+  static reasonForTakingPaymentsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    adyenAccountSetup: AdyenAccountSetup
+  ) {
     const switchingCredentialId = gatewayAccount.getSwitchingCredential().externalId
 
     return new AdyenTask(

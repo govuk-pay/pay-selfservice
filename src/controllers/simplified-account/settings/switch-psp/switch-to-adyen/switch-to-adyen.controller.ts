@@ -5,8 +5,11 @@ import { ResponsiblePersonSession } from '../../adyen-details/responsible-person
 import { getConnectorAdyenAccountSetup } from '@services/adyen-setup.service'
 
 async function get(req: ServiceRequest, res: ServiceResponse) {
-
-  const accountSetup = await getConnectorAdyenAccountSetup(req.service.externalId, req.account.type, req.account.getSwitchingCredential().externalId)
+  const accountSetup = await getConnectorAdyenAccountSetup(
+    req.service.externalId,
+    req.account.type,
+    req.account.getSwitchingCredential().externalId
+  )
   const adyenTasks = AdyenTasks.forProviderSwitching(req.service, req.account, accountSetup)
   ResponsiblePersonSession.clear(req)
 

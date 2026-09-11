@@ -1,6 +1,10 @@
 import { GatewayAccountFixture } from '@test/fixtures/gateway-account/gateway-account.fixture'
 import { stubBuilder } from '@test/cypress/stubs/stub-builder'
-import { AdyenAccountSetupData, AdyenAccountSetupTaskData, AdyenAccountSetupTaskNameData } from '@models/gateway-account/dto/AdyenAccountSetup.dto'
+import {
+  AdyenAccountSetupData,
+  AdyenAccountSetupTaskData,
+  AdyenAccountSetupTaskNameData,
+} from '@models/gateway-account/dto/AdyenAccountSetup.dto'
 
 export function searchByServiceExternalIds(serviceExternalIds: string[]) {
   const path = `/v1/api/accounts`
@@ -31,12 +35,17 @@ export function getByServiceExternalIdAndAccountType(serviceExternalId: string, 
   }
 }
 
-export function getAdyenSetpTasks(serviceExternalId: string, accountType: string, credentialExternalId: string, tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTaskData>) {
+export function getAdyenSetpTasks(
+  serviceExternalId: string,
+  accountType: string,
+  credentialExternalId: string,
+  tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTaskData>
+) {
   const path = `/v1/api/service/${serviceExternalId}/account/${accountType}/adyen-setup/${credentialExternalId}`
   const data: AdyenAccountSetupData = {
     service_id: serviceExternalId,
     credential_external_id: credentialExternalId,
-    tasks: tasksWithStatus
+    tasks: tasksWithStatus,
   }
 
   return {
