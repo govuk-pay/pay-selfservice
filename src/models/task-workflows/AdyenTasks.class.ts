@@ -1,6 +1,5 @@
 import { Task, Tasks } from '@models/task-workflows/Tasks.class'
 import { AdyenTaskIdentifier } from '@models/task-workflows/task-identifiers/adyen-task-identifiers'
-import TaskStatus from '@models/constants/task-status'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import Service from '@models/service/Service.class'
