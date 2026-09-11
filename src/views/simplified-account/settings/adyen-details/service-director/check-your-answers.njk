@@ -28,7 +28,7 @@
             text: "First name"
           },
           value: {
-            html: "Sam"
+            html: currentSession.firstName
           }
         },
         {
@@ -36,7 +36,7 @@
             text: "Last name"
           },
           value: {
-            html: "Person"
+            html: currentSession.lastName
           }
         },
         {
@@ -44,7 +44,7 @@
             text: "Date of birth"
           },
           value: {
-            html: "01 January 1970"
+            html: dateOfBirth | govukDate
           }
         },
         {
@@ -52,7 +52,7 @@
             text: "Work email address"
           },
           value: {
-            html: "S.person@example.gov.uk"
+            html: currentSession.email
           }
         }
       ]
@@ -82,7 +82,7 @@
             text: "Address line 1"
           },
           value: {
-            html: "29 Acacia Road"
+            html: currentSession.addressLine1
           }
         },
         {
@@ -90,7 +90,7 @@
             text: "Address line 2"
           },
           value: {
-            html: "Mitcham"
+            html: currentSession.addressLine2
           }
         } if hasAddressLine2,
         {
@@ -98,7 +98,7 @@
             text: "Town or city"
           },
           value: {
-            html: "London"
+            html: currentSession.addressCity
           }
         },
         {
@@ -106,7 +106,7 @@
             text: "Postcode"
           },
           value: {
-            html: "SW16 1AB"
+            html: currentSession.addressPostcode
           }
         }
       ]

@@ -48,62 +48,82 @@ const setStubs = (additionalStubs = []) => {
   ])
 }
 
+const fromReviewQueryString = '?fromReview=true'
+
 describe(`Service director - check your answers`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
 
-  it('accessibility check', () => {
-    setStubs()
-
-    cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
-    cy.a11yCheck()
-  })
-
-  it('should display correct page title and headings', () => {
-    setStubs()
-
-    cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
-
-    checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
-    cy.get('h1').should('contain.text', `Check your answers`)
-  })
-
   describe('for a service that is migrating to adyen', () => {
-    it('should display a back link to service director details', () => {
-      setStubs()
+    describe('when navigating to the page directly', () => {
+      beforeEach(() => {
+        setStubs()
+      })
 
-      cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
+      it('should redirect to the migration tasks page', () => {
+        setStubs()
 
-      cy.get('.govuk-back-link').should('have.attr', 'href', SERVICE_DIRECTOR_ADDRESS_PATH)
+        cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
+
+        cy.location('pathname').should('eq', TASK_LIST_PATH)
+      })
     })
 
-    it('should redirect to personal details page when change link is clicked in details card', () => {
-      setStubs()
+    describe('when navigating from the address page with fields populated', () => {
+      beforeEach(() => {
+        setStubs()
+        cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
+        cy.get('#first-name').type('John')
+        cy.get('#last-name').type('McClane')
 
-      cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
+        cy.get('#dob-day').type('25')
+        cy.get('#dob-month').type('12')
+        cy.get('#dob-year').type('1960')
 
-      cy.get(`[data-cy='edit-director-details']`).click()
-      cy.location('pathname').should('eq', SERVICE_DIRECTOR_DETAILS_PATH)
-    })
+        cy.get('#email').type('yippeekiyay@example.gov.uk')
 
-    it('should redirect to address page when change link is clicked in address card', () => {
-      setStubs()
+        cy.get('#service-director-details-submit').click()
 
-      cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
+        cy.get('#address-line1').type('7 Green Lane')
+        cy.get('#address-line2').type('Greenfield')
+        cy.get('#address-city').type('Greencity')
+        cy.get('#address-postcode').type('GR3 3NY')
 
-      cy.get(`[data-cy='edit-director-address']`).click()
-      cy.location('pathname').should('eq', SERVICE_DIRECTOR_ADDRESS_PATH)
-    })
+        cy.get('#service-director-address-submit').click()
+      })
 
-    it('should redirect to the task list page when continue is pressed', () => {
-      setStubs()
+      it('accessibility check', () => {
+        setStubs()
+        cy.a11yCheck()
+      })
 
-      cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
+      it('should display correct page content', () => {
+        setStubs()
 
-      cy.get('#service-director-confirm').click()
+        checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
+        cy.get('h1').should('contain.text', `Check your answers`)
+        cy.get('.govuk-back-link').should('have.attr', 'href', SERVICE_DIRECTOR_ADDRESS_PATH + fromReviewQueryString)
 
-      cy.location('pathname').should('eq', TASK_LIST_PATH)
+        cy.get(`[data-cy='edit-director-details']`).should(
+          'have.attr',
+          'href',
+          SERVICE_DIRECTOR_DETAILS_PATH + fromReviewQueryString
+        )
+        cy.get(`[data-cy='edit-director-address']`).should(
+          'have.attr',
+          'href',
+          SERVICE_DIRECTOR_ADDRESS_PATH + fromReviewQueryString
+        )
+      })
+
+      it('should redirect to the migration task page when continue is pressed', () => {
+        setStubs()
+
+        cy.get('#service-director-confirm').click()
+
+        cy.location('pathname').should('eq', TASK_LIST_PATH)
+      })
     })
   })
 
@@ -142,7 +162,7 @@ describe(`Service director - check your answers`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to view service director details', () => {
+      it('should return a 404 when attempting to view check your answers page', () => {
         cy.request({
           url: SERVICE_DIRECTOR_ANSWERS_PATH,
           failOnStatusCode: false,
@@ -174,7 +194,7 @@ describe(`Service director - check your answers`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to view bank details', () => {
+      it('should return a 404 when attempting to view check your answers page', () => {
         cy.request({
           url: SERVICE_DIRECTOR_ANSWERS_PATH,
           failOnStatusCode: false,
