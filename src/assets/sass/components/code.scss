@@ -1,8 +1,10 @@
-.code {
-  color: $govuk-text-colour;
-  background-color: govuk-colour("light-grey");
+@use 'govuk-frontend/dist/govuk' as *;
 
-  text-shadow: 0 1px govuk-colour("white");
+.code {
+  color: govuk-functional-colour(text);
+  background-color: govuk-colour('black', $variant: 'tint-95');
+
+  text-shadow: 0 1px govuk-colour('white');
   font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   font-size: 14px;
   direction: ltr;
@@ -21,6 +23,6 @@
   -ms-hyphens: none;
   hyphens: none;
 
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
   padding: 4px 4px 2px;
 }

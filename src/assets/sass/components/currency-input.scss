@@ -1,3 +1,5 @@
+@use 'govuk-frontend/dist/govuk' as *;
+
 // One day `.currency-input` will be part of the design system - https://github.com/govuk-pay/temporary-event-notice-prototype/blob/master/app/assets/sass/patterns/currency-input.scss
 .currency-input {
   &__inner {

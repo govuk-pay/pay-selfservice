@@ -1,14 +1,16 @@
+@use 'govuk-frontend/dist/govuk' as *;
+
 .links-container {
   @include govuk-media-query(tablet) {
-    .flex-grid--column-half:nth-child(n+3) {
+    .flex-grid--column-half:nth-child(n + 3) {
       margin-top: 45px;
 
       &:before {
-        content: "";
+        content: '';
         position: absolute;
         top: - govuk-spacing(6);
         height: 1px;
-        background-color: govuk-colour("light-grey");
+        background-color: govuk-colour('black', $variant: 'tint-95');
         right: govuk-spacing(3);
         left: govuk-spacing(3);
       }

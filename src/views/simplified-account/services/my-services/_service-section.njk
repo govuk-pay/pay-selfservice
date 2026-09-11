@@ -2,17 +2,17 @@
 
 <div class="govuk-grid-row service-section" data-name="{{ service.name }}">
   <div class="govuk-grid-column-full">
-    <hr/>
+    <hr />
     <h3 class="govuk-heading-s">
       {{ service.name }}
       {% if service.isWorldpayTestService %}
-        <strong class="govuk-tag govuk-tag--grey govuk-tag--worldpay-test-service">
-          Worldpay test service
-        </strong>
+        <strong class="govuk-tag govuk-tag--grey govuk-tag--worldpay-test-service"> Worldpay test service </strong>
       {% endif %}
       {% if service.permissions.service_name_update %}
-        <a href="{{ (service.gatewayAccounts | first).links.editServiceNameLink }}"
-           class="govuk-link govuk-link--no-visited-state govuk-!-font-size-14 govuk-!-font-weight-regular govuk-!-margin-left-2">
+        <a
+          href="{{ (service.gatewayAccounts | first).links.editServiceNameLink }}"
+          class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16 govuk-!-font-weight-regular govuk-!-margin-left-2"
+        >
           Edit name <span class="govuk-visually-hidden">for {{ service.name }}</span>
         </a>
       {% endif %}
@@ -23,7 +23,10 @@
       <ul class="govuk-list service-section__links">
         {% for account in service.gatewayAccounts %}
           <li class="{{ account.type }}">
-            <a href="{{ account.links.dashboardLink }}" class="service-switcher govuk-link govuk-link--no-visited-state service-section__link service-section__link--{{ account.type }}">
+            <a
+              href="{{ account.links.dashboardLink }}"
+              class="service-switcher govuk-link govuk-link--no-visited-state service-section__link service-section__link--{{ account.type }}"
+            >
               {{ account.type | title }}
               {% if account.type === 'live' %}
                 card account
@@ -44,14 +47,19 @@
       <li>
         {% if service.permissions.users_service_create %}
           <p class="govuk-!-margin-top-0 govuk-!-font-size-16">
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ (service.gatewayAccounts | first).links.manageTeamMembersLink }}">
+            <a
+              class="govuk-link govuk-link--no-visited-state"
+              href="{{ (service.gatewayAccounts | first).links.manageTeamMembersLink }}"
+            >
               Manage team members <span class="govuk-visually-hidden">for {{ service.name }}</span>
             </a>
           </p>
         {% else %}
           <p>
-            <a class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16"
-               href="{{ (service.gatewayAccounts | first).links.manageTeamMembersLink }}">
+            <a
+              class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16"
+              href="{{ (service.gatewayAccounts | first).links.manageTeamMembersLink }}"
+            >
               View team members <span class="govuk-visually-hidden">for {{ service.name }}</span>
             </a>
           </p>
@@ -59,8 +67,10 @@
       </li>
       <li>
         {% if service.permissions.merchant_details_read %}
-          <a class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16"
-             href="{{ (service.gatewayAccounts | first).links.organisationDetailsLink }}">
+          <a
+            class="govuk-link govuk-link--no-visited-state govuk-!-font-size-16"
+            href="{{ (service.gatewayAccounts | first).links.organisationDetailsLink }}"
+          >
             Organisation details <span class="govuk-visually-hidden">for {{ service.name }}</span>
           </a>
         {% endif %}
