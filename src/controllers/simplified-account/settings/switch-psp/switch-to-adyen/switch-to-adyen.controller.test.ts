@@ -7,6 +7,7 @@ import sinon from 'sinon'
 import { AdyenTasks } from '@models/task-workflows/AdyenTasks.class'
 import { AdyenTaskIdentifier } from '@models/task-workflows/task-identifiers/adyen-task-identifiers'
 import TaskStatus from '@models/constants/task-status'
+import { AdyenAccountSetup } from '@models/gateway-account/AdyenAccountSetup.class'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const serviceFixture = new ServiceFixture({
@@ -14,6 +15,35 @@ const serviceFixture = new ServiceFixture({
 })
 
 const mockResponse = sinon.stub()
+
+const accountSetup = new AdyenAccountSetup({
+  service_id: SERVICE_EXTERNAL_ID,
+  credential_external_id: 'something',
+  tasks: {
+    bank_details: {
+      status: 'NOT_STARTED',
+    },
+    director: {
+      status: 'NOT_STARTED',
+    },
+    responsible_person: {
+      status: 'COMPLETED',
+    },
+    legal_terms: {
+      status: 'COMPLETED',
+    },
+    reason_for_taking_payments: {
+      status: 'COMPLETED',
+    },
+    organisation_details: {
+      status: 'COMPLETED',
+    },
+  },
+})
+
+const mockAdyenSetupService = {
+  getConnectorAdyenAccountSetup: sinon.stub().resolves(accountSetup),
+}
 
 const { req, res, call } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/switch-psp/switch-to-adyen/switch-to-adyen.controller'
@@ -27,6 +57,7 @@ const { req, res, call } = new ControllerTestBuilder(
   .withUser(UserFixture.asServiceAdmin([serviceFixture]).toUser())
   .withStubs({
     '@utils/response': { response: mockResponse },
+    '@services/adyen-setup.service': mockAdyenSetupService,
   })
   .build()
 
@@ -58,21 +89,21 @@ describe('Switch to Adyen controller tests', () => {
     context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(4)
 
     context.adyenTasks.confirmOrganisationTasks[0].id.should.eq(AdyenTaskIdentifier.ORG_DETAILS)
-    context.adyenTasks.confirmOrganisationTasks[0].status.should.eq(TaskStatus.NOT_STARTED)
+    context.adyenTasks.confirmOrganisationTasks[0].status.should.eq(TaskStatus.COMPLETED)
 
     context.adyenTasks.acceptLegalTermsTasks[0].id.should.eq(AdyenTaskIdentifier.LEGAL_TERMS)
-    context.adyenTasks.acceptLegalTermsTasks[0].status.should.eq(TaskStatus.NOT_STARTED)
+    context.adyenTasks.acceptLegalTermsTasks[0].status.should.eq(TaskStatus.COMPLETED)
 
     context.adyenTasks.completeOrganisationDetailsTasks[0].id.should.eq(AdyenTaskIdentifier.BANK_DETAILS)
     context.adyenTasks.completeOrganisationDetailsTasks[0].status.should.eq(TaskStatus.NOT_STARTED)
 
     context.adyenTasks.completeOrganisationDetailsTasks[1].id.should.eq(AdyenTaskIdentifier.RESPONSIBLE_PERSON)
-    context.adyenTasks.completeOrganisationDetailsTasks[1].status.should.eq(TaskStatus.NOT_STARTED)
+    context.adyenTasks.completeOrganisationDetailsTasks[1].status.should.eq(TaskStatus.COMPLETED)
 
     context.adyenTasks.completeOrganisationDetailsTasks[2].id.should.eq(AdyenTaskIdentifier.SERVICE_DIRECTOR)
     context.adyenTasks.completeOrganisationDetailsTasks[2].status.should.eq(TaskStatus.NOT_STARTED)
 
     context.adyenTasks.completeOrganisationDetailsTasks[3].id.should.eq(AdyenTaskIdentifier.REASON_FOR_TAKING_PAYMENTS)
-    context.adyenTasks.completeOrganisationDetailsTasks[3].status.should.eq(TaskStatus.NOT_STARTED)
+    context.adyenTasks.completeOrganisationDetailsTasks[3].status.should.eq(TaskStatus.COMPLETED)
   })
 })
