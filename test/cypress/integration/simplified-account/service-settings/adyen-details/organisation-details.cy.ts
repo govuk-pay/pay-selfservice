@@ -12,10 +12,10 @@ const LIVE_ACCOUNT_TYPE = 'live'
 const GATEWAY_ACCOUNT_ID = 12
 const ADYEN_CREDENTIAL_EXTERNAL_ID = 'adyen-credential-123-abc'
 
+const ORGANISATION_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/details`
+const COMPANY_REGISTRATION_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/company-registration-number`
+const VAT_REGISTRATION_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/vat-number`
 const TASK_LIST_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/switch-psp/switch-to-adyen`
-const SERVICE_DIRECTOR_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/service-director/details`
-const SERVICE_DIRECTOR_ADDRESS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/service-director/address`
-const SERVICE_DIRECTOR_ANSWERS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/service-director/check-your-answers`
 
 const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
   PaymentProvider.STRIPE,
@@ -48,86 +48,70 @@ const setStubs = (additionalStubs = []) => {
   ])
 }
 
-const fromReviewQueryString = '?fromReview=true'
-
-describe(`Service director - check your answers`, () => {
+describe(`Organisation details, company registration and VAT registration`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
 
-  describe('for a service that is migrating to adyen', () => {
-    describe('when navigating to the page directly', () => {
-      beforeEach(() => {
-        setStubs()
-      })
+  it('accessibility check', () => {
+    setStubs()
 
-      it('should redirect to the migration tasks page', () => {
-        setStubs()
-
-        cy.visit(SERVICE_DIRECTOR_ANSWERS_PATH)
-
-        cy.location('pathname').should('eq', TASK_LIST_PATH)
-      })
+    ;[ORGANISATION_DETAILS_PATH, COMPANY_REGISTRATION_PATH, VAT_REGISTRATION_PATH].forEach((path) => {
+      cy.visit(path)
+      cy.a11yCheck()
     })
+  })
 
-    describe('when navigating from the address page with fields populated', () => {
-      beforeEach(() => {
-        setStubs()
-        cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
-        cy.get('#first-name').type('John')
-        cy.get('#last-name').type('McClane')
+  describe('for a service that is migrating to adyen', () => {
+    it('should walk through organisation details, company registration and VAT registration in sequence', () => {
+      setStubs()
 
-        cy.get('#dob-day').type('25')
-        cy.get('#dob-month').type('12')
-        cy.get('#dob-year').type('1960')
+      // organisation details
+      cy.visit(ORGANISATION_DETAILS_PATH)
+      checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
+      cy.get('h1').should('contain.text', 'Organisation details')
+      cy.get('.govuk-back-link').should('have.attr', 'href', TASK_LIST_PATH)
 
-        cy.get('#email').type('yippeekiyay@example.gov.uk')
+      cy.get('#organisation-name').should('exist')
+      cy.get('#address-line1').should('exist')
+      cy.get('#address-line2').should('exist')
+      cy.get('#address-city').should('exist')
+      cy.get('#address-country').should('exist')
+      cy.get('#address-postcode').should('exist')
+      cy.get('#has-company-registration-number').should('exist')
 
-        cy.get('#service-director-details-submit').click()
+      cy.get('#organisation-name').type('Test Organisation')
+      cy.get('#address-line1').type('1 Test Street')
+      cy.get('#address-city').type('Testville')
+      cy.get('#address-postcode').type('T3 5TT')
+      cy.get('#has-company-registration-number').check('true')
+      cy.get('#organisation-details-submit').click()
 
-        cy.get('#address-line1').type('7 Green Lane')
-        cy.get('#address-line2').type('Greenfield')
-        cy.get('#address-city').type('Greencity')
-        cy.get('#address-postcode').type('GR3 3NY')
+      // company registration number
+      cy.location('pathname').should('eq', COMPANY_REGISTRATION_PATH)
+      cy.get('h1').should('contain.text', 'Tell us your company registration number')
+      cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
+      cy.get('#company-registration-number').should('exist')
 
-        cy.get('#service-director-address-submit').click()
-      })
+      cy.get('#company-registration-number').type('12345678')
+      cy.get('#company-registration-number-submit').click()
 
-      it('accessibility check', () => {
-        setStubs()
-        cy.a11yCheck()
-      })
+      // VAT registration number
+      cy.location('pathname').should('eq', VAT_REGISTRATION_PATH)
+      cy.get('h1').should('contain.text', 'Tell us your VAT registration number')
+      cy.get('.govuk-back-link').should('have.attr', 'href', COMPANY_REGISTRATION_PATH)
+      cy.get('#vat-registration-number').should('exist')
 
-      it('should display correct page content', () => {
-        setStubs()
+      cy.get('#vat-registration-number').type('GB123456789')
+      cy.get('#vat-registration-number-submit').click()
 
-        checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
-        cy.get('h1').should('contain.text', `Check your answers`)
-        cy.get('.govuk-back-link').should('have.attr', 'href', SERVICE_DIRECTOR_ADDRESS_PATH + fromReviewQueryString)
-
-        cy.get(`[data-cy='edit-director-details']`).should(
-          'have.attr',
-          'href',
-          SERVICE_DIRECTOR_DETAILS_PATH + fromReviewQueryString
-        )
-        cy.get(`[data-cy='edit-director-address']`).should(
-          'have.attr',
-          'href',
-          SERVICE_DIRECTOR_ADDRESS_PATH + fromReviewQueryString
-        )
-      })
-
-      it('should redirect to the migration task page when continue is pressed', () => {
-        setStubs()
-
-        cy.get('#service-director-confirm').click()
-
-        cy.location('pathname').should('eq', TASK_LIST_PATH)
-      })
+      cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
   })
 
   describe('for a service not migrating to Adyen', () => {
+    const paths = [ORGANISATION_DETAILS_PATH, COMPANY_REGISTRATION_PATH, VAT_REGISTRATION_PATH]
+
     describe('where the service is switching to a different PSP', () => {
       const WORLDPAY_CREDENTIAL_EXTERNAL_ID = 'worldpay-credential-123-abc'
 
@@ -162,12 +146,14 @@ describe(`Service director - check your answers`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to view check your answers page', () => {
-        cy.request({
-          url: SERVICE_DIRECTOR_ANSWERS_PATH,
-          failOnStatusCode: false,
-        }).then((response) => {
-          expect(response.status).to.eq(404)
+      it('should return a 404 for all three pages', () => {
+        paths.forEach((path) => {
+          cy.request({
+            url: path,
+            failOnStatusCode: false,
+          }).then((response) => {
+            expect(response.status).to.eq(404)
+          })
         })
       })
     })
@@ -194,12 +180,14 @@ describe(`Service director - check your answers`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to view check your answers page', () => {
-        cy.request({
-          url: SERVICE_DIRECTOR_ANSWERS_PATH,
-          failOnStatusCode: false,
-        }).then((response) => {
-          expect(response.status).to.eq(404)
+      it('should return a 404 for all three pages', () => {
+        paths.forEach((path) => {
+          cy.request({
+            url: path,
+            failOnStatusCode: false,
+          }).then((response) => {
+            expect(response.status).to.eq(404)
+          })
         })
       })
     })

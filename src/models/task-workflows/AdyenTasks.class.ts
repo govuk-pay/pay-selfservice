@@ -20,7 +20,12 @@ class AdyenTask extends Task {
     return new AdyenTask(
       'Organisation details',
       AdyenTaskIdentifier.ORG_DETAILS,
-      formatServiceAndAccountPathsFor(paths.simplifiedAccount.settings.index, service.externalId, gatewayAccount.type)
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+        service.externalId,
+        gatewayAccount.type,
+        gatewayAccount.getSwitchingCredential().externalId
+      )
     ).setStatus(adyenAccountSetup.tasks.organisationDetails.status)
   }
 
