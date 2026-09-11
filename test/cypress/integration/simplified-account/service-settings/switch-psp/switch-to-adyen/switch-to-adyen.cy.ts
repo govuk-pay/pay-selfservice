@@ -5,6 +5,7 @@ import { PaymentProvider } from '@models/constants/payment-provider'
 import { getUser } from '@test/cypress/stubs/simplified-account/user-stubs'
 import * as GatewayAccountStubs from '@test/cypress/stubs/simplified-account/gateway-account-stubs'
 import { checkServiceNavigation } from '@test/cypress/integration/simplified-account/common/assertions'
+import { AdyenAccountSetupTaskData, AdyenAccountSetupTaskNameData } from '@models/gateway-account/dto/AdyenAccountSetup.dto'
 
 const USER_EXTERNAL_ID = 'user-123-abc'
 const SERVICE_EXTERNAL_ID = 'service456def'
@@ -33,12 +34,34 @@ const serviceFixture = new ServiceFixture({
 })
 const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
 
+const tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTaskData> = {
+  bank_details: {
+    status: 'NOT_STARTED'
+  },
+  director: {
+    status: 'NOT_STARTED'
+  },
+  responsible_person: {
+    status: 'COMPLETED'
+  },
+  legal_terms: {
+    status: 'COMPLETED'
+  },
+  reason_for_taking_payments: {
+    status: 'COMPLETED'
+  },
+  organisation_details: {
+    status: 'COMPLETED'
+  }
+}
+
 const setStubs = (additionalStubs = []) => {
   cy.task('setupStubs', [
     getUser(USER_EXTERNAL_ID).success(userFixture),
     GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
       gatewayAccountFixture
     ),
+    GatewayAccountStubs.getAdyenSetpTasks(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE, ADYEN_CREDENTIAL_EXTERNAL_ID, tasksWithStatus).success(),
     ...additionalStubs,
   ])
 }
@@ -72,7 +95,7 @@ describe('switch to adyen task list', () => {
     cy.get('h1').should('contain.text', 'Switch your payment provider to Adyen')
   })
 
-  describe('for a service that has completed no migration tasks', () => {
+  describe('for a service that has completed some migration tasks', () => {
     it('should show the task list with all tasks in the correct state', () => {
       setStubs()
 
@@ -90,7 +113,7 @@ describe('switch to adyen task list', () => {
               cy.get('.govuk-task-list__link')
                 .should('contain.text', 'Organisation details')
                 .should('have.attr', 'href', `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings`)
-              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
+              cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
         })
 
@@ -110,7 +133,7 @@ describe('switch to adyen task list', () => {
                   'href',
                   `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/legal-terms`
                 )
-              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
+              cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
         })
 
@@ -143,7 +166,7 @@ describe('switch to adyen task list', () => {
                   'href',
                   `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/details`
                 )
-              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
+              cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
 
           cy.get('.govuk-task-list__item')
@@ -169,7 +192,7 @@ describe('switch to adyen task list', () => {
                   'href',
                   `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/reason-for-taking-payments`
                 )
-              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
+              cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
         })
     })
