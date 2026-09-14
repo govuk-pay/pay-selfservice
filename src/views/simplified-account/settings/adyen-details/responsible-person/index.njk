@@ -23,8 +23,10 @@
 
       <p class="govuk-body govuk-!-margin-bottom-6">
         <a
+          class="govuk-link"
           href="https://www.payments.service.gov.uk/required-responsible-person-and-director-information/"
           target="_blank"
+          rel="noopener noreferrer"
           >Check who can be a responsible person, what details you will need and what the checks involve (opens in new
           tab)</a
         ></p
@@ -36,11 +38,6 @@
 
       {%
         call govukFieldset({
-          legend: {
-            text: "Name",
-            classes: "govuk-fieldset__legend--m",
-            isPageHeading: false
-          }
         })
       %}
         {{
