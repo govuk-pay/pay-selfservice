@@ -39,7 +39,7 @@ const serviceFixture = new ServiceFixture({
 })
 const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
 
-const adyenAccountSetup = AdyenAccountSetupFixture.Completed({
+const adyenAccountSetup = AdyenAccountSetupFixture.NotStarted({
   serviceExternalId: SERVICE_EXTERNAL_ID,
   credentialExternalId: ADYEN_CREDENTIAL_EXTERNAL_ID,
 })

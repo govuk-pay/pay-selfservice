@@ -12,7 +12,7 @@ const getConnectorAdyenAccountSetup = async (
   return connectorClient.gatewayAccounts.adyenSetup.get(serviceExternalId, accountType, credentialExternalId)
 }
 
-export const markTaskAsComplete = async (
+const markTaskAsComplete = async (
   serviceExternalId: string,
   accountType: string,
   credentialExternalId: string,
@@ -28,4 +28,4 @@ export const markTaskAsComplete = async (
   )
 }
 
-export { getConnectorAdyenAccountSetup }
+export { getConnectorAdyenAccountSetup, markTaskAsComplete }
