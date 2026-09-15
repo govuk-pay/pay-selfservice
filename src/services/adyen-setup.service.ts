@@ -4,13 +4,6 @@ import { AdyenAccountSetupTaskName, AdyenAccountSetupTaskStatus } from '@models/
 
 const connectorClient = new ConnectorClient()
 
-/**
- * Function to call the connector client, to update the task status.
- * @param serviceExternalId
- * @param accountType
- * @param credentialExternalId
- * @param task
- */
 export const markTaskAsComplete = async (
   serviceExternalId: string,
   accountType: string,

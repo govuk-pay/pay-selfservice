@@ -2,7 +2,9 @@ import sinon from 'sinon'
 import chaiAsPromised from 'chai-as-promised'
 import proxyquire from 'proxyquire'
 import chai from 'chai'
-
+import { AdyenAccountSetupTaskName } from '@models/gateway-account/AdyenAccountSetup.class'
+import { AdyenAccountSetupUpdateRequest } from '@models/gateway-account/AdyenAccountSetupUpdateRequest.class'
+import * as AdyenSetupService from './adyen-setup.service'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -10,10 +12,10 @@ const SERVICE_EXTERNAL_ID = 'service123abc'
 const ACCOUNT_TYPE = 'live'
 const CREDENTIAL_EXTERNAL_ID = 'adyen-credential-123-abc'
 
-describe('adyen setup service', function () {
+describe('Adyen setup service', function () {
   describe('markTaskAsComplete', function () {
     it('should patch the given task to COMPLETED using the connector client', async function () {
-      const patchStub = sinon.stub().resolves()
+      const patchStub = sinon.stub<[string, string, string, AdyenAccountSetupUpdateRequest]>().resolves()
 
       const ConnectorClientStub = function () {
         return {
@@ -25,7 +27,7 @@ describe('adyen setup service', function () {
         }
       }
 
-      const adyenSetupService = proxyquire('./adyen-setup.service', {
+      const adyenSetupService = proxyquire<typeof AdyenSetupService>('./adyen-setup.service', {
         '@services/clients/pay/ConnectorClient.class': ConnectorClientStub,
       })
 
@@ -50,7 +52,7 @@ describe('adyen setup service', function () {
     })
 
     it('should map each task name to its connector path', async function () {
-      const cases = [
+      const cases: [AdyenAccountSetupTaskName, string][] = [
         ['organisationDetails', 'organisation_details'],
         ['legalTerms', 'legal_terms'],
         ['bankDetails', 'bank_details'],
@@ -60,7 +62,7 @@ describe('adyen setup service', function () {
       ]
 
       for (const [taskName, expectedPath] of cases) {
-        const patchStub = sinon.stub().resolves()
+        const patchStub = sinon.stub<[string, string, string, AdyenAccountSetupUpdateRequest]>().resolves()
 
         const ConnectorClientStub = function () {
           return {
@@ -72,7 +74,7 @@ describe('adyen setup service', function () {
           }
         }
 
-        const adyenSetupService = proxyquire('./adyen-setup.service', {
+        const adyenSetupService = proxyquire<typeof AdyenSetupService>('./adyen-setup.service', {
           '@services/clients/pay/ConnectorClient.class': ConnectorClientStub,
         })
 
@@ -90,7 +92,7 @@ describe('adyen setup service', function () {
 
     it('should propagate errors from the connector client', async function () {
       const error = new Error('Connector patch failed')
-      const patchStub = sinon.stub().rejects(error)
+      const patchStub = sinon.stub<[string, string, string, AdyenAccountSetupUpdateRequest]>().rejects(error)
 
       const ConnectorClientStub = function () {
         return {
@@ -102,7 +104,7 @@ describe('adyen setup service', function () {
         }
       }
 
-      const adyenSetupService = proxyquire('./adyen-setup.service', {
+      const adyenSetupService = proxyquire<typeof AdyenSetupService>('./adyen-setup.service', {
         '@services/clients/pay/ConnectorClient.class': ConnectorClientStub,
       })
 
