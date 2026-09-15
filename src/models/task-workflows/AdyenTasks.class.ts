@@ -1,17 +1,21 @@
 import { Task, Tasks } from '@models/task-workflows/Tasks.class'
 import { AdyenTaskIdentifier } from '@models/task-workflows/task-identifiers/adyen-task-identifiers'
-import TaskStatus from '@models/constants/task-status'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import Service from '@models/service/Service.class'
 import GatewayAccount from '@models/gateway-account/GatewayAccount.class'
+import { AdyenAccountSetup } from '@models/gateway-account/AdyenAccountSetup.class'
 
 class AdyenTask extends Task {
   constructor(linkText: string, id: AdyenTaskIdentifier, href: string) {
     super(linkText, id, href)
   }
 
-  static organisationDetailsTask(service: Service, gatewayAccount: GatewayAccount) {
+  static organisationDetailsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    adyenAccountSetup: AdyenAccountSetup
+  ) {
     return new AdyenTask(
       'Organisation details',
       AdyenTaskIdentifier.ORG_DETAILS,
@@ -21,10 +25,10 @@ class AdyenTask extends Task {
         gatewayAccount.type,
         gatewayAccount.getSwitchingCredential().externalId
       )
-    ).setStatus(TaskStatus.NOT_STARTED)
+    ).setStatus(adyenAccountSetup.tasks.organisationDetails.status)
   }
 
-  static acceptLegalTermsTask(service: Service, gatewayAccount: GatewayAccount) {
+  static acceptLegalTermsTask(service: Service, gatewayAccount: GatewayAccount, adyenAccountSetup: AdyenAccountSetup) {
     return new AdyenTask(
       'Read and accept Adyen’s legal terms',
       AdyenTaskIdentifier.LEGAL_TERMS,
@@ -34,9 +38,9 @@ class AdyenTask extends Task {
         gatewayAccount.type,
         gatewayAccount.getSwitchingCredential().externalId
       )
-    ).setStatus(TaskStatus.NOT_STARTED)
+    ).setStatus(adyenAccountSetup.tasks.legalTerms.status)
   }
-  static bankDetailsTask(service: Service, gatewayAccount: GatewayAccount) {
+  static bankDetailsTask(service: Service, gatewayAccount: GatewayAccount, adyenAccountSetup: AdyenAccountSetup) {
     const switchingCredentialId = gatewayAccount.getSwitchingCredential().externalId
 
     return new AdyenTask(
@@ -48,10 +52,10 @@ class AdyenTask extends Task {
         gatewayAccount.type,
         switchingCredentialId
       )
-    ).setStatus(TaskStatus.NOT_STARTED)
+    ).setStatus(adyenAccountSetup.tasks.bankDetails.status)
   }
 
-  static responsiblePersonTask(service: Service, gatewayAccount: GatewayAccount) {
+  static responsiblePersonTask(service: Service, gatewayAccount: GatewayAccount, adyenAccountSetup: AdyenAccountSetup) {
     const switchingCredentialId = gatewayAccount.getSwitchingCredential().externalId
 
     return new AdyenTask(
@@ -63,10 +67,10 @@ class AdyenTask extends Task {
         gatewayAccount.type,
         switchingCredentialId
       )
-    ).setStatus(TaskStatus.NOT_STARTED)
+    ).setStatus(adyenAccountSetup.tasks.responsiblePerson.status)
   }
 
-  static serviceDirectorTask(service: Service, gatewayAccount: GatewayAccount) {
+  static serviceDirectorTask(service: Service, gatewayAccount: GatewayAccount, adyenAccountSetup: AdyenAccountSetup) {
     const switchingCredentialId = gatewayAccount.getSwitchingCredential().externalId
     return new AdyenTask(
       'Service director',
@@ -77,10 +81,14 @@ class AdyenTask extends Task {
         gatewayAccount.type,
         switchingCredentialId
       )
-    ).setStatus(TaskStatus.NOT_STARTED)
+    ).setStatus(adyenAccountSetup.tasks.director.status)
   }
 
-  static reasonForTakingPaymentsTask(service: Service, gatewayAccount: GatewayAccount) {
+  static reasonForTakingPaymentsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    adyenAccountSetup: AdyenAccountSetup
+  ) {
     const switchingCredentialId = gatewayAccount.getSwitchingCredential().externalId
 
     return new AdyenTask(
@@ -92,7 +100,7 @@ class AdyenTask extends Task {
         gatewayAccount.type,
         switchingCredentialId
       )
-    ).setStatus(TaskStatus.NOT_STARTED)
+    ).setStatus(adyenAccountSetup.tasks.reasonForTakingPayments.status)
   }
 }
 
@@ -112,14 +120,14 @@ export class AdyenTasks extends Tasks<AdyenTask> {
     this.completeOrganisationDetailsTasks = completeOrganisationDetailsTasks
   }
 
-  static forProviderSwitching(service: Service, gatewayAccount: GatewayAccount) {
-    const confirmOrganisationTasks = [AdyenTask.organisationDetailsTask(service, gatewayAccount)]
-    const acceptLegalTermsTasks = [AdyenTask.acceptLegalTermsTask(service, gatewayAccount)]
+  static forProviderSwitching(service: Service, gatewayAccount: GatewayAccount, adyenAccountSetup: AdyenAccountSetup) {
+    const confirmOrganisationTasks = [AdyenTask.organisationDetailsTask(service, gatewayAccount, adyenAccountSetup)]
+    const acceptLegalTermsTasks = [AdyenTask.acceptLegalTermsTask(service, gatewayAccount, adyenAccountSetup)]
     const completeOrganisationDetailsTasks = [
-      AdyenTask.bankDetailsTask(service, gatewayAccount),
-      AdyenTask.responsiblePersonTask(service, gatewayAccount),
-      AdyenTask.serviceDirectorTask(service, gatewayAccount),
-      AdyenTask.reasonForTakingPaymentsTask(service, gatewayAccount),
+      AdyenTask.bankDetailsTask(service, gatewayAccount, adyenAccountSetup),
+      AdyenTask.responsiblePersonTask(service, gatewayAccount, adyenAccountSetup),
+      AdyenTask.serviceDirectorTask(service, gatewayAccount, adyenAccountSetup),
+      AdyenTask.reasonForTakingPaymentsTask(service, gatewayAccount, adyenAccountSetup),
     ]
     return new AdyenTasks(confirmOrganisationTasks, acceptLegalTermsTasks, completeOrganisationDetailsTasks)
   }

@@ -4,7 +4,15 @@ import { AdyenAccountSetupTaskName, AdyenAccountSetupTaskStatus } from '@models/
 
 const connectorClient = new ConnectorClient()
 
-export const markTaskAsComplete = async (
+const getConnectorAdyenAccountSetup = async (
+  serviceExternalId: string,
+  accountType: string,
+  credentialExternalId: string
+) => {
+  return connectorClient.gatewayAccounts.adyenSetup.get(serviceExternalId, accountType, credentialExternalId)
+}
+
+const markTaskAsComplete = async (
   serviceExternalId: string,
   accountType: string,
   credentialExternalId: string,
@@ -19,3 +27,5 @@ export const markTaskAsComplete = async (
     updateRequest
   )
 }
+
+export { getConnectorAdyenAccountSetup, markTaskAsComplete }
