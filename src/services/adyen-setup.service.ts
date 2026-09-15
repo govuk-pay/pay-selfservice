@@ -1,9 +1,6 @@
 import ConnectorClient from '@services/clients/pay/ConnectorClient.class'
 import { AdyenAccountSetupUpdateRequest } from '@models/gateway-account/AdyenAccountSetupUpdateRequest.class'
-import {
-  AdyenAccountSetupTaskName,
-  AdyenAccountSetupTaskStatus,
-} from '@models/gateway-account/AdyenAccountSetup.class'
+import { AdyenAccountSetupTaskName, AdyenAccountSetupTaskStatus } from '@models/gateway-account/AdyenAccountSetup.class'
 
 const connectorClient = new ConnectorClient()
 
@@ -20,9 +17,7 @@ export const markTaskAsComplete = async (
   credentialExternalId: string,
   task: AdyenAccountSetupTaskName
 ) => {
-  const updateRequest = new AdyenAccountSetupUpdateRequest()
-    .replace()
-    [task](AdyenAccountSetupTaskStatus.COMPLETED)
+  const updateRequest = new AdyenAccountSetupUpdateRequest().replace()[task](AdyenAccountSetupTaskStatus.COMPLETED)
 
   await connectorClient.gatewayAccounts.adyenSetup.patch(
     serviceExternalId,
