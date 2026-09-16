@@ -5,6 +5,7 @@ import {
   AdyenAccountSetupTaskData,
   AdyenAccountSetupTaskNameData,
 } from '@models/gateway-account/dto/AdyenAccountSetup.dto'
+import { AdyenAccountSetupTaskStatus } from '@models/gateway-account/AdyenAccountSetup.class'
 
 export function searchByServiceExternalIds(serviceExternalIds: string[]) {
   const path = `/v1/api/accounts`
@@ -52,6 +53,29 @@ export function getAdyenSetpTasks(
     success: function () {
       return stubBuilder('GET', path, 200, {
         response: data,
+      })
+    },
+  }
+}
+
+export function patchAdyenAccountTask(
+  serviceExternalId: string,
+  accountType: string,
+  credentialExternalId: string,
+  taskType: string
+) {
+  const path = `/v1/api/service/${serviceExternalId}/account/${accountType}/adyen-setup/${credentialExternalId}`
+
+  return {
+    success: function () {
+      return stubBuilder('PATCH', path, 200, {
+        request: [
+          {
+            op: 'replace',
+            path: taskType,
+            value: AdyenAccountSetupTaskStatus.COMPLETED,
+          },
+        ],
       })
     },
   }
