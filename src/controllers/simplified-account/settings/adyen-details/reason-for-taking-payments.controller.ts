@@ -18,7 +18,7 @@ async function post(req: ServiceRequest, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
 
-  // await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'reasonForTakingPayments')
+  await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'reasonForTakingPayments')
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
