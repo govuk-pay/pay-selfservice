@@ -64,7 +64,7 @@ const setStubs = (additionalStubs = []) => {
     GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
       gatewayAccountFixture
     ),
-    GatewayAccountStubs.getAdyenSetpTasks(
+    GatewayAccountStubs.getAdyenSetupTasks(
       SERVICE_EXTERNAL_ID,
       LIVE_ACCOUNT_TYPE,
       ADYEN_CREDENTIAL_EXTERNAL_ID,

@@ -36,7 +36,7 @@ export function getByServiceExternalIdAndAccountType(serviceExternalId: string, 
   }
 }
 
-export function getAdyenSetpTasks(
+export function getAdyenSetupTasks(
   serviceExternalId: string,
   accountType: string,
   credentialExternalId: string,
