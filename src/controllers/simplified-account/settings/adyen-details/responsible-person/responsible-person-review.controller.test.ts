@@ -134,14 +134,21 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
   describe('post', () => {
     it('should complete the responsible person task and redirect to the Adyen migration task list', async () => {
       await call('post')
-      sinon.assert.calledOnce(markTaskAsComplete)
+
+      sinon.assert.calledOnceWithExactly(
+        markTaskAsComplete,
+        SERVICE_EXTERNAL_ID,
+        SERVICE_TYPE,
+        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+        'responsiblePerson'
+      )
+
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
           paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
           SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          SERVICE_TYPE
         )
       )
     })
