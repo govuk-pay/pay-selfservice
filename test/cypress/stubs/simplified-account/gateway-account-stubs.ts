@@ -69,11 +69,13 @@ export function patchAdyenAccountTask(
   return {
     success: function () {
       return stubBuilder('PATCH', path, 200, {
-        request: {
-          op: 'replace',
-          path: taskType,
-          value: AdyenAccountSetupTaskStatus.COMPLETED,
-        },
+        request: [
+          {
+            op: 'replace',
+            path: taskType,
+            value: AdyenAccountSetupTaskStatus.COMPLETED,
+          },
+        ],
       })
     },
   }
