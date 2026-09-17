@@ -18,6 +18,7 @@ const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.ST
 }).toGatewayAccount()
 
 const mockResponse = sinon.stub()
+const markTaskAsComplete = sinon.stub().resolves()
 
 const { nextRequest, res, call } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/adyen-details/service-director/service-director-check-your-answers.controller'
@@ -27,6 +28,7 @@ const { nextRequest, res, call } = new ControllerTestBuilder(
   .withUser(UserFixture.asServiceAdmin([serviceFixture]).toUser())
   .withStubs({
     '@utils/response': { response: mockResponse },
+    '@services/adyen-setup.service': { markTaskAsComplete },
   })
   .build()
 
@@ -124,13 +126,11 @@ describe('Controller: settings/adyen-details/service-director/service-director-c
     it('should redirect to Adyen migration task list', async () => {
       await call('post')
       sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-        )
+        markTaskAsComplete,
+        SERVICE_EXTERNAL_ID,
+        SERVICE_TYPE,
+        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+        'director'
       )
     })
   })
