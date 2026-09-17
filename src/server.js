@@ -1,7 +1,8 @@
 const path = require('path')
 const express = require('express')
 const metrics = require('@govuk-pay/pay-js-metrics')
-const { configureCsrfMiddleware } = require('@govuk-pay/pay-js-commons/lib/utils/middleware/csrf.middleware')
+const { configureCsrfMiddleware, CsrfError } = require('@govuk-pay/pay-js-commons/lib/utils/middleware/csrf.middleware')
+const csrfTokens = require('csrf')()
 const nunjucks = require('nunjucks')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -46,6 +47,19 @@ function warnIfAnalyticsNotSet() {
 function addCsrfMiddleware(app) {
   const csrfMiddleware = configureCsrfMiddleware(logger, 'session', 'csrfSecret', 'csrfToken')
   app.use(csrfMiddleware.setSecret, csrfMiddleware.checkToken, csrfMiddleware.generateToken)
+  // Defence-in-depth: the shared library middleware only validates PUT/POST requests,
+  // so explicitly validate the CSRF token for other state-changing methods too
+  app.use(function (req, res, next) {
+    if (!['PATCH', 'DELETE'].includes(req.method.toUpperCase())) {
+      return next()
+    }
+    const csrfSecret = req.session && req.session.csrfSecret
+    const csrfToken = (req.body && req.body.csrfToken) || (req.query && req.query.csrfToken)
+    if (!csrfSecret || !csrfToken || !csrfTokens.verify(csrfSecret, csrfToken)) {
+      return next(new CsrfError('CSRF token missing or invalid for PATCH/DELETE request'))
+    }
+    next()
+  })
 }
 
 function initialiseGlobalMiddleware(app) {
