@@ -8,10 +8,11 @@
 {% endif %}
 
 {% block pageTitle %}
-  {{ title }} - GOV.UK Pay
+  {{ title }}
+  - GOV.UK Pay
 {% endblock %}
 
-{% block beforeContent %}
+{% block containerStart %}
   {{ super() }}
   {{
     govukBackLink({
@@ -22,72 +23,83 @@
 {% endblock %}
 
 {% block mainContent %}
-<div class="govuk-grid-column-two-thirds">
-  {{ errorSummary ({
-    errors: errors,
-    hrefs: {
-      securityCode: "#code"
-    }
-  }) }}
-</div>
-<div class="govuk-grid-column-full">
-  <h1 class="govuk-heading-l page-title">
-    {{ title }}
-  </h1>
-</div>
-<div class="govuk-grid-column-two-thirds">
-{% if method === secondFactorMethod.APP %}
-  {{
-    govukWarningText({
-      text: "Once setup is complete, you will only be able to use this authenticator app to sign in."
-    })
-  }}
-
-  {% include "./_authenticator-app-instructions.njk" %}
-{% else %}
-  {{
-    govukWarningText({
-      text: "Once set-up is complete, you will only be able to sign in using text message codes."
-    })
-  }}
-{% endif %}
-  <form method="post" action="{{routes.user.profile.twoFactorAuth.configure}}" novalidate>
-    <input id="csrf" name="csrfToken" type="hidden" value="{{csrf}}"/>
-
-    {% set codeHint = "This is the 6-digit number shown in your authenticator app" %}
-    {% if method === secondFactorMethod.SMS %}
-      {% set codeHint = "We have sent you a text message with a security code" %}
-    {% endif %}
-
-    {{ govukInput({
-        label: {
-          text: "Security code"
-        },
-        hint: {
-          text: codeHint
-        },
-        errorMessage: { text: errors.securityCode } if  errors.securityCode else false,
-        id: "code",
-        name: "code",
-        classes: "govuk-input--width-10",
-        type: "text",
-        autocomplete: "off",
-        inputmode: "numeric",
-        pattern: "[0-9]*"
+  <div class="govuk-grid-column-two-thirds">
+    {{
+      errorSummary ({
+        errors: errors,
+        hrefs: {
+          securityCode: "#code"
+        }
       })
     }}
+  </div>
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l page-title"> {{ title }} </h1>
+  </div>
+  <div class="govuk-grid-column-two-thirds">
+    {% if method === secondFactorMethod.APP %}
+      {{
+        govukWarningText({
+          text: "Once setup is complete, you will only be able to use this authenticator app to sign in."
+        })
+      }}
+      {% include "./_authenticator-app-instructions.njk" %}
+    {% else %}
+      {{
+        govukWarningText({
+          text: "Once set-up is complete, you will only be able to sign in using text message codes."
+        })
+      }}
+    {% endif %}
+    <form method="post" action="{{ routes.user.profile.twoFactorAuth.configure }}" novalidate>
+      <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
 
-    {{ govukButton({ text: "Complete" }) }}
-  </form>
+      {% set codeHint = "This is the 6-digit number shown in your authenticator app" %}
+      {% if method === secondFactorMethod.SMS %}
+        {% set codeHint = "We have sent you a text message with a security code" %}
+      {% endif %}
 
-  {% if method === secondFactorMethod.SMS %}
-    <p class="govuk-body"><a class="govuk-link govuk-link govuk-link--no-visited-state" href="{{routes.user.profile.twoFactorAuth.resend}}" data-cy="resend-code-link">Try sending the code again</a></p>
-  {% endif %}
+      {{
+        govukInput({
+          label: {
+            text: "Security code"
+          },
+          hint: {
+            text: codeHint
+          },
+          errorMessage: { text: errors.securityCode } if  errors.securityCode else false,
+          id: "code",
+          name: "code",
+          classes: "govuk-input--width-10",
+          type: "text",
+          autocomplete: "off",
+          inputmode: "numeric",
+          pattern: "[0-9]*"
+        })
+      }}
 
-  <p class="govuk-body">
-    <a class="govuk-link govuk-link--no-visited-state" id="service-name-cancel-link" href="{{routes.user.profile.twoFactorAuth.index}}">
-      Cancel
-    </a>
-  </p>
-</div>
+      {{ govukButton({ text: "Complete" }) }}
+    </form>
+
+    {% if method === secondFactorMethod.SMS %}
+      <p class="govuk-body"
+        ><a
+          class="govuk-link govuk-link govuk-link--no-visited-state"
+          href="{{ routes.user.profile.twoFactorAuth.resend }}"
+          data-cy="resend-code-link"
+          >Try sending the code again</a
+        ></p
+      >
+    {% endif %}
+
+    <p class="govuk-body">
+      <a
+        class="govuk-link govuk-link--no-visited-state"
+        id="service-name-cancel-link"
+        href="{{ routes.user.profile.twoFactorAuth.index }}"
+      >
+        Cancel
+      </a>
+    </p>
+  </div>
 {% endblock %}
