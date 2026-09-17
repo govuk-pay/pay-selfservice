@@ -5,6 +5,7 @@ import { PaymentProvider } from '@models/constants/payment-provider'
 import { getUser } from '@test/cypress/stubs/simplified-account/user-stubs'
 import * as GatewayAccountStubs from '@test/cypress/stubs/simplified-account/gateway-account-stubs'
 import { checkServiceNavigation } from '@test/cypress/integration/simplified-account/common/assertions'
+import { AdyenAccountSetupFixture } from '@test/fixtures/gateway-account/adyen-account-setup.fixture'
 
 const USER_EXTERNAL_ID = 'user-123-abc'
 const SERVICE_EXTERNAL_ID = 'service456def'
@@ -38,12 +39,29 @@ const serviceFixture = new ServiceFixture({
 })
 const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
 
+const adyenAccountSetup = AdyenAccountSetupFixture.NotStarted({
+  serviceExternalId: SERVICE_EXTERNAL_ID,
+  credentialExternalId: ADYEN_CREDENTIAL_EXTERNAL_ID,
+})
+
 const setStubs = (additionalStubs = []) => {
   cy.task('setupStubs', [
     getUser(USER_EXTERNAL_ID).success(userFixture),
     GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
       gatewayAccountFixture
     ),
+    GatewayAccountStubs.getAdyenSetupTasks(
+      SERVICE_EXTERNAL_ID,
+      LIVE_ACCOUNT_TYPE,
+      ADYEN_CREDENTIAL_EXTERNAL_ID,
+      adyenAccountSetup.toAdyenAccountSetupData().tasks
+    ).success(),
+    GatewayAccountStubs.patchAdyenAccountTask(
+      SERVICE_EXTERNAL_ID,
+      LIVE_ACCOUNT_TYPE,
+      ADYEN_CREDENTIAL_EXTERNAL_ID,
+      'organisation_details'
+    ).success(),
     ...additionalStubs,
   ])
 }
@@ -56,10 +74,10 @@ describe(`Organisation details, company registration and VAT registration`, () =
   it('accessibility check', () => {
     setStubs()
 
-    ;[ORGANISATION_DETAILS_PATH, COMPANY_REGISTRATION_PATH, VAT_REGISTRATION_PATH].forEach((path) => {
-      cy.visit(path)
-      cy.a11yCheck()
-    })
+      ;[ORGANISATION_DETAILS_PATH, COMPANY_REGISTRATION_PATH, VAT_REGISTRATION_PATH].forEach((path) => {
+        cy.visit(path)
+        cy.a11yCheck()
+      })
   })
 
   describe('for a service that is migrating to adyen', () => {
