@@ -74,10 +74,10 @@ describe(`Organisation details, company registration and VAT registration`, () =
   it('accessibility check', () => {
     setStubs()
 
-      ;[ORGANISATION_DETAILS_PATH, COMPANY_REGISTRATION_PATH, VAT_REGISTRATION_PATH].forEach((path) => {
-        cy.visit(path)
-        cy.a11yCheck()
-      })
+    ;[ORGANISATION_DETAILS_PATH, COMPANY_REGISTRATION_PATH, VAT_REGISTRATION_PATH].forEach((path) => {
+      cy.visit(path)
+      cy.a11yCheck()
+    })
   })
 
   describe('for a service that is migrating to adyen', () => {
