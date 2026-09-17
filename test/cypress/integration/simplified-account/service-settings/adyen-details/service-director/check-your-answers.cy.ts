@@ -60,7 +60,7 @@ const setStubs = (additionalStubs = []) => {
       SERVICE_EXTERNAL_ID,
       LIVE_ACCOUNT_TYPE,
       ADYEN_CREDENTIAL_EXTERNAL_ID,
-      'bank_details'
+      'director'
     ).success(),
     ...additionalStubs,
   ])
