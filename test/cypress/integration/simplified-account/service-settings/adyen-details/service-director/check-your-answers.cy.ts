@@ -56,6 +56,12 @@ const setStubs = (additionalStubs = []) => {
       ADYEN_CREDENTIAL_EXTERNAL_ID,
       adyenAccountSetup.toAdyenAccountSetupData().tasks
     ).success(),
+    GatewayAccountStubs.patchAdyenAccountTask(
+      SERVICE_EXTERNAL_ID,
+      LIVE_ACCOUNT_TYPE,
+      ADYEN_CREDENTIAL_EXTERNAL_ID,
+      'director'
+    ).success(),
     ...additionalStubs,
   ])
 }
