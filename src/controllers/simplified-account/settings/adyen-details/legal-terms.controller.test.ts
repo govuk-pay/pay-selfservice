@@ -12,8 +12,12 @@ const SERVICE_TYPE = 'live'
 const serviceFixture = new ServiceFixture({
   externalId: SERVICE_EXTERNAL_ID,
 })
+const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.STRIPE, PaymentProvider.ADYEN, [], [], {
+  type: 'live',
+}).toGatewayAccount()
 
 const mockResponse = sinon.stub()
+const markTaskAsComplete = sinon.stub().resolves()
 
 const { req, res, call } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/adyen-details/legal-terms.controller'
@@ -27,6 +31,7 @@ const { req, res, call } = new ControllerTestBuilder(
   .withUser(UserFixture.asServiceAdmin([serviceFixture]).toUser())
   .withStubs({
     '@utils/response': { response: mockResponse },
+    '@services/adyen-setup.service': { markTaskAsComplete },
   })
   .build()
 
@@ -54,8 +59,17 @@ describe('Controller: settings/adyen-details/legal-terms', () => {
     })
   })
   describe('post', () => {
-    it('should redirect to the switch to adyen task list', async () => {
+    it('should complete the legal terms task and redirect to the switch to adyen task list', async () => {
       await call('post')
+
+      sinon.assert.calledOnceWithExactly(
+        markTaskAsComplete,
+        SERVICE_EXTERNAL_ID,
+        SERVICE_TYPE,
+        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+        'legalTerms'
+      )
+
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
