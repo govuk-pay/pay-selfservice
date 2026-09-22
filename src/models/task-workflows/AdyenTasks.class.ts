@@ -2,19 +2,147 @@ import { Task, Tasks } from '@models/task-workflows/Tasks.class'
 import { AdyenTaskIdentifier } from '@models/task-workflows/task-identifiers/adyen-task-identifiers'
 import TaskStatus from '@models/constants/task-status'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
+import paths from '@root/paths'
 import Service from '@models/service/Service.class'
 import GatewayAccount from '@models/gateway-account/GatewayAccount.class'
-import { AdyenAccountSetup, AdyenAccountSetupTaskName } from '@models/gateway-account/AdyenAccountSetup.class'
-import {
-  AdyenTaskDefinition,
-  LEGAL_TERMS_TASK,
-  ORGANISATION_DETAILS_GROUP_TASKS,
-  ORGANISATION_DETAILS_TASK,
-} from '@models/task-workflows/adyen-task-definitions'
+import { AdyenAccountSetup } from '@models/gateway-account/AdyenAccountSetup.class'
 
 class AdyenTask extends Task {
   constructor(linkText: string, id: AdyenTaskIdentifier, href: string) {
     super(linkText, id, href)
+  }
+
+  // check the status of the given task
+  private static checkStatus(ownCompleted: boolean, canStart: boolean) {
+    if (!canStart) {
+      return TaskStatus.CANNOT_START
+    }
+    return ownCompleted ? TaskStatus.COMPLETED : TaskStatus.NOT_STARTED
+  }
+
+  static organisationDetailsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const status = AdyenTask.checkStatus(accountSetup.tasks.organisationDetails.status === 'COMPLETED', true)
+
+    return new AdyenTask(
+      'Organisation details',
+      AdyenTaskIdentifier.ORG_DETAILS,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
+  static acceptLegalTermsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const canStart = accountSetup.tasks.organisationDetails.status === 'COMPLETED'
+    const status = AdyenTask.checkStatus(accountSetup.tasks.legalTerms.status === 'COMPLETED', canStart)
+
+    return new AdyenTask(
+      'Read and accept Adyen’s legal terms',
+      AdyenTaskIdentifier.LEGAL_TERMS,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.legalTerms,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
+  static bankDetailsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const canStart = accountSetup.tasks.legalTerms.status === 'COMPLETED'
+    const status = AdyenTask.checkStatus(accountSetup.tasks.bankDetails.status === 'COMPLETED', canStart)
+
+    return new AdyenTask(
+      'Organisation’s bank details',
+      AdyenTaskIdentifier.BANK_DETAILS,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.bankDetails,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
+  static responsiblePersonTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const canStart = accountSetup.tasks.legalTerms.status === 'COMPLETED'
+    const status = AdyenTask.checkStatus(accountSetup.tasks.responsiblePerson.status === 'COMPLETED', canStart)
+
+    return new AdyenTask(
+      'Responsible person',
+      AdyenTaskIdentifier.RESPONSIBLE_PERSON,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.index,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
+  static serviceDirectorTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const canStart = accountSetup.tasks.legalTerms.status === 'COMPLETED'
+    const status = AdyenTask.checkStatus(accountSetup.tasks.director.status === 'COMPLETED', canStart)
+
+    return new AdyenTask(
+      'Service director',
+      AdyenTaskIdentifier.SERVICE_DIRECTOR,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.serviceDirector.details,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
+  static reasonForTakingPaymentsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const canStart = accountSetup.tasks.legalTerms.status === 'COMPLETED'
+    const status = AdyenTask.checkStatus(accountSetup.tasks.reasonForTakingPayments.status === 'COMPLETED', canStart)
+
+    return new AdyenTask(
+      'Tell us why your service takes payments',
+      AdyenTaskIdentifier.REASON_FOR_TAKING_PAYMENTS,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.reasonForTakingPayments,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
   }
 }
 
@@ -35,41 +163,20 @@ export class AdyenTasks extends Tasks<AdyenTask> {
   }
 
   static forProviderSwitching(service: Service, gatewayAccount: GatewayAccount, accountSetup: AdyenAccountSetup) {
-    // retrieve the cred id.
     const switchingCredentialId = gatewayAccount.getSwitchingCredential().externalId
 
-    // func to check if a given task has been completed.
-    const isTaskCompleted = (taskKey: AdyenAccountSetupTaskName) => accountSetup.tasks[taskKey].status === 'COMPLETED'
-
-    // generic func to build a task model.
-    const buildTask = (taskDefinition: AdyenTaskDefinition, required: boolean) => {
-      const status = !required
-        ? TaskStatus.CANNOT_START
-        : isTaskCompleted(taskDefinition.taskKey)
-          ? TaskStatus.COMPLETED
-          : TaskStatus.NOT_STARTED
-
-      return new AdyenTask(
-        taskDefinition.linkText,
-        taskDefinition.id,
-        formatServiceAndAccountPathsFor(
-          taskDefinition.path,
-          service.externalId,
-          gatewayAccount.type,
-          switchingCredentialId
-        )
-      ).setStatus(status)
-    }
-
-    // check if the tasks have been completed.
-    const organisationDetailsCompleted = isTaskCompleted('organisationDetails')
-    const legalTermsCompleted = isTaskCompleted('legalTerms')
-
-    // build and return new adyen tasks object
-    return new AdyenTasks(
-      [buildTask(ORGANISATION_DETAILS_TASK, true)],
-      [buildTask(LEGAL_TERMS_TASK, organisationDetailsCompleted)],
-      ORGANISATION_DETAILS_GROUP_TASKS.map((taskDefinition) => buildTask(taskDefinition, legalTermsCompleted))
-    )
+    const confirmOrganisationTasks = [
+      AdyenTask.organisationDetailsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+    ]
+    const acceptLegalTermsTasks = [
+      AdyenTask.acceptLegalTermsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+    ]
+    const completeOrganisationDetailsTasks = [
+      AdyenTask.bankDetailsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+      AdyenTask.responsiblePersonTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+      AdyenTask.serviceDirectorTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+      AdyenTask.reasonForTakingPaymentsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+    ]
+    return new AdyenTasks(confirmOrganisationTasks, acceptLegalTermsTasks, completeOrganisationDetailsTasks)
   }
 }
