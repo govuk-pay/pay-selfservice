@@ -5,6 +5,7 @@ const { configureCsrfMiddleware } = require('@govuk-pay/pay-js-commons/lib/utils
 const nunjucks = require('nunjucks')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const rateLimit = require('express-rate-limit')
 const flash = require('connect-flash')
 const staticify = require('staticify')(__dirname)
 const router = require('@root/routes')
@@ -44,9 +45,17 @@ function warnIfAnalyticsNotSet() {
 }
 
 function addCsrfMiddleware(app) {
+  // CSRF protection: validates a per-session csrf token/cookie on state-changing requests (functionally equivalent to csurf/csrf middleware)
   const csrfMiddleware = configureCsrfMiddleware(logger, 'session', 'csrfSecret', 'csrfToken')
   app.use(csrfMiddleware.setSecret, csrfMiddleware.checkToken, csrfMiddleware.generateToken)
 }
+
+const requestRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 1000, // limit each IP to 1000 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+})
 
 function initialiseGlobalMiddleware(app) {
   app.use(staticify.middleware)
@@ -192,6 +201,7 @@ function initialise() {
   }
 
   app.use(Sentry.Handlers.requestHandler())
+  app.use(requestRateLimiter)
   initialiseCookies(app)
   initialiseGlobalMiddleware(app)
   initialiseAuth(app)
