@@ -5,7 +5,7 @@
   Edit phone number - My profile - GOV.UK Pay
 {% endblock %}
 
-{% block beforeContent %}
+{% block containerStart %}
   {{ super() }}
   {{
     govukBackLink({
@@ -16,48 +16,54 @@
 {% endblock %}
 
 {% block mainContent %}
-<div class="govuk-grid-column-two-thirds">
-  {{ errorSummary ({
-    errors: errors,
-    hrefs: {
-      phone: "#phone"
-    }
-  }) }}
-
-  <h1 class="govuk-heading-l">Change your phone number</h1>
-  <p class="govuk-body">Your phone number is used to send a text message code when you sign in to help verify your identity.</p>
-
-  {% set phoneError = false %}
-  {% if errors.phone %}
-  {% set phoneError = {
-    text: errors.phone
-  } %}
-  {% endif %}
-
-  <form method="post" novalidate>
-    <input id="csrf" name="csrfToken" type="hidden" value="{{csrf}}"/>
+  <div class="govuk-grid-column-two-thirds">
     {{
-      govukInput({
-        id: "phone",
-        name: "phone",
-        type: "tel",
-        autocomplete: "mobile tel",
-        value: telephoneNumber if telephone_number != ' ',
-        classes: "govuk-!-width-one-half",
-        label: {
-          text: "Phone number"
-        },
-        errorMessage: phoneError
-      })
-    }}
-    {{
-      govukButton({
-        text: "Save changes",
-        attributes: {
-          id: "save-phone-number"
+      errorSummary ({
+        errors: errors,
+        hrefs: {
+          phone: "#phone"
         }
       })
     }}
-  </form>
-</div>
+
+    <h1 class="govuk-heading-l">Change your phone number</h1>
+    <p class="govuk-body"
+      >Your phone number is used to send a text message code when you sign in to help verify your identity.</p
+    >
+
+    {% set phoneError = false %}
+    {% if errors.phone %}
+      {%
+        set phoneError = {
+          text: errors.phone
+        }
+      %}
+    {% endif %}
+
+    <form method="post" novalidate>
+      <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+      {{
+        govukInput({
+          id: "phone",
+          name: "phone",
+          type: "tel",
+          autocomplete: "mobile tel",
+          value: telephoneNumber if telephone_number != ' ',
+          classes: "govuk-!-width-one-half",
+          label: {
+            text: "Phone number"
+          },
+          errorMessage: phoneError
+        })
+      }}
+      {{
+        govukButton({
+          text: "Save changes",
+          attributes: {
+            id: "save-phone-number"
+          }
+        })
+      }}
+    </form>
+  </div>
 {% endblock %}
