@@ -17,7 +17,7 @@ class AdyenTask extends Task {
     if (!canStart) {
       return TaskStatus.CANNOT_START
     }
-    return ownCompleted ? TaskStatus.COMPLETED : TaskStatus.NOT_STARTED
+    return ownCompleted ? TaskStatus.COMPLETED_CANNOT_START : TaskStatus.NOT_STARTED
   }
 
   static organisationDetailsTask(
