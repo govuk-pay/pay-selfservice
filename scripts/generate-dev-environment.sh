@@ -63,5 +63,8 @@ SELFSERVICE_URL=https://selfservice.pymnt.localdomain
 ZENDESK_URL=https://govuk.zendesk.com/api/v2
 STRIPE_HOST=127.0.0.1
 STRIPE_PORT=8000
+ADYEN_ENVIRONMENT=TEST
+EXPERIMENTAL_FEATURES_FLAG=true
+EXPERIMENTAL_FEATURES_LIST=transactions,sidebar_nav
 $URL_MAP
 EOM
