@@ -118,13 +118,8 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(0)
             .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Organisation details')
-                .should(
-                  'have.attr',
-                  'href',
-                  `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/details`
-                )
+              cy.get('.govuk-task-list__link').should('not.exist')
+              cy.get('.govuk-task-list__name-and-hint').should('contain.text', 'Organisation details')
               cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
         })
@@ -138,13 +133,7 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(0)
             .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Read and accept Adyen’s legal terms')
-                .should(
-                  'have.attr',
-                  'href',
-                  `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/legal-terms`
-                )
+              cy.get('.govuk-task-list__name-and-hint').should('contain.text', 'Read and accept Adyen’s legal terms')
               cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
         })
@@ -171,13 +160,7 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(1)
             .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Responsible person')
-                .should(
-                  'have.attr',
-                  'href',
-                  `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/responsible-person/details`
-                )
+              cy.get('.govuk-task-list__name-and-hint').should('contain.text', 'Responsible person')
               cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
 
@@ -197,13 +180,10 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(3)
             .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Tell us why your service takes payments')
-                .should(
-                  'have.attr',
-                  'href',
-                  `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/reason-for-taking-payments`
-                )
+              cy.get('.govuk-task-list__name-and-hint').should(
+                'contain.text',
+                'Tell us why your service takes payments'
+              )
               cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
         })
