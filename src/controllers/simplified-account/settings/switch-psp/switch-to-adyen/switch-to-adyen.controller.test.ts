@@ -89,21 +89,21 @@ describe('Switch to Adyen controller tests', () => {
     context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(4)
 
     context.adyenTasks.confirmOrganisationTasks[0].id.should.eq(AdyenTaskIdentifier.ORG_DETAILS)
-    context.adyenTasks.confirmOrganisationTasks[0].status.should.eq(TaskStatus.COMPLETED)
+    context.adyenTasks.confirmOrganisationTasks[0].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
 
     context.adyenTasks.acceptLegalTermsTasks[0].id.should.eq(AdyenTaskIdentifier.LEGAL_TERMS)
-    context.adyenTasks.acceptLegalTermsTasks[0].status.should.eq(TaskStatus.COMPLETED)
+    context.adyenTasks.acceptLegalTermsTasks[0].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
 
     context.adyenTasks.completeOrganisationDetailsTasks[0].id.should.eq(AdyenTaskIdentifier.BANK_DETAILS)
     context.adyenTasks.completeOrganisationDetailsTasks[0].status.should.eq(TaskStatus.NOT_STARTED)
 
     context.adyenTasks.completeOrganisationDetailsTasks[1].id.should.eq(AdyenTaskIdentifier.RESPONSIBLE_PERSON)
-    context.adyenTasks.completeOrganisationDetailsTasks[1].status.should.eq(TaskStatus.COMPLETED)
+    context.adyenTasks.completeOrganisationDetailsTasks[1].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
 
     context.adyenTasks.completeOrganisationDetailsTasks[2].id.should.eq(AdyenTaskIdentifier.SERVICE_DIRECTOR)
     context.adyenTasks.completeOrganisationDetailsTasks[2].status.should.eq(TaskStatus.NOT_STARTED)
 
     context.adyenTasks.completeOrganisationDetailsTasks[3].id.should.eq(AdyenTaskIdentifier.REASON_FOR_TAKING_PAYMENTS)
-    context.adyenTasks.completeOrganisationDetailsTasks[3].status.should.eq(TaskStatus.COMPLETED)
+    context.adyenTasks.completeOrganisationDetailsTasks[3].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
   })
 })
