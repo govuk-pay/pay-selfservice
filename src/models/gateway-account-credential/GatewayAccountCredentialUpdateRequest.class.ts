@@ -1,12 +1,13 @@
+type CredentialUpdateKey = 'legal_entity_id' | 'store_id' | 'account_holder_id' | 'balance_account_id'
 type Operation = 'replace'
 
 export interface Update {
   op: Operation
   path: string
-  value: string
+  value: string | Partial<Record<CredentialUpdateKey, string>>
 }
 
-export default class GatewayAccountCredentialUpdateRequest {
+export class GatewayAccountCredentialUpdateRequest {
   public updates: Update[]
 
   constructor(userExternalId: string) {
@@ -46,6 +47,22 @@ const safeOperation = (op: Operation, request: GatewayAccountCredentialUpdateReq
         },
         googlePayMerchantId: (value: string) => {
           request.updates.push({ op, path: 'credentials/gateway_merchant_id', value })
+          return request
+        },
+        legalEntityId: (value: string) => {
+          request.updates.push({ op, path: 'credentials', value: { legal_entity_id: value } })
+          return request
+        },
+        storeId: (value: string) => {
+          request.updates.push({ op, path: 'credentials', value: { store_id: value } })
+          return request
+        },
+        accountHolderId: (value: string) => {
+          request.updates.push({ op, path: 'credentials', value: { account_holder_id: value } })
+          return request
+        },
+        balanceAccountId: (value: string) => {
+          request.updates.push({ op, path: 'credentials', value: { balance_account_id: value } })
           return request
         },
       }
