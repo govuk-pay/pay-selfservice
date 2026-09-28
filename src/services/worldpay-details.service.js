@@ -1,5 +1,7 @@
 const { ConnectorClient } = require('./clients/connector.client')
-const GatewayAccountCredentialUpdateRequest = require('@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class')
+const {
+  GatewayAccountCredentialUpdateRequest,
+} = require('@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class')
 const GatewayAccountUpdateRequest = require('@models/gateway-account/GatewayAccountUpdateRequest.class')
 const logger = require('../utils/logger')(__filename)
 
