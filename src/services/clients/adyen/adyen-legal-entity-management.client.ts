@@ -1,11 +1,5 @@
-import {
-  Client,
-  EnvironmentEnum,
-  LegalEntityManagementAPI,
-} from '@adyen/api-library'
-import {
-  LegalEntityInfoRequiredType
-} from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityInfoRequiredType'
+import { Client, EnvironmentEnum, LegalEntityManagementAPI } from '@adyen/api-library'
+import { LegalEntityInfoRequiredType } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityInfoRequiredType'
 import { LegalEntity } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntity'
 import { AdyenMockHttpClient } from '@test/test-helpers/adyen-mock-http-client'
 

@@ -1,8 +1,6 @@
 import { createLegalEntity } from '@services/clients/adyen/adyen-legal-entity-management.client'
 import { OrganisationDetailsSession } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
-import {
-  LegalEntityInfoRequiredType
-} from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityInfoRequiredType'
+import { LegalEntityInfoRequiredType } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityInfoRequiredType'
 import { Organization } from '@adyen/api-library/lib/src/typings/legalEntityManagement/organization'
 
 export async function createOrganisation(session: OrganisationDetailsSession) {
