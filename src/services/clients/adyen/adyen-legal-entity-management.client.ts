@@ -7,8 +7,7 @@ const ADYEN_LEGAL_ENTITY_MANAGEMENT_API_KEY = process.env.ADYEN_LEGAL_ENTITY_MAN
 const ADYEN_ENVIRONMENT = process.env.ADYEN_ENVIRONMENT === 'LIVE' ? EnvironmentEnum.LIVE : EnvironmentEnum.TEST
 
 const client = process.env.MOCK_ADYEN_APIS
-  // pragma: allowlist secret
-  ? new Client({ apiKey: 'test', environment: ADYEN_ENVIRONMENT }, new AdyenMockHttpClient())
+  ? new Client({ apiKey: 'test', environment: ADYEN_ENVIRONMENT }, new AdyenMockHttpClient()) // pragma: allowlist secret
   : new Client({ apiKey: ADYEN_LEGAL_ENTITY_MANAGEMENT_API_KEY, environment: ADYEN_ENVIRONMENT })
 
 const legalEntityManagementAPI = new LegalEntityManagementAPI(client)
