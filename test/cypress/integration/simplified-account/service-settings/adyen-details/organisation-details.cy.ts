@@ -85,7 +85,7 @@ describe(`Organisation details, company registration and VAT registration`, () =
   describe('for a service that is migrating to adyen', () => {
     it('should walk through organisation details, company registration and VAT registration in sequence', () => {
       setStubs()
-      process.env.MOCK_ADYEN_APIS = 'true'
+
       // organisation details
       cy.visit(ORGANISATION_DETAILS_PATH)
       checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
