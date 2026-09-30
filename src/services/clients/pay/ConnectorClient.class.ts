@@ -8,6 +8,12 @@ import { GatewayAccountData } from '@models/gateway-account/dto/GatewayAccount.d
 import StripeAccountSetup from '@models/StripeAccountSetup.class'
 import StripeAccountSetupData from '@models/gateway-account/dto/StripeAccountSetup.dto'
 import GatewayAccountSwitchPaymentProviderRequest from '@models/gateway-account/GatewayAccountSwitchPaymentProviderRequest.class'
+import {
+  GatewayAccountCredentialUpdateRequest,
+  Update,
+} from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
+import GatewayAccountCredential from '@models/gateway-account-credential/GatewayAccountCredential.class'
+import { GatewayAccountCredentialData } from '@models/gateway-account-credential/dto/GatewayAccountCredential.dto'
 import { GatewayAccountSwitchPaymentProviderRequestData } from '@models/gateway-account/dto/GatewayAccountSwitchPaymentProviderRequest.dto'
 import { AgreementCancelRequest } from '@models/agreements/AgreementCancelRequest.class'
 import { AgreementCancelRequestData } from '@models/agreements/dto/AgreementCancelRequest.dto'
@@ -171,6 +177,24 @@ class ConnectorClient extends BaseClient {
           }[],
           void
         >(path, body, 'set stripe account onboarding step to done')
+      },
+      patchCredentialsByServiceExternalIdAndAccountType: async (
+        serviceExternalId: string,
+        accountType: string,
+        credentialExternalId: string,
+        patchRequest: GatewayAccountCredentialUpdateRequest
+      ) => {
+        const path = `/v1/api/service/{serviceExternalId}/account/{accountType}/credentials/{credentialExternalId}`
+          .replace('{serviceExternalId}', encodeURIComponent(serviceExternalId))
+          .replace('{accountType}', encodeURIComponent(accountType))
+          .replace('{credentialExternalId}', encodeURIComponent(credentialExternalId))
+
+        const response = await this.patch<Update[], GatewayAccountCredentialData>(
+          path,
+          patchRequest.formatPayload(),
+          'patch gateway account credentials'
+        )
+        return GatewayAccountCredential.fromJson(response.data)
       },
 
       adyenSetup: {
