@@ -7,6 +7,10 @@ class Credential {
   public recurringCustomerInitiated?: WorldpayCredential
   public recurringMerchantInitiated?: WorldpayCredential
   public googlePayMerchantId?: string
+  public legalEntityId?: string
+  public storeId?: string
+  public accountHolderId?: string
+  public balanceAccountId?: string
   public rawResponse?: CredentialData
 
   withStripeAccountId(stripeAccountId: string) {
@@ -34,6 +38,26 @@ class Credential {
     return this
   }
 
+  withLegalEntityId(legalEntityId: string) {
+    this.legalEntityId = legalEntityId
+    return this
+  }
+
+  withStoreId(storeId: string) {
+    this.storeId = storeId
+    return this
+  }
+
+  withAccountHolderId(accountHolderId: string) {
+    this.accountHolderId = accountHolderId
+    return this
+  }
+
+  withBalanceAccountId(balanceAccountId: string) {
+    this.balanceAccountId = balanceAccountId
+    return this
+  }
+
   /** @deprecated this is a temporary compatability fix! If you find yourself using this for new code
    * you should instead add any rawResponse data as part of the constructor */
   withRawResponse(data: CredentialData) {
@@ -57,6 +81,18 @@ class Credential {
     }
     if (data?.gateway_merchant_id) {
       credential.withGooglePayMerchantId(data.gateway_merchant_id)
+    }
+    if (data?.legal_entity_id) {
+      credential.withLegalEntityId(data.legal_entity_id)
+    }
+    if (data?.store_id) {
+      credential.withStoreId(data.store_id)
+    }
+    if (data?.account_holder_id) {
+      credential.withAccountHolderId(data.account_holder_id)
+    }
+    if (data?.balance_account_id) {
+      credential.withBalanceAccountId(data.balance_account_id)
     }
     return credential
   }

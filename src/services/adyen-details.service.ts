@@ -1,9 +1,73 @@
+import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
+import ConnectorClient from '@services/clients/pay/ConnectorClient.class'
 import { createLegalEntity } from '@services/clients/adyen/adyen-legal-entity-management.client'
 import { OrganisationDetailsSession } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
 import { LegalEntityInfoRequiredType } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityInfoRequiredType'
 import { Organization } from '@adyen/api-library/lib/src/typings/legalEntityManagement/organization'
 
-export async function createOrganisation(session: OrganisationDetailsSession) {
+const connectorClient = new ConnectorClient()
+
+const setAdyenLegalEntityId = async (
+  serviceExternalId: string,
+  accountType: string,
+  credentialExternalId: string,
+  userExternalId: string,
+  legalEntityId: string
+) => {
+  return connectorClient.gatewayAccounts.patchCredentialsByServiceExternalIdAndAccountType(
+    serviceExternalId,
+    accountType,
+    credentialExternalId,
+    new GatewayAccountCredentialUpdateRequest(userExternalId).replace().credentials().legalEntityId(legalEntityId)
+  )
+}
+
+const setAdyenStoreId = async (
+  serviceExternalId: string,
+  accountType: string,
+  credentialExternalId: string,
+  userExternalId: string,
+  storeId: string
+) => {
+  return connectorClient.gatewayAccounts.patchCredentialsByServiceExternalIdAndAccountType(
+    serviceExternalId,
+    accountType,
+    credentialExternalId,
+    new GatewayAccountCredentialUpdateRequest(userExternalId).replace().credentials().storeId(storeId)
+  )
+}
+
+const setAdyenAccountHolderId = async (
+  serviceExternalId: string,
+  accountType: string,
+  credentialExternalId: string,
+  userExternalId: string,
+  accountHolderId: string
+) => {
+  return connectorClient.gatewayAccounts.patchCredentialsByServiceExternalIdAndAccountType(
+    serviceExternalId,
+    accountType,
+    credentialExternalId,
+    new GatewayAccountCredentialUpdateRequest(userExternalId).replace().credentials().accountHolderId(accountHolderId)
+  )
+}
+
+const setAdyenBalanceAccountId = async (
+  serviceExternalId: string,
+  accountType: string,
+  credentialExternalId: string,
+  userExternalId: string,
+  balanceAccountId: string
+) => {
+  return connectorClient.gatewayAccounts.patchCredentialsByServiceExternalIdAndAccountType(
+    serviceExternalId,
+    accountType,
+    credentialExternalId,
+    new GatewayAccountCredentialUpdateRequest(userExternalId).replace().credentials().balanceAccountId(balanceAccountId)
+  )
+}
+
+const createOrganisation = async (session: OrganisationDetailsSession) => {
   const organization: Organization = {
     legalName: session.organisationName ?? '',
     registeredAddress: {
@@ -24,3 +88,5 @@ export async function createOrganisation(session: OrganisationDetailsSession) {
 
   return createLegalEntity(legalEntityInfo)
 }
+
+export { setAdyenLegalEntityId, setAdyenStoreId, setAdyenAccountHolderId, setAdyenBalanceAccountId, createOrganisation }
