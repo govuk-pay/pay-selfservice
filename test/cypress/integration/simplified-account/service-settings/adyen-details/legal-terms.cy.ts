@@ -115,6 +115,25 @@ describe(`Adyen's Legal Terms`, () => {
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
+
+    it('should redirect to the same page and display errors when the box is not checked and continue is pressed', () => {
+      setStubs()
+
+      cy.visit(LEGAL_TERMS_PATH)
+
+      cy.get('#accept-terms-submit').click()
+
+      cy.get('.govuk-error-summary')
+        .should('be.visible')
+        .and('contain', 'There is a problem')
+        .and('contain', 'Confirm that you have the legal authority to accept these terms')
+
+      cy.get('#accept-terms-error')
+        .should('be.visible')
+        .and('contain', 'Select the checkbox to confirm that you have the legal authority to accept these terms')
+
+      cy.location('pathname').should('eq', LEGAL_TERMS_PATH)
+    })
   })
 
   describe('for a service not migrating to Adyen', () => {
