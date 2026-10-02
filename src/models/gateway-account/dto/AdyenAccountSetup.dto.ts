@@ -1,10 +1,5 @@
 export type AdyenAccountSetupTaskNameData =
-  | 'organisation_details'
-  | 'legal_terms'
-  | 'bank_details'
-  | 'responsible_person'
-  | 'director'
-  | 'reason_for_taking_payments'
+  'organisation_details' | 'legal_terms' | 'bank_details' | 'responsible_person' | 'director'
 
 export interface AdyenAccountSetupData {
   service_id: string

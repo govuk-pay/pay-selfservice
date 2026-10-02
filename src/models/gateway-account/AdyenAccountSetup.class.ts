@@ -14,7 +14,6 @@ export class AdyenAccountSetup {
       bankDetails: data.tasks.bank_details,
       responsiblePerson: data.tasks.responsible_person,
       director: data.tasks.director,
-      reasonForTakingPayments: data.tasks.reason_for_taking_payments,
     }
   }
 }
@@ -30,4 +29,4 @@ export const AdyenAccountSetupTaskStatus = {
 
 export type AdyenAccountSetupTaskStatus = 'COMPLETED' | 'NOT_STARTED'
 export type AdyenAccountSetupTaskName =
-  'organisationDetails' | 'legalTerms' | 'bankDetails' | 'responsiblePerson' | 'director' | 'reasonForTakingPayments'
+  'organisationDetails' | 'legalTerms' | 'bankDetails' | 'responsiblePerson' | 'director'

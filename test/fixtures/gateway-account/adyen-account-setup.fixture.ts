@@ -19,7 +19,6 @@ export class AdyenAccountSetupFixture {
       bankDetails: AdyenAccountSetupTaskFixture.NotStarted(),
       responsiblePerson: AdyenAccountSetupTaskFixture.NotStarted(),
       director: AdyenAccountSetupTaskFixture.NotStarted(),
-      reasonForTakingPayments: AdyenAccountSetupTaskFixture.NotStarted(),
     }
 
     overrides.forEach((override) => {
@@ -40,7 +39,6 @@ export class AdyenAccountSetupFixture {
           bankDetails: AdyenAccountSetupTaskFixture.Completed(),
           responsiblePerson: AdyenAccountSetupTaskFixture.Completed(),
           director: AdyenAccountSetupTaskFixture.Completed(),
-          reasonForTakingPayments: AdyenAccountSetupTaskFixture.Completed(),
         },
       },
       ...overrides
@@ -57,7 +55,6 @@ export class AdyenAccountSetupFixture {
         bank_details: this.tasks.bankDetails.toTaskData(),
         responsible_person: this.tasks.responsiblePerson.toTaskData(),
         director: this.tasks.director.toTaskData(),
-        reason_for_taking_payments: this.tasks.reasonForTakingPayments.toTaskData(),
       },
     }
   }

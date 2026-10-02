@@ -32,9 +32,6 @@ const accountSetup = new AdyenAccountSetup({
     legal_terms: {
       status: 'COMPLETED',
     },
-    reason_for_taking_payments: {
-      status: 'COMPLETED',
-    },
     organisation_details: {
       status: 'COMPLETED',
     },
@@ -83,10 +80,10 @@ describe('Switch to Adyen controller tests', () => {
     }
 
     context.currentPsp.should.eq(PaymentProvider.STRIPE)
-    context.adyenTasks.tasks.should.have.length(6)
+    context.adyenTasks.tasks.should.have.length(5)
     context.adyenTasks.confirmOrganisationTasks.should.have.length(1)
     context.adyenTasks.acceptLegalTermsTasks.should.have.length(1)
-    context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(4)
+    context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(3)
 
     context.adyenTasks.confirmOrganisationTasks[0].id.should.eq(AdyenTaskIdentifier.ORG_DETAILS)
     context.adyenTasks.confirmOrganisationTasks[0].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
@@ -102,8 +99,5 @@ describe('Switch to Adyen controller tests', () => {
 
     context.adyenTasks.completeOrganisationDetailsTasks[2].id.should.eq(AdyenTaskIdentifier.SERVICE_DIRECTOR)
     context.adyenTasks.completeOrganisationDetailsTasks[2].status.should.eq(TaskStatus.NOT_STARTED)
-
-    context.adyenTasks.completeOrganisationDetailsTasks[3].id.should.eq(AdyenTaskIdentifier.REASON_FOR_TAKING_PAYMENTS)
-    context.adyenTasks.completeOrganisationDetailsTasks[3].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
   })
 })
