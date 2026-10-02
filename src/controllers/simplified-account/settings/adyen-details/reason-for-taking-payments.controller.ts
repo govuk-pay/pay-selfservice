@@ -2,7 +2,6 @@ import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
-import { markTaskAsComplete } from '@services/adyen-setup.service'
 
 function get(req: ServiceRequest, res: ServiceResponse) {
   return response(req, res, 'simplified-account/settings/adyen-details/reason-for-taking-payments', {
@@ -15,11 +14,6 @@ function get(req: ServiceRequest, res: ServiceResponse) {
 }
 
 async function post(req: ServiceRequest, res: ServiceResponse) {
-  const { account } = req
-  const switchingCredentialId = account.getSwitchingCredential().externalId
-
-  await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'reasonForTakingPayments')
-
   return res.redirect(
     formatServiceAndAccountPathsFor(
       paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,

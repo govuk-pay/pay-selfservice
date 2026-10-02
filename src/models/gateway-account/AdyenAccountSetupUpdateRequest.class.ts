@@ -34,10 +34,6 @@ export class AdyenAccountSetupUpdateRequest {
       director: (value: AdyenAccountSetupTaskStatus) => {
         return this.#op('replace', 'director', value)
       },
-
-      reasonForTakingPayments: (value: AdyenAccountSetupTaskStatus) => {
-        return this.#op('replace', 'reason_for_taking_payments', value)
-      },
     }
   }
 
