@@ -66,9 +66,6 @@ describe('connector client - get adyen account setup', () => {
               director: {
                 status: 'NOT_STARTED',
               },
-              reasonForTakingPayments: {
-                status: 'NOT_STARTED',
-              },
             })
           })
       })

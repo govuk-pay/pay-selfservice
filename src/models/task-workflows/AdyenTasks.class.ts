@@ -123,27 +123,6 @@ class AdyenTask extends Task {
       )
     ).setStatus(status)
   }
-
-  static reasonForTakingPaymentsTask(
-    service: Service,
-    gatewayAccount: GatewayAccount,
-    accountSetup: AdyenAccountSetup,
-    switchingCredentialId: string
-  ) {
-    const canStart = accountSetup.tasks.legalTerms.status === 'COMPLETED'
-    const status = AdyenTask.checkStatus(accountSetup.tasks.reasonForTakingPayments.status === 'COMPLETED', canStart)
-
-    return new AdyenTask(
-      'Tell us why your service takes payments',
-      AdyenTaskIdentifier.REASON_FOR_TAKING_PAYMENTS,
-      formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.reasonForTakingPayments,
-        service.externalId,
-        gatewayAccount.type,
-        switchingCredentialId
-      )
-    ).setStatus(status)
-  }
 }
 
 export class AdyenTasks extends Tasks<AdyenTask> {
@@ -175,7 +154,6 @@ export class AdyenTasks extends Tasks<AdyenTask> {
       AdyenTask.bankDetailsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
       AdyenTask.responsiblePersonTask(service, gatewayAccount, accountSetup, switchingCredentialId),
       AdyenTask.serviceDirectorTask(service, gatewayAccount, accountSetup, switchingCredentialId),
-      AdyenTask.reasonForTakingPaymentsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
     ]
     return new AdyenTasks(confirmOrganisationTasks, acceptLegalTermsTasks, completeOrganisationDetailsTasks)
   }
