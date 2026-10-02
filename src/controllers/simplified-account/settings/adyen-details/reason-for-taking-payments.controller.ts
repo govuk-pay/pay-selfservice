@@ -13,7 +13,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   })
 }
 
-async function post(req: ServiceRequest, res: ServiceResponse) {
+function post(req: ServiceRequest, res: ServiceResponse) {
   return res.redirect(
     formatServiceAndAccountPathsFor(
       paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,

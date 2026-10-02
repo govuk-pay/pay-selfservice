@@ -12,9 +12,6 @@ const SERVICE_TYPE = 'live'
 const serviceFixture = new ServiceFixture({
   externalId: SERVICE_EXTERNAL_ID,
 })
-const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.STRIPE, PaymentProvider.ADYEN, [], [], {
-  type: 'live',
-}).toGatewayAccount()
 
 const mockResponse = sinon.stub()
 const markTaskAsComplete = sinon.stub().resolves()
