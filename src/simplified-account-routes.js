@@ -1125,6 +1125,22 @@ simplifiedAccount.post(
   serviceSettingsController.adyenDetails.serviceDirector.checkYourAnswers.post
 )
 
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.statementDescriptors.user,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.statementDescriptors.user.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.statementDescriptors.user,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.statementDescriptors.user.post
+)
+
 // stripe details
 const stripeDetailsPath = paths.simplifiedAccount.settings.stripeDetails
 const stripeDetailsRouter = new Router({ mergeParams: true }).use(
