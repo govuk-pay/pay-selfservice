@@ -6,6 +6,7 @@ import { getUser } from '@test/cypress/stubs/simplified-account/user-stubs'
 import * as GatewayAccountStubs from '@test/cypress/stubs/simplified-account/gateway-account-stubs'
 import { checkServiceNavigation } from '@test/cypress/integration/simplified-account/common/assertions'
 import { AdyenAccountSetupFixture } from '@test/fixtures/gateway-account/adyen-account-setup.fixture'
+import * as AdyenStubs from '@test/cypress/stubs/adyen-stubs'
 
 const USER_EXTERNAL_ID = 'user-123-abc'
 const SERVICE_EXTERNAL_ID = 'service456def'
@@ -62,6 +63,7 @@ const setStubs = (additionalStubs = []) => {
       ADYEN_CREDENTIAL_EXTERNAL_ID,
       'organisation_details'
     ).success(),
+    AdyenStubs.createLegalEntity().success({ id: 'legal-entity-123' }),
     ...additionalStubs,
   ])
 }
@@ -83,7 +85,6 @@ describe(`Organisation details, company registration and VAT registration`, () =
   describe('for a service that is migrating to adyen', () => {
     it('should walk through organisation details, company registration and VAT registration in sequence', () => {
       setStubs()
-
       // organisation details
       cy.visit(ORGANISATION_DETAILS_PATH)
       checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)

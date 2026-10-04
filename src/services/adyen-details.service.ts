@@ -1,5 +1,9 @@
 import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
 import ConnectorClient from '@services/clients/pay/ConnectorClient.class'
+import { createLegalEntity } from '@services/clients/adyen/adyen-legal-entity-management.client'
+import { OrganisationDetailsSession } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
+import { LegalEntityInfoRequiredType } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityInfoRequiredType'
+import { Organization } from '@adyen/api-library/lib/src/typings/legalEntityManagement/organization'
 
 const connectorClient = new ConnectorClient()
 
@@ -63,4 +67,26 @@ const setAdyenBalanceAccountId = async (
   )
 }
 
-export { setAdyenLegalEntityId, setAdyenStoreId, setAdyenAccountHolderId, setAdyenBalanceAccountId }
+const createOrganisation = async (session: OrganisationDetailsSession) => {
+  const organization: Organization = {
+    legalName: session.organisationName ?? '',
+    registeredAddress: {
+      street: session.addressLine1,
+      street2: session.addressLine2,
+      city: session.addressCity,
+      postalCode: session.addressPostcode,
+      country: session.addressCountry ?? '',
+    },
+    registrationNumber: session.companyRegistrationNumber,
+    vatNumber: session.vatRegistrationNumber,
+  }
+
+  const legalEntityInfo: LegalEntityInfoRequiredType = {
+    type: LegalEntityInfoRequiredType.TypeEnum.Organization,
+    organization,
+  }
+
+  return createLegalEntity(legalEntityInfo)
+}
+
+export { setAdyenLegalEntityId, setAdyenStoreId, setAdyenAccountHolderId, setAdyenBalanceAccountId, createOrganisation }
