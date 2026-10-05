@@ -2,7 +2,6 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
-import { markTaskAsComplete } from '@services/adyen-setup.service'
 
 function get(req: ServiceRequest, res: ServiceResponse) {
   return response(req, res, 'simplified-account/settings/adyen-details/vat-registration-number', {
@@ -16,18 +15,13 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   })
 }
 
-async function post(req: ServiceRequest, res: ServiceResponse) {
-  const { account } = req
-  const switchingCredentialId = account.getSwitchingCredential().externalId
-
-  await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'organisationDetails')
-
+function post(req: ServiceRequest, res: ServiceResponse) {
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
       req.service.externalId,
       req.account.type,
-      switchingCredentialId
+      req.account.getSwitchingCredential().externalId
     )
   )
 }

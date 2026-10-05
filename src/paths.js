@@ -317,11 +317,12 @@ module.exports = {
         },
         bankDetails: '/settings/adyen-details/:credentialId/bank-details',
         legalTerms: '/settings/adyen-details/:credentialId/legal-terms',
-        reasonForTakingPayments: '/settings/adyen-details/:credentialId/reason-for-taking-payments',
         organisationDetails: {
           index: '/settings/adyen-details/:credentialId/organisation-details/details',
           companyRegistration: '/settings/adyen-details/:credentialId/organisation-details/company-registration-number',
           vatRegistration: '/settings/adyen-details/:credentialId/organisation-details/vat-number',
+          reasonForTakingPayments:
+            '/settings/adyen-details/:credentialId/organisation-details/reason-for-taking-payments',
         },
       },
     },
