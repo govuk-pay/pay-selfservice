@@ -65,7 +65,7 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
     })
   })
   describe('post', () => {
-    it('should redirect to the switch to adyen task list', async () => {
+    it('should mark organisation details task as complete and redirect to the switch to adyen task list', async () => {
       await call('post')
       sinon.assert.calledOnceWithExactly(
         markTaskAsComplete,
