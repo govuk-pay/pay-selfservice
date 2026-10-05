@@ -1062,19 +1062,19 @@ simplifiedAccount.post(
 )
 
 simplifiedAccount.get(
-  paths.simplifiedAccount.settings.adyenDetails.reasonForTakingPayments,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.reasonForTakingPayments.get
+  serviceSettingsController.adyenDetails.organisationDetails.reasonForTakingPayments.get
 )
 
 simplifiedAccount.post(
-  paths.simplifiedAccount.settings.adyenDetails.reasonForTakingPayments,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.reasonForTakingPayments.post
+  serviceSettingsController.adyenDetails.organisationDetails.reasonForTakingPayments.post
 )
 
 simplifiedAccount.get(

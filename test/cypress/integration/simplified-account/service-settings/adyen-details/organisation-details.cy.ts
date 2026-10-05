@@ -16,6 +16,7 @@ const ADYEN_CREDENTIAL_EXTERNAL_ID = 'adyen-credential-123-abc'
 const ORGANISATION_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/details`
 const COMPANY_REGISTRATION_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/company-registration-number`
 const VAT_REGISTRATION_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/vat-number`
+const TAKING_PAYMENTS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details/reason-for-taking-payments`
 const TASK_LIST_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/switch-psp/switch-to-adyen`
 
 const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
@@ -122,6 +123,12 @@ describe(`Organisation details, company registration and VAT registration`, () =
 
       cy.get('#vat-registration-number').type('GB123456789')
       cy.get('#vat-registration-number-submit').click()
+
+      // reason for taking payments
+      cy.location('pathname').should('eq', TAKING_PAYMENTS_PATH)
+      cy.get('h1').should('contain.text', `What will your service be taking payments for?`)
+      cy.get('#reason-for-taking-payments-textarea').type('Test reason for taking payments')
+      cy.get('#reason-for-taking-payments-submit').click()
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })

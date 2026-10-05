@@ -61,21 +61,16 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
     })
   })
   describe('post', () => {
-    it('should complete the organisation details task redirect to the switch to adyen task list', async () => {
+    it('should redirect to the reason for taking payments page', async () => {
       await call('post')
-      sinon.assert.calledOnceWithExactly(
-        markTaskAsComplete,
-        SERVICE_EXTERNAL_ID,
-        SERVICE_TYPE,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        'organisationDetails'
-      )
+
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
           SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
         )
       )
     })

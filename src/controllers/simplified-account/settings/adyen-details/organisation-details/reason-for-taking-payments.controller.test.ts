@@ -13,11 +13,15 @@ const serviceFixture = new ServiceFixture({
   externalId: SERVICE_EXTERNAL_ID,
 })
 
+const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.STRIPE, PaymentProvider.ADYEN, [], [], {
+  type: 'live',
+}).toGatewayAccount()
+
 const mockResponse = sinon.stub()
 const markTaskAsComplete = sinon.stub().resolves()
 
 const { req, res, call } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/reason-for-taking-payments.controller'
+  '@controllers/simplified-account/settings/adyen-details/organisation-details/reason-for-taking-payments.controller.ts'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
   .withAccount(
@@ -52,16 +56,24 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
       const context = mockResponse.firstCall.lastArg as { backLink: string }
       sinon.assert.match(context, {
         backLink: formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
           SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
         ),
       })
     })
   })
   describe('post', () => {
-    it('should redirect to the switch to adyen task list', async () => {
+    it('should mark organisation details task as complete and redirect to the switch to adyen task list', async () => {
       await call('post')
+      sinon.assert.calledOnceWithExactly(
+        markTaskAsComplete,
+        SERVICE_EXTERNAL_ID,
+        SERVICE_TYPE,
+        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+        'organisationDetails'
+      )
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
