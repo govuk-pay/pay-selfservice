@@ -127,7 +127,17 @@ describe(`Organisation details, company registration and VAT registration`, () =
       // reason for taking payments
       cy.location('pathname').should('eq', TAKING_PAYMENTS_PATH)
       cy.get('h1').should('contain.text', `What will your service be taking payments for?`)
-      cy.get('#reason-for-taking-payments-textarea').type('Test reason for taking payments')
+
+      //// sad path
+      cy.get('#reason-for-taking-payments-submit').click()
+      cy.location('pathname').should('eq', TAKING_PAYMENTS_PATH)
+      cy.get('.govuk-error-summary')
+        .should('be.visible')
+        .and('contain', 'There is a problem')
+        .and('contain', 'Please confirm what your service will be taking payments for')
+
+      //// happy path
+      cy.get('[data-cy="radio-government-activities"]').check()
       cy.get('#reason-for-taking-payments-submit').click()
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)
