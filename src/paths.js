@@ -324,6 +324,9 @@ module.exports = {
           reasonForTakingPayments:
             '/settings/adyen-details/:credentialId/organisation-details/reason-for-taking-payments',
         },
+        statementDescriptors: {
+          user: '/settings/adyen-details/:credentialId/statement-descriptors/user',
+        },
       },
     },
   },

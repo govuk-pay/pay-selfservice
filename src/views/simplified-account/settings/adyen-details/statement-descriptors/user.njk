@@ -1,0 +1,36 @@
+{% extends "simplified-account/settings/settings-layout.njk" %}
+
+{% set settingsPageTitle = 'Add a descriptor for what your paying users will see on their bank statements - GOV.UK Pay' %}
+
+{% block settingsContent %}
+  <form id="user-descriptor-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+
+    {{
+      govukCharacterCount({
+        label: {
+          text: "Add a descriptor for what your paying users will see on their bank statements",
+          classes: "govuk-label--l",
+          isPageHeading: true
+        },
+        hint: {
+          text: "This will appear on your users’ bank statements to help them know what they’ve paid for. For example, parking fines or licence fees."
+        },
+      id: "user-descriptor",
+      name: "userDescriptor",
+      rows: 1,
+      value: userDescriptor,
+      errorMessage: { text: errors.formErrors['userDescriptor'] } if errors.formErrors['userDescriptor'] else false,
+      maxlength: 22
+      })
+    }}
+
+    {{
+      govukButton({
+        id: "user-descriptor-submit",
+        text: "Continue",
+        preventDoubleClick: true
+      })
+    }}
+  </form>
+{% endblock %}
