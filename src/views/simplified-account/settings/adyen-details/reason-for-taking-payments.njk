@@ -8,41 +8,41 @@
     <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
     {{
       govukRadios({
-            name: "takingPaymentsFor",
-            fieldset: {
-              legend: {
-                text: "What will your service be taking payments for?",
-                isPageHeading: true,
-                classes: "govuk-fieldset__legend--l"
-              }
-            },
-            hint: {
-              text: "This helps the payment provider to categorise the service correctly."
-            },
-            items: [
-              {
-                value: "government-activities",
-                text: "General local government activities",
-                attributes: {
-                  "data-cy": "radio-government-activities"
-                }
-              },
-              {
-                value: "police-safety",
-                text: "Police and public safety",
-                attributes: {
-                  "data-cy": "radio-government-activities"
-                }
-              },
-              {
-                value: "everything-else",
-                text: "Armed forces, cadets, colleges and everything else",
-                attributes: {
-                  "data-cy": "radio-everything-else"
-                }
-              }
-            ]
-          })
+        name: "takingPaymentsFor",
+        fieldset: {
+          legend: {
+            text: "What will your service be taking payments for?",
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        hint: {
+          text: "This helps the payment provider to categorise the service correctly."
+        },
+        items: [
+          {
+            value: "government-activities",
+            text: "General local government activities",
+            attributes: {
+              "data-cy": "radio-government-activities"
+            }
+          },
+          {
+            value: "police-safety",
+            text: "Police and public safety",
+            attributes: {
+              "data-cy": "radio-government-activities"
+            }
+          },
+          {
+            value: "everything-else",
+            text: "Armed forces, cadets, colleges and everything else",
+            attributes: {
+              "data-cy": "radio-everything-else"
+            }
+          }
+        ]
+      })
     }}
 
     {{
