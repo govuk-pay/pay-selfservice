@@ -118,7 +118,7 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
         }
         sinon.assert.match(context.errors.summary, [
           {
-            text: 'Please confirm what your service will be taking payments for',
+            text: 'You must make a selection',
             href: '#taking-payments-for',
           },
         ])

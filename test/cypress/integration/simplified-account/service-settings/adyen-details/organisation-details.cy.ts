@@ -134,7 +134,8 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.get('.govuk-error-summary')
         .should('be.visible')
         .and('contain', 'There is a problem')
-        .and('contain', 'Please confirm what your service will be taking payments for')
+        .and('contain', 'You must make a selection')
+      cy.get('#takingPaymentsFor-error').should('be.visible').and('contain', 'You must make a selection')
 
       //// happy path
       cy.get('[data-cy="radio-government-activities"]').check()

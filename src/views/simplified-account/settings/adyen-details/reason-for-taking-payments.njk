@@ -19,6 +19,9 @@
         hint: {
           text: "This helps the payment provider to categorise the service correctly."
         },
+        errorMessage: {
+          text: errors.formErrors['takingPaymentsFor']
+          } if errors.formErrors['takingPaymentsFor'],
         items: [
           {
             value: "government-activities",
