@@ -326,6 +326,7 @@ module.exports = {
         },
         statementDescriptors: {
           user: '/settings/adyen-details/:credentialId/statement-descriptors/user',
+          payout: '/settings/adyen-details/:credentialId/statement-descriptors/payout',
         },
       },
     },
