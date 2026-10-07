@@ -130,7 +130,6 @@ class AdyenTask extends Task {
     accountSetup: AdyenAccountSetup,
     switchingCredentialId: string
   ) {
-
     const status = TaskStatus.NOT_STARTED
 
     return new AdyenTask(
@@ -151,7 +150,6 @@ class AdyenTask extends Task {
     accountSetup: AdyenAccountSetup,
     switchingCredentialId: string
   ) {
-
     const status = TaskStatus.NOT_STARTED
 
     return new AdyenTask(
@@ -172,7 +170,6 @@ class AdyenTask extends Task {
     accountSetup: AdyenAccountSetup,
     switchingCredentialId: string
   ) {
-
     const status = TaskStatus.NOT_STARTED
 
     return new AdyenTask(
@@ -226,6 +223,11 @@ export class AdyenTasks extends Tasks<AdyenTask> {
       AdyenTask.paymentTask(service, gatewayAccount, accountSetup, switchingCredentialId),
       AdyenTask.finishSwitchingTask(service, gatewayAccount, accountSetup, switchingCredentialId),
     ]
-    return new AdyenTasks(confirmOrganisationTasks, acceptLegalTermsTasks, completeOrganisationDetailsTasks, completeFinalTasks)
+    return new AdyenTasks(
+      confirmOrganisationTasks,
+      acceptLegalTermsTasks,
+      completeOrganisationDetailsTasks,
+      completeFinalTasks
+    )
   }
 }

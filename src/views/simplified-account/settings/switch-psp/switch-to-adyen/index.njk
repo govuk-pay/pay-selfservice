@@ -4,54 +4,54 @@
 {% set settingsPageTitle = "Switch your payment provider to Adyen" %}
 
 {% block settingsContent %}
-<h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
+  <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
 
-{% if currentPsp == 'stripe' %}
-{% call govukInsetText() %}
-You must complete the switch by 22 August 2026 to continue taking payments.
-{% endcall %}
-{% endif %}
+  {% if currentPsp == 'stripe' %}
+    {% call govukInsetText() %}
+      You must complete the switch by 22 August 2026 to continue taking payments.
+    {% endcall %}
+  {% endif %}
 
-<p class="govuk-body">
-  Your service will continue to use {{ currentPsp | smartCaps }} until the switch to Adyen is complete.
-</p>
+  <p class="govuk-body">
+    Your service will continue to use {{ currentPsp | smartCaps }} until the switch to Adyen is complete.
+  </p>
 
-<h2 class="govuk-heading-m">1. Confirm your organisation</h2>
+  <h2 class="govuk-heading-m">1. Confirm your organisation</h2>
 
-{{
+  {{
     taskList({
       tasks: adyenTasks.confirmOrganisationTasks,
       idPrefix: 'adyen-confirm-org-tasks'
     })
   }}
 
-<h2 class="govuk-heading-m">2. Accept the legal terms</h2>
+  <h2 class="govuk-heading-m">2. Accept the legal terms</h2>
 
-{{
+  {{
     taskList({
       tasks: adyenTasks.acceptLegalTermsTasks,
       idPrefix: 'adyen-accept-legal-terms-tasks'
     })
   }}
 
-<h2 class="govuk-heading-m">3. Complete your organisation’s details</h2>
+  <h2 class="govuk-heading-m">3. Complete your organisation’s details</h2>
 
-{{
+  {{
     taskList({
       tasks: adyenTasks.completeOrganisationDetailsTasks,
       idPrefix: 'adyen-complete-org-details-tasks'
     })
   }}
 
-<p class="govuk-body">
-  Adyen will check your information. This could take up to 2 full working days.
-  You will receive an email when the checks are complete.
-  You will need to make a real payment of £1 when the checks have been completed successfully to check everything works.
-</p>
+  <p class="govuk-body">
+    Adyen will check your information. This could take up to 2 full working days. You will receive an email when the
+    checks are complete. You will need to make a real payment of £1 when the checks have been completed successfully to
+    check everything works.
+  </p>
 
-<h2 class="govuk-heading-m">4. Make a payment and finish switching</h2>
+  <h2 class="govuk-heading-m">4. Make a payment and finish switching</h2>
 
-{{
+  {{
     taskList({
       tasks: adyenTasks.completeFinalTasks,
       idPrefix: 'adyen-complete-final-tasks'
