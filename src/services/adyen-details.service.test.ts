@@ -62,6 +62,22 @@ describe('Adyen details service', () => {
 
     sinon.assert.calledOnce(createLegalEntityStub)
 
+    expect(createLegalEntityStub.firstCall.args[0]).to.deep.equal({
+      type: ORGANISATION_TYPE,
+      organization: {
+        legalName: 'Test Org Ltd',
+        registeredAddress: {
+          street: '1 Test Street',
+          street2: 'Test Building',
+          city: 'London',
+          postalCode: 'SW1A 1AA',
+          country: 'GB',
+        },
+        registrationNumber: '12345678',
+        vatNumber: 'GB123456789',
+      },
+    })
+
     expect(result).to.equal(legalEntity)
   })
 })
