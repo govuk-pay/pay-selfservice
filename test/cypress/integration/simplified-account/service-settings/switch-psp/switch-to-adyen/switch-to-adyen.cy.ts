@@ -177,8 +177,7 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(3)
             .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Bank statement descriptors for your service')
+              cy.get('.govuk-task-list__link').should('contain.text', 'Bank statement descriptors for your service')
               cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
             })
         })
@@ -192,16 +191,14 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(0)
             .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Make a £1 payment using a debit or credit card')
+              cy.get('.govuk-task-list__link').should('contain.text', 'Make a £1 payment using a debit or credit card')
               cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
             })
 
           cy.get('.govuk-task-list__item')
             .eq(1)
             .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Finish switching to Adyen')
+              cy.get('.govuk-task-list__link').should('contain.text', 'Finish switching to Adyen')
               cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
             })
         })
