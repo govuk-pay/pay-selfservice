@@ -1,3 +1,4 @@
+---
 version: 2
 updates:
 - package-ecosystem: npm
@@ -8,7 +9,7 @@ updates:
   open-pull-requests-limit: 0
   cooldown:
     exclude:
-      - "@govuk-pay/*"
+    - "@govuk-pay/*"
   labels:
   - dependencies
   - govuk-pay
@@ -49,3 +50,12 @@ updates:
   - dependencies
   - govuk-pay
   - github_actions
+- package-ecosystem: github-actions
+  directory: /.github/workflows
+  schedule:
+    interval: daily
+    time: 03:00
+  open-pull-requests-limit: 3
+  cooldown: 3
+  allow:
+  - dependency-name: govuk-pay/pay-ci/*
