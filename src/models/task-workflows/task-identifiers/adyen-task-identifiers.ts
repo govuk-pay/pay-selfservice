@@ -5,6 +5,9 @@ export const AdyenTaskIdentifier = {
   RESPONSIBLE_PERSON: 'adyen-responsible-person' as AdyenTaskIdentifier,
   SERVICE_DIRECTOR: 'adyen-service-director' as AdyenTaskIdentifier,
   REASON_FOR_TAKING_PAYMENTS: 'adyen-reason' as AdyenTaskIdentifier,
+  STATEMENT_DESCRIPTORS: 'adyen-statement-descriptors' as AdyenTaskIdentifier,
+  PAYMENT: 'adyen-payment' as AdyenTaskIdentifier,
+  FINISH_SWITCHING: 'adyen-finish-swicthing' as AdyenTaskIdentifier
 } as const
 
 export type AdyenTaskIdentifier =
@@ -14,3 +17,6 @@ export type AdyenTaskIdentifier =
   | 'adyen-responsible-person'
   | 'adyen-service-director'
   | 'adyen-reason'
+  | 'adyen-statement-descriptors'
+  | 'adyen-payment'
+  | 'adyen-finish-swicthing'
