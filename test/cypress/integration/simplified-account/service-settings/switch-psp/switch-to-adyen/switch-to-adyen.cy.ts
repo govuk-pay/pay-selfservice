@@ -177,7 +177,13 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(3)
             .within(() => {
-              cy.get('.govuk-task-list__link').should('contain.text', 'Bank statement descriptors for your service')
+              cy.get('.govuk-task-list__link')
+                .should('contain.text', 'Bank statement descriptors for your service')
+                .should(
+                  'have.attr',
+                  'href',
+                  `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/statement-descriptors/user`
+                )
               cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
             })
         })

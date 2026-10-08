@@ -136,7 +136,7 @@ class AdyenTask extends Task {
       'Bank statement descriptors for your service',
       AdyenTaskIdentifier.STATEMENT_DESCRIPTORS,
       formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+        paths.simplifiedAccount.settings.adyenDetails.statementDescriptors.user,
         service.externalId,
         gatewayAccount.type,
         switchingCredentialId
