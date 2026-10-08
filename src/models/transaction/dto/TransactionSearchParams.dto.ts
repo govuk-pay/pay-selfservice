@@ -23,6 +23,7 @@ export class TransactionSearchParamsData {
   readonly gateway_payout_id?: string
   readonly fee_headers?: boolean
   readonly moto_header?: boolean
+  readonly include_additional_fee_headers?: boolean
 
   constructor(params: TransactionSearchParams) {
     this.account_id = params.accountIds.join(',')
@@ -46,6 +47,7 @@ export class TransactionSearchParamsData {
     this.gateway_payout_id = params.gatewayPayoutId
     this.fee_headers = params.feeHeaders
     this.moto_header = params.motoHeader
+    this.include_additional_fee_headers = params.include_additional_fee_headers
   }
 
   asQueryString(): string {

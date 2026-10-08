@@ -4,7 +4,12 @@ const querystring = require('querystring')
 const _ = require('lodash')
 const dates = require('./dates.js')
 
-function getQueryStringForParams (params = {}, removeEmptyParams = false, flattenCardBrandsParam = false, ignorePagination = false) {
+function getQueryStringForParams(
+  params = {},
+  removeEmptyParams = false,
+  flattenCardBrandsParam = false,
+  ignorePagination = false
+) {
   let queryStrings = {
     reference: params.reference,
     email: params.email,
@@ -14,10 +19,11 @@ function getQueryStringForParams (params = {}, removeEmptyParams = false, flatte
     gateway_payout_id: params.gatewayPayoutId,
     from_date: dates.fromDateToApiFormat(params.fromDate, params.fromTime),
     to_date: dates.toDateToApiFormat(params.toDate, params.toTime),
-    ...params.feeHeaders && { fee_headers: params.feeHeaders },
-    ...params.motoHeader && { moto_header: params.motoHeader },
+    ...(params.feeHeaders && { fee_headers: params.feeHeaders }),
+    ...(params.motoHeader && { moto_header: params.motoHeader }),
+    ...(params.includeAdditionalFeeHeaders && { include_additional_fee_headers: params.includeAdditionalFeeHeaders }),
     metadata_value: params.metadataValue,
-    agreement_id: params.agreementId
+    agreement_id: params.agreementId,
   }
 
   if (!ignorePagination) {
@@ -26,13 +32,16 @@ function getQueryStringForParams (params = {}, removeEmptyParams = false, flatte
   }
 
   if (params.payment_states) {
-    queryStrings.payment_states = params.payment_states instanceof Array ? params.payment_states.join(',') : params.payment_states
+    queryStrings.payment_states =
+      params.payment_states instanceof Array ? params.payment_states.join(',') : params.payment_states
   }
   if (params.refund_states) {
-    queryStrings.refund_states = params.refund_states instanceof Array ? params.refund_states.join(',') : params.refund_states
+    queryStrings.refund_states =
+      params.refund_states instanceof Array ? params.refund_states.join(',') : params.refund_states
   }
   if (params.dispute_states) {
-    queryStrings.dispute_states = params.dispute_states instanceof Array ? params.dispute_states.join(',') : params.dispute_states
+    queryStrings.dispute_states =
+      params.dispute_states instanceof Array ? params.dispute_states.join(',') : params.dispute_states
   }
 
   if (flattenCardBrandsParam) {
