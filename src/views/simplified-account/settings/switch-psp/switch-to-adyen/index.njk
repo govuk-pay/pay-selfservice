@@ -44,7 +44,17 @@
   }}
 
   <p class="govuk-body">
-    Adyen will check your information. You will receive an email when the checks are complete. You will need to make a
-    real payment when the checks have been completed successfully to check everything works.
+    Adyen will check your information. This could take up to 2 full working days. You will receive an email when the
+    checks are complete. You will need to make a real payment of £1 when the checks have been completed successfully to
+    check everything works.
   </p>
+
+  <h2 class="govuk-heading-m">4. Make a payment and finish switching</h2>
+
+  {{
+    taskList({
+      tasks: adyenTasks.completeFinalTasks,
+      idPrefix: 'adyen-complete-final-tasks'
+    })
+  }}
 {% endblock %}

@@ -123,22 +123,85 @@ class AdyenTask extends Task {
       )
     ).setStatus(status)
   }
+
+  static statementDescriptorsTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const status = TaskStatus.NOT_STARTED
+
+    return new AdyenTask(
+      'Bank statement descriptors for your service',
+      AdyenTaskIdentifier.STATEMENT_DESCRIPTORS,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.statementDescriptors.user,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
+  static paymentTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const status = TaskStatus.NOT_STARTED
+
+    return new AdyenTask(
+      'Make a £1 payment using a debit or credit card',
+      AdyenTaskIdentifier.PAYMENT,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
+  static finishSwitchingTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const status = TaskStatus.NOT_STARTED
+
+    return new AdyenTask(
+      'Finish switching to Adyen',
+      AdyenTaskIdentifier.FINISH_SWITCHING,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
 }
 
 export class AdyenTasks extends Tasks<AdyenTask> {
   confirmOrganisationTasks: AdyenTask[]
   acceptLegalTermsTasks: AdyenTask[]
   completeOrganisationDetailsTasks: AdyenTask[]
+  completeFinalTasks: AdyenTask[]
 
   constructor(
     confirmOrganisationTasks: AdyenTask[],
     acceptLegalTermsTasks: AdyenTask[],
-    completeOrganisationDetailsTasks: AdyenTask[]
+    completeOrganisationDetailsTasks: AdyenTask[],
+    completeFinalTasks: AdyenTask[]
   ) {
     super([...confirmOrganisationTasks, ...acceptLegalTermsTasks, ...completeOrganisationDetailsTasks])
     this.confirmOrganisationTasks = confirmOrganisationTasks
     this.acceptLegalTermsTasks = acceptLegalTermsTasks
     this.completeOrganisationDetailsTasks = completeOrganisationDetailsTasks
+    this.completeFinalTasks = completeFinalTasks
   }
 
   static forProviderSwitching(service: Service, gatewayAccount: GatewayAccount, accountSetup: AdyenAccountSetup) {
@@ -154,7 +217,17 @@ export class AdyenTasks extends Tasks<AdyenTask> {
       AdyenTask.bankDetailsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
       AdyenTask.responsiblePersonTask(service, gatewayAccount, accountSetup, switchingCredentialId),
       AdyenTask.serviceDirectorTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+      AdyenTask.statementDescriptorsTask(service, gatewayAccount, accountSetup, switchingCredentialId),
     ]
-    return new AdyenTasks(confirmOrganisationTasks, acceptLegalTermsTasks, completeOrganisationDetailsTasks)
+    const completeFinalTasks = [
+      AdyenTask.paymentTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+      AdyenTask.finishSwitchingTask(service, gatewayAccount, accountSetup, switchingCredentialId),
+    ]
+    return new AdyenTasks(
+      confirmOrganisationTasks,
+      acceptLegalTermsTasks,
+      completeOrganisationDetailsTasks,
+      completeFinalTasks
+    )
   }
 }
