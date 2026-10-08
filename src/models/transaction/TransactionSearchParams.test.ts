@@ -45,6 +45,16 @@ describe('Transaction search params tests', () => {
     queryString.should.eq('account_id=1&moto_header=true')
   })
 
+  it('should allow setting include_additional_fee headers', () => {
+    const testGatewayAccountId = 1
+    const searchParams = TransactionSearchParams.Builder(testGatewayAccountId)
+      .withSearchQuery({})
+      .withIncludeAdditionalFeeHeaders(true)
+
+    const queryString = searchParams.toJson().asQueryString()
+    queryString.should.eq('account_id=1&include_additional_fee_headers=true')
+  })
+
   it('should allow setting default date params', () => {
     const testGatewayAccountId = 1
     const searchParams = TransactionSearchParams.Builder(testGatewayAccountId).withDefaultDateFilter(

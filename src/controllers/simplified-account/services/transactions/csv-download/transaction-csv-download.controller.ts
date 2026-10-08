@@ -10,7 +10,10 @@ async function get(req: ServiceRequest, res: ServiceResponse) {
   const transactionSearchParams = TransactionSearchParams.Builder(req.account.id)
     .withSearchQuery(req.query)
     .withMotoHeader(req.account.allowMoto)
-    .withFeeHeaders(req.account.paymentProvider === PaymentProviders.STRIPE)
+    .withFeeHeaders(
+      req.account.paymentProvider === PaymentProviders.STRIPE || req.account.paymentProvider === PaymentProviders.ADYEN
+    )
+    .withIncludeAdditionalFeeHeaders(req.account.paymentProvider === PaymentProviders.ADYEN)
 
   const filename = `GOVUK_Pay_${date.dateToDefaultFormat(new Date()).replace(' ', '_')}.csv`
   const [downloadStartTime, downloadEndTime] = await downloadCsv(transactionSearchParams, filename, res)

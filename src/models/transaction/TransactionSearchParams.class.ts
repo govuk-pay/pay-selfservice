@@ -61,6 +61,7 @@ export class TransactionSearchParams {
   gatewayPayoutId?: NonEmptyString
   motoHeader?: boolean
   feeHeaders?: boolean
+  include_additional_fee_headers?: boolean
 
   private includeTime?: boolean
   private baseQuery?: TransactionSearchQuery
@@ -139,6 +140,11 @@ export class TransactionSearchParams {
 
   withFeeHeaders(includeFeeHeaders?: boolean) {
     this.feeHeaders = includeFeeHeaders
+    return this
+  }
+
+  withIncludeAdditionalFeeHeaders(includeAdditionalFeeHeaders?: boolean) {
+    this.include_additional_fee_headers = includeAdditionalFeeHeaders
     return this
   }
 
