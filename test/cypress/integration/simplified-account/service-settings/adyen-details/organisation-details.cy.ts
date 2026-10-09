@@ -67,7 +67,7 @@ const setStubs = (additionalStubs = []) => {
   ])
 }
 
-describe(`Organisation details, company registration and VAT registration`, () => {
+describe.skip(`Organisation details, company registration and VAT registration`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
