@@ -1,6 +1,7 @@
 import { Client, EnvironmentEnum, HttpURLConnectionClient, ManagementAPI } from '@adyen/api-library'
 import { PaymentMethod } from '@adyen/api-library/lib/src/typings/checkout/paymentMethod'
 import { PaymentMethodSetupInfo } from '@adyen/api-library/lib/src/typings/management/paymentMethodSetupInfo'
+import { AdyenAPI, AdyenRequest } from './adyen-request-wrapper'
 
 const ADYEN_COMPANY_ACCOUNT_API_KEY = process.env.ADYEN_COMPANY_ACCOUNT_API_KEY
 const ADYEN_ENVIRONMENT = process.env.ADYEN_ENVIRONMENT === 'LIVE' ? EnvironmentEnum.LIVE : EnvironmentEnum.TEST
@@ -18,12 +19,13 @@ if (
   client.httpClient = httpClient
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const managementAPI = new ManagementAPI(client)
 
 export async function requestPaymentMethod(
   merchantId: string,
   paymentMethodSetupInfo: PaymentMethodSetupInfo
 ): Promise<PaymentMethod> {
-  return managementAPI.PaymentMethodsMerchantLevelApi.requestPaymentMethod(merchantId, paymentMethodSetupInfo)
+  return new AdyenRequest(AdyenAPI.MANAGEMENT, 'request payment method').execute(() =>
+    managementAPI.PaymentMethodsMerchantLevelApi.requestPaymentMethod(merchantId, paymentMethodSetupInfo)
+  )
 }
