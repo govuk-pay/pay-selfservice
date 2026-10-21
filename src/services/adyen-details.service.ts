@@ -12,6 +12,7 @@ import {
   getLegalEntity,
   updateLegalEntity,
   createTransferInstrument,
+  createBusinessLine,
 } from '@services/clients/adyen/adyen-legal-entity-management.client'
 import {
   createAccountHolder as createAdyenAccountHolder,
@@ -22,6 +23,14 @@ import { ResponsiblePersonSession } from '@controllers/simplified-account/settin
 import { Individual } from '@adyen/api-library/lib/src/typings/legalEntityManagement/individual'
 import { requestPaymentMethod } from './clients/adyen/adyen-management.client'
 import { PaymentMethodSetupInfo } from '@adyen/api-library/lib/src/typings/management/paymentMethodSetupInfo'
+import { BusinessLineInfo } from '@adyen/api-library/lib/src/typings/legalEntityManagement/businessLineInfo'
+import {
+  INDUSTRY_CODE_MAP,
+  GovernmentActivity,
+} from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
+import { SweepSchedule } from '@adyen/api-library/lib/src/typings/balancePlatform/sweepSchedule'
+import { CreateSweepConfigurationV2 } from '@adyen/api-library/lib/src/typings/balancePlatform/createSweepConfigurationV2'
+import { createSweep } from './clients/adyen/adyen-balance-platform.client'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -91,14 +100,7 @@ const setAdyenBalanceAccountId = async (
   )
 }
 
-const createOrganisation = async (
-  session: OrganisationDetailsSession,
-  serviceName: string,
-  serviceExternalId: string,
-  accountType: string,
-  switchingCredentialId: string,
-  userExternalId: string
-) => {
+const createOrganisationLegalEntity = (session: OrganisationDetailsSession) => {
   const organization: Organization = {
     legalName: session.organisationName ?? '',
     registeredAddress: {
@@ -117,19 +119,44 @@ const createOrganisation = async (
     organization,
   }
 
-  const legalEntity = await createLegalEntity(legalEntityInfo)
+  return createLegalEntity(legalEntityInfo)
+}
+
+const createOrganisation = async (
+  session: OrganisationDetailsSession,
+  governmentActivity: GovernmentActivity,
+  serviceName: string,
+  serviceExternalId: string,
+  accountType: string,
+  switchingCredentialId: string,
+  userExternalId: string
+) => {
+  const legalEntity = await createOrganisationLegalEntity(session)
+
+  await createBusinessLine({
+    service: BusinessLineInfo.ServiceEnum.PaymentProcessing,
+    industryCode: INDUSTRY_CODE_MAP[governmentActivity],
+    legalEntityId: legalEntity.id,
+    salesChannels: ['eCommerce'],
+  })
   const accountHolder = await createAccountHolder(legalEntity.id, serviceName)
   const balanceAccount = await createBalanceAccount(accountHolder.id, serviceName)
 
-  if (!legalEntity) {
-    throw new Error('Organisation legal entity creation failed')
-  }
-
-  if (!accountHolder) {
-    throw new Error('Account holder creation failed')
-  }
-
-  await setAdyenLegalEntityId(serviceExternalId, accountType, switchingCredentialId, userExternalId, legalEntity.id)
+  await connectorClient.gatewayAccounts.patchCredentialsByServiceExternalIdAndAccountType(
+    serviceExternalId,
+    accountType,
+    switchingCredentialId,
+    new GatewayAccountCredentialUpdateRequest(userExternalId)
+      .replace()
+      .credentials()
+      .legalEntityId(legalEntity.id)
+      .replace()
+      .credentials()
+      .balanceAccountId(balanceAccount.id)
+      .replace()
+      .credentials()
+      .accountHolderId(accountHolder.id)
+  )
 
   return { legalEntity, accountHolder, balanceAccount }
 }
@@ -226,7 +253,8 @@ async function addPayByBankPaymentMethod(storeId: string, businessLineId: string
   })
 }
 
-const getLegalEntityId = async (serviceExternalId: string, accountType: string, switchingCredentialId: string) => {
+
+const getAdyenCredentials = async (serviceExternalId: string, accountType: string, switchingCredentialId: string) => {
   const gatewayAccount = await connectorClient.gatewayAccounts.getByServiceExternalIdAndAccountType(
     serviceExternalId,
     accountType
@@ -234,8 +262,7 @@ const getLegalEntityId = async (serviceExternalId: string, accountType: string, 
   const adyenCredential = gatewayAccount.gatewayAccountCredentials.find(
     (credential) => credential.externalId === switchingCredentialId
   )
-  const legalEntityId = adyenCredential!.credentials.legalEntityId!
-  return legalEntityId
+  return adyenCredential?.credentials
 }
 
 const createBankDetails = async (
@@ -244,7 +271,9 @@ const createBankDetails = async (
   accountType: string,
   switchingCredentialId: string
 ) => {
-  const legalEntityId = await getLegalEntityId(serviceExternalId, accountType, switchingCredentialId)
+  const adyenCredentials = await getAdyenCredentials(serviceExternalId, accountType, switchingCredentialId)
+  const legalEntityId = adyenCredentials!.legalEntityId!
+  const balanceAccountId = adyenCredentials!.balanceAccountId!
 
   const accountIdentification: BankAccountAccountIdentification = {
     sortCode: details.sortCode,
@@ -260,10 +289,39 @@ const createBankDetails = async (
     },
   }
 
-  await createTransferInstrument(transferInstrumentInfo)
+  const transferInstrument = await createTransferInstrument(transferInstrumentInfo)
+
+  if (!transferInstrument) {
+    throw new Error('Transfer instrument creation failed')
+  }
 
   logger.info(`Transfer instrument created for legal entity`, {
     legal_entity_id: legalEntityId,
+    transfer_instrument_id: transferInstrument.id,
+  })
+
+  const sweepSchedule: SweepSchedule = {
+    type: SweepSchedule.TypeEnum.Cron,
+    cronExpression: '00 2 * * MON-FRI',
+  }
+
+  const createSweepConfiguration: CreateSweepConfigurationV2 = {
+    schedule: sweepSchedule,
+    counterparty: { transferInstrumentId: transferInstrument.id },
+    currency: 'GBP',
+    category: CreateSweepConfigurationV2.CategoryEnum.Bank,
+    type: CreateSweepConfigurationV2.TypeEnum.Push,
+    priorities: [CreateSweepConfigurationV2.PrioritiesEnum.Fast, CreateSweepConfigurationV2.PrioritiesEnum.Regular],
+  }
+
+  const sweep = await createSweep(balanceAccountId, createSweepConfiguration)
+
+  if (!sweep) {
+    throw new Error('Payout schedules sweep creation failed')
+  }
+
+  logger.info(`Custom payout schedules sweep created`, {
+    sweep_id: sweep.id,
   })
 
   return

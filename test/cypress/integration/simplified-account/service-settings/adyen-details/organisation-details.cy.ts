@@ -71,13 +71,27 @@ const setStubs = (additionalStubs = []) => {
       SERVICE_EXTERNAL_ID,
       LIVE_ACCOUNT_TYPE,
       ADYEN_CREDENTIAL_EXTERNAL_ID,
-      {
-        path: 'credentials',
-        value: { legal_entity_id: ADYEN_LEGAL_ENTITY_ID },
-        userExternalId: USER_EXTERNAL_ID,
-      }
+      USER_EXTERNAL_ID,
+      [
+        {
+          op: 'replace',
+          path: 'credentials',
+          value: { legal_entity_id: ADYEN_LEGAL_ENTITY_ID },
+        },
+        {
+          op: 'replace',
+          path: 'credentials',
+          value: { balance_account_id: 'balance-account-123' },
+        },
+        {
+          op: 'replace',
+          path: 'credentials',
+          value: { account_holder_id: 'account-holder-123' },
+        },
+      ]
     ),
     AdyenStubs.createBalanceAccount().success({ id: 'balance-account-123', accountHolderId: 'account-holder-123' }),
+    AdyenStubs.createBusinessLine().success({ id: 'BL123' }),
     ...additionalStubs,
   ])
 }
@@ -143,10 +157,10 @@ describe(`Organisation details, company registration and VAT registration`, () =
         .should('be.visible')
         .and('contain', 'There is a problem')
         .and('contain', 'You must make a selection')
-      cy.get('#takingPaymentsFor-error').should('be.visible').and('contain', 'You must make a selection')
+      cy.get('#governmentActivity-error').should('be.visible').and('contain', 'You must make a selection')
 
       //// happy path
-      cy.get('[data-cy="radio-government-activities"]').check()
+      cy.get('[data-cy="radio-general-local"]').check()
       cy.get('#reason-for-taking-payments-submit').click()
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)

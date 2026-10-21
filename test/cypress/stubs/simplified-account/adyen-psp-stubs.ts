@@ -48,6 +48,18 @@ export function createTransferInstrument() {
   }
 }
 
+export function createSweep(balanceAccountId: string) {
+  const path = `/bcl/v2/balanceAccounts/${balanceAccountId}/sweeps`
+
+  return {
+    success: function (sweep: { id: string }) {
+      return stubBuilder('POST', path, 200, {
+        response: sweep,
+      })
+    },
+  }
+}
+
 export function createAccountHolder() {
   const path = `/bcl/v2/accountHolders`
 
@@ -67,6 +79,18 @@ export function createBalanceAccount() {
     success: function (balanceAccount: { id: string; accountHolderId: string }) {
       return stubBuilder('POST', path, 200, {
         response: balanceAccount,
+      })
+    },
+  }
+}
+
+export function createBusinessLine() {
+  const path = `/lem/v4/businessLines`
+
+  return {
+    success: function (businessLine: { id: string }) {
+      return stubBuilder('POST', path, 200, {
+        response: businessLine,
       })
     },
   }
