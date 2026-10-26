@@ -140,8 +140,7 @@ describe('make a live payment task', () => {
           userExternalId: USER_EXTERNAL_ID,
         }
       ),
-    ],
-    )
+    ])
     cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_RETURN_URL)
     cy.get('.govuk-notification-banner')
       .should('have.class', 'govuk-notification-banner--success')
