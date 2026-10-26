@@ -29,7 +29,7 @@ describe('Adyen details service', () => {
 
   const managementClientMock = {
     createStore: sinon.stub(),
-    requestPaymentMethod: sinon.stub()
+    requestPaymentMethod: sinon.stub(),
   }
 
   const connectorClientMock = {
@@ -608,37 +608,36 @@ describe('Adyen details service', () => {
 
       const cardTypes = ['visa', 'mc', 'jcb', 'maestro', 'discover', 'diners', 'cup']
 
-      cardTypes.forEach(type => (sinon.assert.calledWith(
-        managementClientMock.requestPaymentMethod,
-        'MERCHANT123',
-        { type: type, storeIds: [store.id], businessLineId: 'BL123' }
-      )))
-
-      sinon.assert.calledWith(
-        managementClientMock.requestPaymentMethod,
-        'MERCHANT123',
-        {
-          type: 'paybybank', storeIds: [store.id], businessLineId: 'BL123', countries: ['GB'],
-          currencies: ['GBP']
-        }
+      cardTypes.forEach((type) =>
+        sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
+          type: type,
+          storeIds: [store.id],
+          businessLineId: 'BL123',
+        })
       )
 
-      sinon.assert.calledWith(
-        managementClientMock.requestPaymentMethod,
-        'MERCHANT123',
-        {
-          type: 'amex', storeIds: [store.id], businessLineId: 'BL123', countries: ['GB'],
-          currencies: ['GBP']
-        }
-      )
+      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
+        type: 'paybybank',
+        storeIds: [store.id],
+        businessLineId: 'BL123',
+        countries: ['GB'],
+        currencies: ['GBP'],
+      })
 
-      sinon.assert.calledWith(
-        managementClientMock.requestPaymentMethod,
-        'MERCHANT123',
-        {
-          type: 'googlepay', storeIds: [store.id], businessLineId: 'BL123', googlePay: { merchantId: 'MERCHANT123', }
-        }
-      )
+      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
+        type: 'amex',
+        storeIds: [store.id],
+        businessLineId: 'BL123',
+        countries: ['GB'],
+        currencies: ['GBP'],
+      })
+
+      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
+        type: 'googlepay',
+        storeIds: [store.id],
+        businessLineId: 'BL123',
+        googlePay: { merchantId: 'MERCHANT123' },
+      })
     })
 
     it('should not create store when ADYEN_LIVE_MERCHANT_ACCOUNT_ID is NOT set', async () => {

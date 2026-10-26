@@ -220,7 +220,6 @@ async function addPayByBankPaymentMethod(storeId: string, businessLineId: string
   })
 }
 
-
 const getAdyenCredentials = async (serviceExternalId: string, accountType: string, switchingCredentialId: string) => {
   const gatewayAccount = await connectorClient.gatewayAccounts.getByServiceExternalIdAndAccountType(
     serviceExternalId,
