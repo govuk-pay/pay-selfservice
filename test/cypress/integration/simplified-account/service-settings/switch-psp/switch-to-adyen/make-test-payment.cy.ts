@@ -9,13 +9,18 @@ import {
   AdyenAccountSetupTaskNameData,
 } from '@models/gateway-account/dto/AdyenAccountSetup.dto'
 import checkTitleAndHeading from '../../helpers/check-title-and-heading'
+import connectorChargeStubs from '@test/cypress/stubs/connector-charge-stubs'
+import { VERIFY_PSP_INTEGRATION_CHARGE_EXTERNAL_ID_KEY } from '@utils/verify-psp-integration'
+import { VERIFIED } from '@models/constants/credential-state'
 
 const USER_EXTERNAL_ID = 'user-123-abc'
 const SERVICE_EXTERNAL_ID = 'service456def'
 const LIVE_ACCOUNT_TYPE = 'live'
 const GATEWAY_ACCOUNT_ID = 12
 const ADYEN_CREDENTIAL_EXTERNAL_ID = 'adyen-credential-123-abc'
-const SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_SETTINGS_URL = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/switch-psp/make-a-payment`
+const SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_INFO_URL = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/switch-psp/make-a-payment`
+const SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_RETURN_URL = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/switch-psp/make-a-payment/verify`
+const CHARGE_EXTERNAL_ID = 'charge-456-def'
 
 const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
   PaymentProvider.STRIPE,
@@ -40,10 +45,10 @@ const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: U
 
 const tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTaskData> = {
   bank_details: {
-    status: 'NOT_STARTED',
+    status: 'COMPLETED',
   },
   director: {
-    status: 'NOT_STARTED',
+    status: 'COMPLETED',
   },
   responsible_person: {
     status: 'COMPLETED',
@@ -56,7 +61,7 @@ const tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTa
   },
 }
 
-const setStubs = (additionalStubs = []) => {
+const setStubs = (additionalStubs: object[] = []) => {
   cy.task('setupStubs', [
     getUser(USER_EXTERNAL_ID).success(userFixture),
     GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
@@ -72,104 +77,78 @@ const setStubs = (additionalStubs = []) => {
   ])
 }
 
-describe('switch to adyen task list', () => {
+describe('make a live payment task', () => {
   beforeEach(() => {
-    cy.setEncryptedCookies(USER_EXTERNAL_ID)
+    cy.setEncryptedCookies(USER_EXTERNAL_ID, {
+      [VERIFY_PSP_INTEGRATION_CHARGE_EXTERNAL_ID_KEY]: CHARGE_EXTERNAL_ID,
+    })
   })
 
   it('accessibility check', () => {
     setStubs()
 
-    cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_SETTINGS_URL)
+    cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_INFO_URL)
     cy.a11yCheck()
   })
 
   it('should display correct page title and headings', () => {
     setStubs()
 
-    cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_SETTINGS_URL)
+    cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_INFO_URL)
 
     checkTitleAndHeading(`Make a £1 payment using a debit or credit card`, gatewayAccountFixture.serviceName)
   })
 
+  it('should redirect the user to complete a payment', () => {
+    setStubs([
+      connectorChargeStubs.postChargeRequestSuccessByServiceExternalIdAndAccountType({
+        serviceExternalId: SERVICE_EXTERNAL_ID,
+        accountType: LIVE_ACCOUNT_TYPE,
+        chargeExternalId: CHARGE_EXTERNAL_ID,
+        nextUrl: 'https://notfrontend.gov.uk',
+      }),
+    ])
 
+    cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_INFO_URL)
+    cy.intercept('https://notfrontend.gov.uk', {
+      statusCode: 200,
+    }).as('frontendCall')
 
-  describe('for a service not migrating to Adyen', () => {
-    describe('where the service is switching to a different PSP', () => {
-      const WORLDPAY_CREDENTIAL_EXTERNAL_ID = 'worldpay-credential-123-abc'
+    cy.get('#make-a-payment-submit').click()
 
-      beforeEach(() => {
-        cy.task('clearStubs')
-
-        const gatewayAccountSwitchingToWorldpay = GatewayAccountFixture.forSwitchingPsp(
-          PaymentProvider.STRIPE,
-          PaymentProvider.WORLDPAY,
-          [],
-          [
-            {
-              externalId: WORLDPAY_CREDENTIAL_EXTERNAL_ID,
-            },
-          ],
-          {
-            id: GATEWAY_ACCOUNT_ID,
-            serviceId: SERVICE_EXTERNAL_ID,
-          }
-        )
-        const serviceFixture = new ServiceFixture({
-          externalId: SERVICE_EXTERNAL_ID,
-          gatewayAccountIds: [`${gatewayAccountSwitchingToWorldpay.id}`],
-          currentGoLiveStage: 'LIVE',
-        })
-        const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
-        cy.task('setupStubs', [
-          getUser(USER_EXTERNAL_ID).success(userFixture),
-          GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
-            gatewayAccountSwitchingToWorldpay
-          ),
-        ])
-      })
-
-      it('should return a 404 when attempting to view the task list', () => {
-        cy.request({
-          url: SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_SETTINGS_URL,
-          failOnStatusCode: false,
-        }).then((response) => {
-          expect(response.status).to.eq(404)
-        })
-      })
-    })
-
-    describe('where the service is not switching PSP', () => {
-      beforeEach(() => {
-        cy.task('clearStubs')
-        const adyenGatewayAccount = GatewayAccountFixture.forAdyen({
-          type: LIVE_ACCOUNT_TYPE,
-        })
-
-        const serviceFixture = new ServiceFixture({
-          externalId: SERVICE_EXTERNAL_ID,
-          gatewayAccountIds: [`${adyenGatewayAccount.id}`],
-          currentGoLiveStage: 'LIVE',
-        })
-        const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
-
-        cy.task('setupStubs', [
-          getUser(USER_EXTERNAL_ID).success(userFixture),
-          GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
-            adyenGatewayAccount
-          ),
-        ])
-      })
-
-      it('should return a 404 when attempting to view the task list', () => {
-        cy.request({
-          url: SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_SETTINGS_URL,
-          failOnStatusCode: false,
-        }).then((response) => {
-          expect(response.status).to.eq(404)
-        })
-      })
+    cy.wait('@frontendCall').then((interception) => {
+      expect(interception.request).to.not.equal(undefined)
+      expect(interception.request.method).to.equal('GET')
+      expect(interception.response?.statusCode).to.equal(200)
     })
   })
-})
 
+  it('should be redirected back to the tasks index with a success message', () => {
+    setStubs([
+      connectorChargeStubs.getChargeSuccessByServiceExternalIdAndAccountType({
+        serviceExternalId: SERVICE_EXTERNAL_ID,
+        accountType: LIVE_ACCOUNT_TYPE,
+        chargeExternalId: CHARGE_EXTERNAL_ID,
+      }),
+      GatewayAccountStubs.patchUpdateCredentialsSuccessByServiceExternalIdAndType(
+        SERVICE_EXTERNAL_ID,
+        LIVE_ACCOUNT_TYPE,
+        ADYEN_CREDENTIAL_EXTERNAL_ID,
+        {
+          path: 'state',
+          value: VERIFIED,
+          userExternalId: USER_EXTERNAL_ID,
+        }
+      ),
+    ],
+    )
+    cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_RETURN_URL)
+    cy.get('.govuk-notification-banner')
+      .should('have.class', 'govuk-notification-banner--success')
+      .should('have.class', 'system-messages')
+      .contains('Payment verified')
+      .parent()
+      .parent()
+      .contains('This service is ready to switch to Adyen')
+  })
+})
