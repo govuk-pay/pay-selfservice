@@ -75,37 +75,62 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
       })
     })
     describe('post', () => {
-      beforeEach(async () => {
-        res.redirect.resetHistory()
+      describe('when submitting valid data', () => {
+        beforeEach(async () => {
+          res.redirect.resetHistory()
 
-        nextRequest({
-          session: {
-            pageData: {
-              responsiblePerson: {},
+          nextRequest({
+            session: {
+              pageData: {
+                responsiblePerson: {},
+              },
             },
-          },
-          body: {
-            firstName: 'Sam',
-            lastName: 'Person',
-            dobDay: '25',
-            dobMonth: '12',
-            dobYear: '1970',
-          },
+            body: {
+              firstName: 'Sam',
+              lastName: 'Person',
+              dobDay: '25',
+              dobMonth: '12',
+              dobYear: '1970',
+            },
+          })
+
+          await call('post')
         })
 
-        await call('post')
+        it('should redirect to the responsible person address', () => {
+          sinon.assert.calledOnceWithExactly(
+            res.redirect,
+            formatServiceAndAccountPathsFor(
+              paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.address,
+              SERVICE_EXTERNAL_ID,
+              SERVICE_TYPE,
+              GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+            )
+          )
+        })
       })
 
-      it('should redirect to the responsible person address', () => {
-        sinon.assert.calledOnceWithExactly(
-          res.redirect,
-          formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.address,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+      describe('when submitting invalid data', () => {
+        it('should call the response function with the template path', async () => {
+          nextRequest({
+            body: {
+              firstName: 'Sam Person',
+              lastName: '',
+              dobDay: '',
+              dobMonth: '12',
+              dobYear: '70',
+            },
+          })
+
+          await call('post')
+
+          mockResponse.should.have.been.calledOnce
+          mockResponse.should.have.been.calledWith(
+            sinon.match.any,
+            sinon.match.any,
+            'simplified-account/settings/adyen-details/responsible-person/index'
           )
-        )
+        })
       })
     })
   })

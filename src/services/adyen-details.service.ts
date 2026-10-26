@@ -216,7 +216,7 @@ const createResponsiblePerson = async (session: ResponsiblePersonSession, organi
       lastName: session.lastName ?? '',
     },
     birthData: {
-      dateOfBirth: `${session.dobYear}-${session.dobMonth}-${session.dobDay}`,
+      dateOfBirth: formatDateInputs(session.dobDay!, session.dobMonth!, session.dobYear!),
     },
     residentialAddress: {
       street: session.addressLine1,
@@ -316,8 +316,11 @@ const createServiceDirector = async (
     type: Types.legalEntityManagement.LegalEntityInfoRequiredType.TypeEnum.Individual,
     individual: {
       birthData: {
-        // Expected format yyyy-MM-dd
-        dateOfBirth: `${serviceDirectorSession.dobYear}-${serviceDirectorSession.dobMonth?.padStart(2, '0')}-${serviceDirectorSession.dobDay?.padStart(2, '0')}`,
+        dateOfBirth: formatDateInputs(
+          serviceDirectorSession.dobDay!,
+          serviceDirectorSession.dobMonth!,
+          serviceDirectorSession.dobYear!
+        ),
       },
       email: serviceDirectorSession.email,
       name: {
@@ -470,6 +473,11 @@ const isAccountHolderVerified = async (accountHolderId: string): Promise<boolean
     (capabilityName) => accountHolder.capabilities?.[capabilityName]
   )
   return capabilities.every((capability) => capability?.allowed ?? false)
+}
+
+// Expected format yyyy-MM-dd
+function formatDateInputs(dobDay: string, dobMonth: string, dobYear: string): string {
+  return `${dobYear}-${dobMonth?.padStart(2, '0')}-${dobDay?.padStart(2, '0')}`
 }
 
 export {
