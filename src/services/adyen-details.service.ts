@@ -156,6 +156,7 @@ async function addCardPaymentMethods(storeId: string, businessLineId: string, me
     PaymentMethodSetupInfo.TypeEnum.Discover,
     PaymentMethodSetupInfo.TypeEnum.Diners,
     PaymentMethodSetupInfo.TypeEnum.Cup,
+    PaymentMethodSetupInfo.TypeEnum.Amex,
   ]
 
   for (const paymentMethod of cardPaymentMethods) {
@@ -163,6 +164,8 @@ async function addCardPaymentMethods(storeId: string, businessLineId: string, me
       type: paymentMethod,
       storeIds: [storeId],
       businessLineId: businessLineId,
+      countries: ['GB'],
+      currencies: ['GBP'],
     }
 
     await requestPaymentMethod(merchantId, paymentMethodSetupInfo)
@@ -172,20 +175,6 @@ async function addCardPaymentMethods(storeId: string, businessLineId: string, me
       store_id: storeId,
     })
   }
-
-  const amexSetupInfo: PaymentMethodSetupInfo = {
-    type: PaymentMethodSetupInfo.TypeEnum.Amex,
-    storeIds: [storeId],
-    countries: ['GB'],
-    currencies: ['GBP'],
-    businessLineId: businessLineId,
-  }
-
-  await requestPaymentMethod(merchantId, amexSetupInfo)
-  logger.info(`Payment method added to store`, {
-    type: PaymentMethodSetupInfo.TypeEnum.Amex,
-    store_id: storeId,
-  })
 }
 
 async function addGooglePayPaymentMethods(storeId: string, businessLineId: string, merchantId: string) {
@@ -198,6 +187,8 @@ async function addGooglePayPaymentMethods(storeId: string, businessLineId: strin
     },
     storeIds: [storeId],
     businessLineId: businessLineId,
+    countries: ['GB'],
+    currencies: ['GBP'],
   }
 
   await requestPaymentMethod(merchantId, googlePayPaySetupInfo)

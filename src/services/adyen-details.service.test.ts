@@ -608,13 +608,15 @@ describe('Adyen details service', () => {
         },
       })
 
-      const cardTypes = ['visa', 'mc', 'jcb', 'maestro', 'discover', 'diners', 'cup']
+      const cardTypes = ['visa', 'mc', 'jcb', 'maestro', 'discover', 'diners', 'cup', 'amex']
 
       cardTypes.forEach((type) =>
         sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
           type: type,
           storeIds: [store.id],
           businessLineId: 'BL123',
+          countries: ['GB'],
+          currencies: ['GBP'],
         })
       )
 
@@ -627,18 +629,12 @@ describe('Adyen details service', () => {
       })
 
       sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
-        type: 'amex',
-        storeIds: [store.id],
-        businessLineId: 'BL123',
-        countries: ['GB'],
-        currencies: ['GBP'],
-      })
-
-      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
         type: 'googlepay',
         storeIds: [store.id],
         businessLineId: 'BL123',
         googlePay: { merchantId: 'MERCHANT123' },
+        countries: ['GB'],
+        currencies: ['GBP'],
       })
     })
 
