@@ -26,11 +26,10 @@ import {
   createAccountHolder as createAdyenAccountHolder,
   createBalanceAccount as createAdyenBalanceAccount,
 } from '@services/clients/adyen/adyen-balance-platform.client'
-import { createStore as createAdyenStore } from '@services/clients/adyen/adyen-management.client'
+import { createStore as createAdyenStore, requestPaymentMethod } from '@services/clients/adyen/adyen-management.client'
 import { ServiceDirectorSession } from '@controllers/simplified-account/settings/adyen-details/service-director/constants'
 import { ResponsiblePersonSession } from '@controllers/simplified-account/settings/adyen-details/responsible-person/constants'
 import { Individual } from '@adyen/api-library/lib/src/typings/legalEntityManagement/individual'
-import { requestPaymentMethod } from './clients/adyen/adyen-management.client'
 import { PaymentMethodSetupInfo } from '@adyen/api-library/lib/src/typings/management/paymentMethodSetupInfo'
 import { BusinessLineInfo } from '@adyen/api-library/lib/src/typings/legalEntityManagement/businessLineInfo'
 import { SweepSchedule } from '@adyen/api-library/lib/src/typings/balancePlatform/sweepSchedule'
@@ -132,10 +131,7 @@ const createOrganisation = async (
   return { legalEntity, businessLine, accountHolder, balanceAccount }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const addPaymentMethodsToStore = async (storeId: string, businessLineId: string) => {
-  const merchantId = ''
-
+const addPaymentMethodsToStore = async (storeId: string, businessLineId: string, merchantId: string) => {
   await addCardPaymentMethods(storeId, businessLineId, merchantId)
   await addGooglePayPaymentMethods(storeId, businessLineId, merchantId)
   await addPayByBankPaymentMethod(storeId, businessLineId, merchantId)
@@ -546,7 +542,10 @@ const createStore = async ({
       splitConfigurationId,
     },
   }
-  return await createAdyenStore(storeCreationRequest)
+  const store = await createAdyenStore(storeCreationRequest)
+  await addPaymentMethodsToStore(store.id!, businessLineId, merchantId)
+
+  return store
 }
 
 export {
