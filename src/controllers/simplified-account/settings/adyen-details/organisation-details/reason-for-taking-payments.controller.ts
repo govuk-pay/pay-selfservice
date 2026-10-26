@@ -91,8 +91,7 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
   const { businessLine, balanceAccount } = await createOrganisation(
     completeSession,
     governmentActivity,
-    req.service.name,
-    req.service.externalId,
+    req.service,
     req.account.type,
     switchingCredentialId,
     req.user.externalId

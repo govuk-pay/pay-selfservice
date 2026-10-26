@@ -5,6 +5,8 @@ import type { OrganisationDetailsSession } from '@controllers/simplified-account
 import { ResponsiblePersonSession } from '@controllers/simplified-account/settings/adyen-details/responsible-person/constants'
 import { ServiceDirectorSession } from '@controllers/simplified-account/settings/adyen-details/service-director/constants'
 import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
+import { ServiceFixture } from '@test/fixtures/service/service.fixture'
+import { MerchantDetailsFixture } from '@test/fixtures/service/merchant-details.fixture'
 
 type AdyenDetailsService = typeof import('./adyen-details.service')
 
@@ -64,6 +66,15 @@ describe('Adyen details service', () => {
       vatRegistrationNumber: 'GB123456789',
     } as OrganisationDetailsSession
 
+    const serviceFixture = new ServiceFixture({
+      name: 'Test Service',
+      externalId: 'service_id',
+      merchantDetails: new MerchantDetailsFixture({
+        email: 'test@gov.uk',
+        telephoneNumber: '01234567890',
+      }),
+    })
+
     const SERVICE_NAME = 'Test Service'
     const BALANCE_PLATFORM_ID = 'BP123'
 
@@ -88,8 +99,7 @@ describe('Adyen details service', () => {
       const result = await service.createOrganisation(
         fullOrganisationSession,
         'general-local',
-        SERVICE_NAME,
-        'service_id',
+        serviceFixture.toService(),
         'live',
         'credential_id',
         'user_id'
@@ -98,7 +108,10 @@ describe('Adyen details service', () => {
       sinon.assert.calledOnceWithExactly(legalEntityClientMock.createLegalEntity, {
         type: ORGANISATION_TYPE,
         organization: {
+          type: 'governmentalOrganization',
           legalName: 'Test Org Ltd',
+          doingBusinessAs: 'Test Service',
+          countryOfGoverningLaw: 'GB',
           registeredAddress: {
             street: '1 Test Street',
             street2: 'Test Building',
@@ -108,6 +121,10 @@ describe('Adyen details service', () => {
           },
           registrationNumber: '12345678',
           vatNumber: 'GB123456789',
+          support: {
+            email: 'test@gov.uk',
+            phone: { number: '01234567890' },
+          },
         },
       })
 
@@ -118,8 +135,7 @@ describe('Adyen details service', () => {
       const result = await service.createOrganisation(
         fullOrganisationSession,
         'general-local',
-        SERVICE_NAME,
-        'service_id',
+        serviceFixture.toService(),
         'live',
         'credential_id',
         'user_id'
@@ -138,8 +154,7 @@ describe('Adyen details service', () => {
       const result = await service.createOrganisation(
         fullOrganisationSession,
         'general-local',
-        SERVICE_NAME,
-        'service_id',
+        serviceFixture.toService(),
         'live',
         'credential_id',
         'user_id'
@@ -164,8 +179,7 @@ describe('Adyen details service', () => {
         service.createOrganisation(
           fullOrganisationSession,
           'general-local',
-          SERVICE_NAME,
-          'service_id',
+          serviceFixture.toService(),
           'live',
           'credential_id',
           'user_id'
@@ -182,8 +196,7 @@ describe('Adyen details service', () => {
         service.createOrganisation(
           fullOrganisationSession,
           'general-local',
-          SERVICE_NAME,
-          'service_id',
+          serviceFixture.toService(),
           'live',
           'credential_id',
           'user_id'
@@ -196,8 +209,7 @@ describe('Adyen details service', () => {
       await service.createOrganisation(
         fullOrganisationSession,
         'general-local',
-        SERVICE_NAME,
-        'service_id',
+        serviceFixture.toService(),
         'live',
         'credential_id',
         'user_id'
@@ -225,8 +237,7 @@ describe('Adyen details service', () => {
       await service.createOrganisation(
         fullOrganisationSession,
         'general-local',
-        SERVICE_NAME,
-        'service_id',
+        serviceFixture.toService(),
         'live',
         'credential_id',
         'user_id'
@@ -249,8 +260,7 @@ describe('Adyen details service', () => {
       await service.createOrganisation(
         fullOrganisationSession,
         'police-safety',
-        SERVICE_NAME,
-        'service_id',
+        serviceFixture.toService(),
         'live',
         'credential_id',
         'user_id'
@@ -262,8 +272,7 @@ describe('Adyen details service', () => {
       await service.createOrganisation(
         fullOrganisationSession,
         'everything-else',
-        SERVICE_NAME,
-        'service_id',
+        serviceFixture.toService(),
         'live',
         'credential_id',
         'user_id'

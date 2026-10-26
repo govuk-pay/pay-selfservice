@@ -34,6 +34,7 @@ import { BusinessLineInfo } from '@adyen/api-library/lib/src/typings/legalEntity
 import { SweepSchedule } from '@adyen/api-library/lib/src/typings/balancePlatform/sweepSchedule'
 import { CreateSweepConfigurationV2 } from '@adyen/api-library/lib/src/typings/balancePlatform/createSweepConfigurationV2'
 import { createSweep } from './clients/adyen/adyen-balance-platform.client'
+import Service from '@models/service/Service.class'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -114,8 +115,9 @@ const setAdyenBalanceAccountId = async (
   )
 }
 
-const createOrganisationLegalEntity = (session: OrganisationDetailsSession) => {
+const createOrganisationLegalEntity = (session: OrganisationDetailsSession, service: Service) => {
   const organization: Organization = {
+    type: Types.legalEntityManagement.Organization.TypeEnum.GovernmentalOrganization,
     legalName: session.organisationName ?? '',
     registeredAddress: {
       street: session.addressLine1,
@@ -126,6 +128,14 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession) => {
     },
     registrationNumber: session.companyRegistrationNumber,
     vatNumber: ensureVatRegistrationPrefix(session.vatRegistrationNumber),
+    doingBusinessAs: service.name,
+    countryOfGoverningLaw: 'GB',
+    support: {
+      email: service.merchantDetails?.email,
+      phone: {
+        number: service.merchantDetails?.telephoneNumber ?? '',
+      },
+    },
   }
 
   const legalEntityInfo: LegalEntityInfoRequiredType = {
@@ -139,13 +149,13 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession) => {
 const createOrganisation = async (
   session: OrganisationDetailsSession,
   governmentActivity: GovernmentActivity,
-  serviceName: string,
-  serviceExternalId: string,
+  service: Service,
   accountType: string,
   switchingCredentialId: string,
   userExternalId: string
 ) => {
-  const legalEntity = await createOrganisationLegalEntity(session)
+  const { name: serviceName, externalId: serviceExternalId } = service
+  const legalEntity = await createOrganisationLegalEntity(session, service)
 
   const businessLine = await createBusinessLine({
     service: BusinessLineInfo.ServiceEnum.PaymentProcessing,
