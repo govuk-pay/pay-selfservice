@@ -32,7 +32,7 @@ async function canStartPspPaymentVerificationTask(req: ServiceRequest, _: Servic
       errorPath = paths.simplifiedAccount.settings.switchPsp.switchToStripe.index
       break
     case ADYEN:
-      tasks = AdyenTasks.forProviderSwitching(
+      tasks = await AdyenTasks.forProviderSwitching(
         req.service,
         req.account,
         await getConnectorAdyenAccountSetup(

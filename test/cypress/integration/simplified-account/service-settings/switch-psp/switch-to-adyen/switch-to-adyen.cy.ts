@@ -139,7 +139,7 @@ describe('switch to adyen task list', () => {
         .contains('3. Complete your organisation’s details')
         .next('.govuk-task-list')
         .within(() => {
-          cy.get('.govuk-task-list__item').should('have.length', 4)
+          cy.get('.govuk-task-list__item').should('have.length', 3)
 
           cy.get('.govuk-task-list__item')
             .eq(0)
@@ -173,19 +173,6 @@ describe('switch to adyen task list', () => {
                 )
               cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
             })
-
-          cy.get('.govuk-task-list__item')
-            .eq(3)
-            .within(() => {
-              cy.get('.govuk-task-list__link')
-                .should('contain.text', 'Bank statement descriptors for your service')
-                .should(
-                  'have.attr',
-                  'href',
-                  `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/statement-descriptors/user`
-                )
-              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
-            })
         })
 
       cy.get('h2')
@@ -197,15 +184,20 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(0)
             .within(() => {
-              cy.get('.govuk-task-list__link').should('contain.text', 'Make a £1 payment using a debit or credit card')
-              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
+              cy.get('.govuk-task-list__link').should('not.exist')
+              cy.get('.govuk-task-list__name-and-hint').should(
+                'contain.text',
+                'Make a £1 payment using a debit or credit card'
+              )
+              cy.get('.govuk-task-list__status').should('contain.text', 'Cannot start yet')
             })
 
           cy.get('.govuk-task-list__item')
             .eq(1)
             .within(() => {
-              cy.get('.govuk-task-list__link').should('contain.text', 'Finish switching to Adyen')
-              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
+              cy.get('.govuk-task-list__link').should('not.exist')
+              cy.get('.govuk-task-list__name-and-hint').should('contain.text', 'Finish switching to Adyen')
+              cy.get('.govuk-task-list__status').should('contain.text', 'Cannot start yet')
             })
         })
     })
