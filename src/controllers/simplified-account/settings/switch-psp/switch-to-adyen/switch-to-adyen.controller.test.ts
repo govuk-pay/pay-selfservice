@@ -80,10 +80,10 @@ describe('Switch to Adyen controller tests', () => {
     }
 
     context.currentPsp.should.eq(PaymentProvider.STRIPE)
-    context.adyenTasks.tasks.should.have.length(8)
+    context.adyenTasks.tasks.should.have.length(7)
     context.adyenTasks.confirmOrganisationTasks.should.have.length(1)
     context.adyenTasks.acceptLegalTermsTasks.should.have.length(1)
-    context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(4)
+    context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(3)
     context.adyenTasks.completeFinalTasks.should.have.length(2)
 
     context.adyenTasks.confirmOrganisationTasks[0].id.should.eq(AdyenTaskIdentifier.ORG_DETAILS)
@@ -101,13 +101,10 @@ describe('Switch to Adyen controller tests', () => {
     context.adyenTasks.completeOrganisationDetailsTasks[2].id.should.eq(AdyenTaskIdentifier.SERVICE_DIRECTOR)
     context.adyenTasks.completeOrganisationDetailsTasks[2].status.should.eq(TaskStatus.NOT_STARTED)
 
-    context.adyenTasks.completeOrganisationDetailsTasks[3].id.should.eq(AdyenTaskIdentifier.STATEMENT_DESCRIPTORS)
-    context.adyenTasks.completeOrganisationDetailsTasks[3].status.should.eq(TaskStatus.NOT_STARTED)
-
     context.adyenTasks.completeFinalTasks[0].id.should.eq(AdyenTaskIdentifier.PAYMENT)
-    context.adyenTasks.completeFinalTasks[0].status.should.eq(TaskStatus.NOT_STARTED)
+    context.adyenTasks.completeFinalTasks[0].status.should.eq(TaskStatus.CANNOT_START)
 
     context.adyenTasks.completeFinalTasks[1].id.should.eq(AdyenTaskIdentifier.FINISH_SWITCHING)
-    context.adyenTasks.completeFinalTasks[1].status.should.eq(TaskStatus.NOT_STARTED)
+    context.adyenTasks.completeFinalTasks[1].status.should.eq(TaskStatus.CANNOT_START)
   })
 })
