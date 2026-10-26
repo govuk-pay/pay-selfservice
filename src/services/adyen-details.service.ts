@@ -86,9 +86,9 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
     doingBusinessAs: service.name,
     countryOfGoverningLaw: 'GB',
     support: {
-      email: service.merchantDetails?.email,
+      email: service.merchantDetails!.email,
       phone: {
-        number: service.merchantDetails?.telephoneNumber ?? '',
+        number: service.merchantDetails!.telephoneNumber,
       },
     },
   }
@@ -109,7 +109,6 @@ const createOrganisation = async (
   switchingCredentialId: string,
   userExternalId: string
 ) => {
-  const { name: serviceName, externalId: serviceExternalId } = service
   const legalEntity = await createOrganisationLegalEntity(session, service)
 
   const businessLine = await createBusinessLine({
@@ -118,11 +117,11 @@ const createOrganisation = async (
     legalEntityId: legalEntity.id,
     salesChannels: ['eCommerce'],
   })
-  const accountHolder = await createAccountHolder(legalEntity.id, serviceName)
-  const balanceAccount = await createBalanceAccount(accountHolder.id, serviceName)
+  const accountHolder = await createAccountHolder(legalEntity.id, service.name)
+  const balanceAccount = await createBalanceAccount(accountHolder.id, service.name)
 
   await connectorClient.gatewayAccounts.patchCredentialsByServiceExternalIdAndAccountType(
-    serviceExternalId,
+    service.externalId,
     accountType,
     switchingCredentialId,
     new GatewayAccountCredentialUpdateRequest(userExternalId)
