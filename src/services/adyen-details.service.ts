@@ -22,13 +22,8 @@ import {
   generatePciQuestionnaire,
   signPciQuestionnaire,
 } from '@services/clients/adyen/adyen-legal-entity-management.client'
-import {
-  createAccountHolder as createAdyenAccountHolder,
-  createBalanceAccount as createAdyenBalanceAccount,
-} from '@services/clients/adyen/adyen-balance-platform.client'
 import { createStore as createAdyenStore, requestPaymentMethod } from '@services/clients/adyen/adyen-management.client'
 import * as AdyenBalancePlatformClient from '@services/clients/adyen/adyen-balance-platform.client'
-import * as AdyenManagementClient from '@services/clients/adyen/adyen-management.client'
 import { ServiceDirectorSession } from '@controllers/simplified-account/settings/adyen-details/service-director/constants'
 import { ResponsiblePersonSession } from '@controllers/simplified-account/settings/adyen-details/responsible-person/constants'
 import { Individual } from '@adyen/api-library/lib/src/typings/legalEntityManagement/individual'
