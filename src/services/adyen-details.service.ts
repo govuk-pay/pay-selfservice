@@ -27,6 +27,8 @@ import {
   createBalanceAccount as createAdyenBalanceAccount,
 } from '@services/clients/adyen/adyen-balance-platform.client'
 import { createStore as createAdyenStore, requestPaymentMethod } from '@services/clients/adyen/adyen-management.client'
+import * as AdyenBalancePlatformClient from '@services/clients/adyen/adyen-balance-platform.client'
+import * as AdyenManagementClient from '@services/clients/adyen/adyen-management.client'
 import { ServiceDirectorSession } from '@controllers/simplified-account/settings/adyen-details/service-director/constants'
 import { ResponsiblePersonSession } from '@controllers/simplified-account/settings/adyen-details/responsible-person/constants'
 import { Individual } from '@adyen/api-library/lib/src/typings/legalEntityManagement/individual'
@@ -35,6 +37,7 @@ import { BusinessLineInfo } from '@adyen/api-library/lib/src/typings/legalEntity
 import { SweepSchedule } from '@adyen/api-library/lib/src/typings/balancePlatform/sweepSchedule'
 import { CreateSweepConfigurationV2 } from '@adyen/api-library/lib/src/typings/balancePlatform/createSweepConfigurationV2'
 import { createSweep } from './clients/adyen/adyen-balance-platform.client'
+import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatform/accountHolder'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -54,6 +57,14 @@ type GeneratePciDescriptionResponse = Types.legalEntityManagement.GeneratePciDes
 
 const connectorClient = new ConnectorClient()
 const logger = createLogger(__filename)
+
+const REQUIRED_VERIFICATION_CAPABILITIES = [
+  'receiveFromPlatformPayments',
+  'receiveFromBalanceAccount',
+  'sendToBalanceAccount',
+  'sendToTransferInstrument',
+  'receivePayments',
+]
 
 const setAdyenStoreId = async (
   serviceExternalId: string,
@@ -362,7 +373,7 @@ const createAccountHolder = async (organisationLegalEntityId: string, serviceNam
     description: serviceName,
   }
 
-  return createAdyenAccountHolder(accountHolderInfo)
+  return AdyenBalancePlatformClient.createAccountHolder(accountHolderInfo)
 }
 
 const createBalanceAccount = async (accountHolderId: string, serviceName: string) => {
@@ -372,7 +383,7 @@ const createBalanceAccount = async (accountHolderId: string, serviceName: string
     description: serviceName,
   }
 
-  return createAdyenBalanceAccount(balanceAccountInfo)
+  return AdyenBalancePlatformClient.createBalanceAccount(balanceAccountInfo)
 }
 
 const toUkInternationalNumber = (input: string): string => {
@@ -541,10 +552,23 @@ const createStore = async ({
       splitConfigurationId,
     },
   }
+
   const store = await createAdyenStore(storeCreationRequest)
   await addPaymentMethodsToStore(store.id!, businessLineId, merchantId)
 
   return store
+}
+
+const getAccountHolder = async (accountHolderId: string): Promise<AccountHolder> => {
+  return AdyenBalancePlatformClient.getAccountHolder(accountHolderId)
+}
+
+const isAccountHolderVerified = async (accountHolderId: string): Promise<boolean> => {
+  const accountHolder = await getAccountHolder(accountHolderId)
+  const capabilities = REQUIRED_VERIFICATION_CAPABILITIES.map(
+    (capabilityName) => accountHolder.capabilities?.[capabilityName]
+  )
+  return capabilities.every((capability) => capability?.allowed ?? false)
 }
 
 export {
@@ -556,4 +580,6 @@ export {
   createAccountHolder,
   createBalanceAccount,
   createStore,
+  getAccountHolder,
+  isAccountHolderVerified,
 }

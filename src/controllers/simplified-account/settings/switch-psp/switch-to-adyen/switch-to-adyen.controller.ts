@@ -11,7 +11,8 @@ async function get(req: ServiceRequest, res: ServiceResponse) {
     req.account.type,
     req.account.getSwitchingCredential().externalId
   )
-  const adyenTasks = AdyenTasks.forProviderSwitching(req.service, req.account, accountSetup)
+
+  const adyenTasks = await AdyenTasks.forProviderSwitching(req.service, req.account, accountSetup)
   ResponsiblePersonSession.clear(req)
   ServiceDirectorSession.clear(req)
 

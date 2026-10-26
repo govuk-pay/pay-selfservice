@@ -30,6 +30,12 @@ if (
 
 const balancePlatformAPI = new BalancePlatformAPI(client)
 
+export async function getAccountHolder(accountHolderId: string): Promise<AccountHolder> {
+  return new AdyenRequest(AdyenAPI.BALANCE_PLATFORM, 'get account holder').execute(() =>
+    balancePlatformAPI.AccountHoldersApi.getAccountHolder(accountHolderId)
+  )
+}
+
 export async function createSweep(balanceAccountId: string, sweepConfiguration: CreateSweepConfigurationV2) {
   return new AdyenRequest(AdyenAPI.BALANCE_PLATFORM, 'create account holder').execute(() =>
     balancePlatformAPI.CustomPayoutSchedulesSweepsApi.createSweep(balanceAccountId, sweepConfiguration)
