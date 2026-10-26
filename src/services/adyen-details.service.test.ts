@@ -587,6 +587,8 @@ describe('Adyen details service', () => {
 
       const result = await service.createStore(storeParams)
 
+      expect(result).to.equal(store)
+
       sinon.assert.calledOnceWithExactly(managementClientMock.createStore, {
         merchantId: 'MERCHANT123',
         description: 'Test Service',

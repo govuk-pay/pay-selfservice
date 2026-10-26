@@ -110,6 +110,7 @@ const setStubs = (additionalStubs = []) => {
     AdyenStubs.createBusinessLine().success({ id: 'BL123' }),
     StripeStubs.retrieveAccountDetails({ stripeAccountId: 'a-stripe-account', statementDescriptor: 'TEST SERVICE' }),
     AdyenStubs.createStore().success({ id: 'store-123' }),
+    AdyenStubs.requestPaymentMethod('test').success({ id: 'PM3227C223224K5FH84M8CBNH' }),
     ...additionalStubs,
   ])
 }
