@@ -31,6 +31,7 @@ describe('Adyen details service', () => {
 
   const managementClientMock = {
     createStore: sinon.stub(),
+    requestPaymentMethod: sinon.stub(),
   }
 
   const connectorClientMock = {
@@ -589,8 +590,13 @@ describe('Adyen details service', () => {
     it('should create Adyen store linked to the given business line with a split configuration', async () => {
       const store = { id: 'ST123', businessLineIds: ['BL123'] }
       managementClientMock.createStore.resolves(store)
+      managementClientMock.requestPaymentMethod.resolves()
+
+      managementClientMock.createStore.resolves(store)
 
       const result = await service.createStore(storeParams)
+
+      expect(result).to.equal(store)
 
       sinon.assert.calledOnceWithExactly(managementClientMock.createStore, {
         merchantId: 'MERCHANT123',
@@ -610,7 +616,35 @@ describe('Adyen details service', () => {
           splitConfigurationId: 'SC123',
         },
       })
-      expect(result).to.equal(store)
+
+      const cardTypes = ['visa', 'mc', 'jcb', 'maestro', 'discover', 'diners', 'cup', 'amex']
+
+      cardTypes.forEach((type) =>
+        sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
+          type: type,
+          storeIds: [store.id],
+          businessLineId: 'BL123',
+          countries: ['GB'],
+          currencies: ['GBP'],
+        })
+      )
+
+      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
+        type: 'paybybank',
+        storeIds: [store.id],
+        businessLineId: 'BL123',
+        countries: ['GB'],
+        currencies: ['GBP'],
+      })
+
+      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
+        type: 'googlepay',
+        storeIds: [store.id],
+        businessLineId: 'BL123',
+        googlePay: { merchantId: 'MERCHANT123' },
+        countries: ['GB'],
+        currencies: ['GBP'],
+      })
     })
 
     it('should not create store when ADYEN_LIVE_MERCHANT_ACCOUNT_ID is NOT set', async () => {

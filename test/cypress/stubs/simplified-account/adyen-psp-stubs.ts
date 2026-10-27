@@ -155,3 +155,15 @@ export function createStore() {
     },
   }
 }
+
+export function requestPaymentMethod(merchantId: string) {
+  const path = `/v3/merchants/${merchantId}/paymentMethodSettings`
+
+  return {
+    success: function (paymentMethod: { id: string }) {
+      return stubBuilder('POST', path, 200, {
+        response: paymentMethod,
+      })
+    },
+  }
+}

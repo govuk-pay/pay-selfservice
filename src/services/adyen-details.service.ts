@@ -22,11 +22,12 @@ import {
   generatePciQuestionnaire,
   signPciQuestionnaire,
 } from '@services/clients/adyen/adyen-legal-entity-management.client'
+import { createStore as createAdyenStore, requestPaymentMethod } from '@services/clients/adyen/adyen-management.client'
 import * as AdyenBalancePlatformClient from '@services/clients/adyen/adyen-balance-platform.client'
-import * as AdyenManagementClient from '@services/clients/adyen/adyen-management.client'
 import { ServiceDirectorSession } from '@controllers/simplified-account/settings/adyen-details/service-director/constants'
 import { ResponsiblePersonSession } from '@controllers/simplified-account/settings/adyen-details/responsible-person/constants'
 import { Individual } from '@adyen/api-library/lib/src/typings/legalEntityManagement/individual'
+import { PaymentMethodSetupInfo } from '@adyen/api-library/lib/src/typings/management/paymentMethodSetupInfo'
 import { BusinessLineInfo } from '@adyen/api-library/lib/src/typings/legalEntityManagement/businessLineInfo'
 import { SweepSchedule } from '@adyen/api-library/lib/src/typings/balancePlatform/sweepSchedule'
 import { CreateSweepConfigurationV2 } from '@adyen/api-library/lib/src/typings/balancePlatform/createSweepConfigurationV2'
@@ -143,6 +144,86 @@ const createOrganisation = async (
   )
 
   return { legalEntity, businessLine, accountHolder, balanceAccount }
+}
+
+const addPaymentMethodsToStore = async (storeId: string, businessLineId: string, merchantId: string) => {
+  await addCardPaymentMethods(storeId, businessLineId, merchantId)
+  await addGooglePayPaymentMethods(storeId, businessLineId, merchantId)
+  await addPayByBankPaymentMethod(storeId, businessLineId, merchantId)
+
+  logger.info(`Required payment methods added to store`, {
+    store_id: storeId,
+  })
+}
+
+async function addCardPaymentMethods(storeId: string, businessLineId: string, merchantId: string) {
+  const cardPaymentMethods = [
+    PaymentMethodSetupInfo.TypeEnum.Visa,
+    PaymentMethodSetupInfo.TypeEnum.Mc,
+    PaymentMethodSetupInfo.TypeEnum.Jcb,
+    PaymentMethodSetupInfo.TypeEnum.Maestro,
+    PaymentMethodSetupInfo.TypeEnum.Discover,
+    PaymentMethodSetupInfo.TypeEnum.Diners,
+    PaymentMethodSetupInfo.TypeEnum.Cup,
+    PaymentMethodSetupInfo.TypeEnum.Amex,
+  ]
+
+  for (const paymentMethod of cardPaymentMethods) {
+    const paymentMethodSetupInfo: PaymentMethodSetupInfo = {
+      type: paymentMethod,
+      storeIds: [storeId],
+      businessLineId: businessLineId,
+      countries: ['GB'],
+      currencies: ['GBP'],
+    }
+
+    await requestPaymentMethod(merchantId, paymentMethodSetupInfo)
+
+    logger.info(`Payment method added to store`, {
+      type: paymentMethodSetupInfo.type,
+      store_id: storeId,
+    })
+  }
+}
+
+async function addGooglePayPaymentMethods(storeId: string, businessLineId: string, merchantId: string) {
+  const googlePayPaymentType = PaymentMethodSetupInfo.TypeEnum.Googlepay
+
+  const googlePayPaySetupInfo: PaymentMethodSetupInfo = {
+    type: googlePayPaymentType,
+    googlePay: {
+      merchantId,
+    },
+    storeIds: [storeId],
+    businessLineId: businessLineId,
+    countries: ['GB'],
+    currencies: ['GBP'],
+  }
+
+  await requestPaymentMethod(merchantId, googlePayPaySetupInfo)
+
+  logger.info(`Payment method added to store`, {
+    type: googlePayPaymentType,
+    store_id: storeId,
+  })
+}
+
+async function addPayByBankPaymentMethod(storeId: string, businessLineId: string, merchantId: string) {
+  const payByBankPaymentType = PaymentMethodSetupInfo.TypeEnum.Paybybank
+  const payByBankSetupInfo: PaymentMethodSetupInfo = {
+    type: payByBankPaymentType,
+    storeIds: [storeId],
+    businessLineId: businessLineId,
+    countries: ['GB'],
+    currencies: ['GBP'],
+  }
+
+  await requestPaymentMethod(merchantId, payByBankSetupInfo)
+
+  logger.info(`Payment method added to store`, {
+    type: payByBankPaymentType,
+    store_id: storeId,
+  })
 }
 
 const getAdyenCredentials = async (serviceExternalId: string, accountType: string, switchingCredentialId: string) => {
@@ -469,7 +550,11 @@ const createStore = async ({
       splitConfigurationId,
     },
   }
-  return await AdyenManagementClient.createStore(storeCreationRequest)
+
+  const store = await createAdyenStore(storeCreationRequest)
+  await addPaymentMethodsToStore(store.id!, businessLineId, merchantId)
+
+  return store
 }
 
 const getAccountHolder = async (accountHolderId: string): Promise<AccountHolder> => {
