@@ -31,6 +31,7 @@ import { BusinessLineInfo } from '@adyen/api-library/lib/src/typings/legalEntity
 import { SweepSchedule } from '@adyen/api-library/lib/src/typings/balancePlatform/sweepSchedule'
 import { CreateSweepConfigurationV2 } from '@adyen/api-library/lib/src/typings/balancePlatform/createSweepConfigurationV2'
 import { createSweep } from './clients/adyen/adyen-balance-platform.client'
+import Service from '@models/service/Service.class'
 import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatform/accountHolder'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
@@ -75,8 +76,9 @@ const setAdyenStoreId = async (
   )
 }
 
-const createOrganisationLegalEntity = (session: OrganisationDetailsSession) => {
+const createOrganisationLegalEntity = (session: OrganisationDetailsSession, service: Service) => {
   const organization: Organization = {
+    type: Types.legalEntityManagement.Organization.TypeEnum.GovernmentalOrganization,
     legalName: session.organisationName ?? '',
     registeredAddress: {
       street: session.addressLine1,
@@ -87,6 +89,14 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession) => {
     },
     registrationNumber: session.companyRegistrationNumber,
     vatNumber: ensureVatRegistrationPrefix(session.vatRegistrationNumber),
+    doingBusinessAs: service.name,
+    countryOfGoverningLaw: 'GB',
+    support: {
+      email: service.merchantDetails!.email,
+      phone: {
+        number: service.merchantDetails!.telephoneNumber,
+      },
+    },
   }
 
   const legalEntityInfo: LegalEntityInfoRequiredType = {
@@ -100,13 +110,12 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession) => {
 const createOrganisation = async (
   session: OrganisationDetailsSession,
   governmentActivity: GovernmentActivity,
-  serviceName: string,
-  serviceExternalId: string,
+  service: Service,
   accountType: string,
   switchingCredentialId: string,
   userExternalId: string
 ) => {
-  const legalEntity = await createOrganisationLegalEntity(session)
+  const legalEntity = await createOrganisationLegalEntity(session, service)
 
   const businessLine = await createBusinessLine({
     service: BusinessLineInfo.ServiceEnum.PaymentProcessing,
@@ -114,11 +123,11 @@ const createOrganisation = async (
     legalEntityId: legalEntity.id,
     salesChannels: ['eCommerce'],
   })
-  const accountHolder = await createAccountHolder(legalEntity.id, serviceName)
-  const balanceAccount = await createBalanceAccount(accountHolder.id, serviceName)
+  const accountHolder = await createAccountHolder(legalEntity.id, service.name)
+  const balanceAccount = await createBalanceAccount(accountHolder.id, service.name)
 
   await connectorClient.gatewayAccounts.patchCredentialsByServiceExternalIdAndAccountType(
-    serviceExternalId,
+    service.externalId,
     accountType,
     switchingCredentialId,
     new GatewayAccountCredentialUpdateRequest(userExternalId)

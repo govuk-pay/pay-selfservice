@@ -126,8 +126,7 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
           createOrganisation,
           new OrganisationDetailsSession(VALID_SESSION as OrganisationDetailsSession),
           'general-local',
-          serviceFixture.name,
-          SERVICE_EXTERNAL_ID,
+          serviceFixture.toService(),
           GATEWAY_ACCOUNT.type,
           GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
           USER.externalId
