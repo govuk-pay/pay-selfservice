@@ -5,14 +5,13 @@ import { PaymentProvider } from '@models/constants/payment-provider'
 import { getUser } from '@test/cypress/stubs/simplified-account/user-stubs'
 import * as SimplifiedGatewayAccountStubs from '@test/cypress/stubs/simplified-account/gateway-account-stubs'
 import gatewayAccountStubs from '@test/cypress/stubs/gateway-account-stubs'
-import {
-  AdyenAccountSetupTaskData,
-  AdyenAccountSetupTaskNameData,
-} from '@models/gateway-account/dto/AdyenAccountSetup.dto'
 import checkTitleAndHeading from '../../helpers/check-title-and-heading'
 import connectorChargeStubs from '@test/cypress/stubs/connector-charge-stubs'
 import { VERIFY_PSP_INTEGRATION_CHARGE_EXTERNAL_ID_KEY } from '@utils/verify-psp-integration'
 import { VERIFIED } from '@models/constants/credential-state'
+import * as AdyenStubs from '@test/cypress/stubs/simplified-account/adyen-psp-stubs'
+import { AdyenAccountSetupFixture } from '@test/fixtures/gateway-account/adyen-account-setup.fixture'
+import { CredentialFixture } from '@test/fixtures/gateway-account/credential.fixture'
 
 const USER_EXTERNAL_ID = 'user-123-abc'
 const SERVICE_EXTERNAL_ID = 'service456def'
@@ -30,6 +29,7 @@ const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
   [
     {
       externalId: ADYEN_CREDENTIAL_EXTERNAL_ID,
+      credentials: CredentialFixture.forAdyen({ accountHolderId: 'account-holder-123' }),
     },
   ],
   {
@@ -44,23 +44,10 @@ const serviceFixture = new ServiceFixture({
 })
 const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
 
-const tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTaskData> = {
-  bank_details: {
-    status: 'COMPLETED',
-  },
-  director: {
-    status: 'COMPLETED',
-  },
-  responsible_person: {
-    status: 'COMPLETED',
-  },
-  legal_terms: {
-    status: 'COMPLETED',
-  },
-  organisation_details: {
-    status: 'COMPLETED',
-  },
-}
+const adyenAccountSetup = AdyenAccountSetupFixture.Completed({
+  serviceExternalId: SERVICE_EXTERNAL_ID,
+  credentialExternalId: ADYEN_CREDENTIAL_EXTERNAL_ID,
+})
 
 const setStubs = (additionalStubs: object[] = []) => {
   cy.task('setupStubs', [
@@ -72,8 +59,9 @@ const setStubs = (additionalStubs: object[] = []) => {
       SERVICE_EXTERNAL_ID,
       LIVE_ACCOUNT_TYPE,
       ADYEN_CREDENTIAL_EXTERNAL_ID,
-      tasksWithStatus
+      adyenAccountSetup.toAdyenAccountSetupData().tasks
     ).success(),
+    AdyenStubs.getAccountHolder('account-holder-123').success({ id: 'account-holder-123', legalEntityId: 'LE-456' }),
     ...additionalStubs,
   ])
 }
