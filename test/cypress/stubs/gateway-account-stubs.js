@@ -647,4 +647,3 @@ module.exports = {
   postAcceptedCardTypesByServiceExternalIdAndAccountType,
   getGatewayAccountsByServiceIdAndTypeSuccess,
 }
-
