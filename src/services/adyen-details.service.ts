@@ -62,6 +62,12 @@ const REQUIRED_VERIFICATION_CAPABILITIES = [
   'receivePayments',
 ]
 
+const SERVICE_DIRECTOR_ASSOCIATION_TYPES = [
+  Types.legalEntityManagement.LegalEntityAssociation.TypeEnum.Director,
+  Types.legalEntityManagement.LegalEntityAssociation.TypeEnum.UboThroughOwnership,
+  Types.legalEntityManagement.LegalEntityAssociation.TypeEnum.UboThroughControl,
+]
+
 const setAdyenStoreId = async (
   serviceExternalId: string,
   accountType: string,
@@ -443,10 +449,10 @@ const createServiceDirector = async (
     await updateLegalEntity(organisationLegalEntityId, {
       entityAssociations: [
         ...currentAssociations,
-        {
+        ...SERVICE_DIRECTOR_ASSOCIATION_TYPES.map((type) => ({
           legalEntityId: serviceDirector.id,
-          type: Types.legalEntityManagement.LegalEntityAssociation.TypeEnum.Director,
-        },
+          type,
+        })),
       ],
     })
   } catch (error: unknown) {
