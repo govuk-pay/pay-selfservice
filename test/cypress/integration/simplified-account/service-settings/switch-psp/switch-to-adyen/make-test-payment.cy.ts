@@ -3,7 +3,8 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import { GatewayAccountFixture } from '@test/fixtures/gateway-account/gateway-account.fixture'
 import { PaymentProvider } from '@models/constants/payment-provider'
 import { getUser } from '@test/cypress/stubs/simplified-account/user-stubs'
-import * as GatewayAccountStubs from '@test/cypress/stubs/simplified-account/gateway-account-stubs'
+import * as SimplifiedGatewayAccountStubs from '@test/cypress/stubs/simplified-account/gateway-account-stubs'
+import gatewayAccountStubs from '@test/cypress/stubs/gateway-account-stubs'
 import {
   AdyenAccountSetupTaskData,
   AdyenAccountSetupTaskNameData,
@@ -64,10 +65,10 @@ const tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTa
 const setStubs = (additionalStubs: object[] = []) => {
   cy.task('setupStubs', [
     getUser(USER_EXTERNAL_ID).success(userFixture),
-    GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
+    SimplifiedGatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
       gatewayAccountFixture
     ),
-    GatewayAccountStubs.getAdyenSetupTasks(
+    SimplifiedGatewayAccountStubs.getAdyenSetupTasks(
       SERVICE_EXTERNAL_ID,
       LIVE_ACCOUNT_TYPE,
       ADYEN_CREDENTIAL_EXTERNAL_ID,
@@ -130,7 +131,7 @@ describe('make a live payment task', () => {
         accountType: LIVE_ACCOUNT_TYPE,
         chargeExternalId: CHARGE_EXTERNAL_ID,
       }),
-      GatewayAccountStubs.patchUpdateCredentialsSuccessByServiceExternalIdAndType(
+      gatewayAccountStubs.patchUpdateCredentialsSuccessByServiceExternalIdAndType(
         SERVICE_EXTERNAL_ID,
         LIVE_ACCOUNT_TYPE,
         ADYEN_CREDENTIAL_EXTERNAL_ID,
