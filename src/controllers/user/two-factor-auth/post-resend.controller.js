@@ -2,7 +2,7 @@
 
 const userService = require('../../../services/user.service')
 const paths = require('../../../paths')
-const { invalidTelephoneNumber } = require('../../../utils/telephone-number-utils')
+const { invalidTelephoneNumber } = require('@utils/telephone-number-utils')
 const { validationErrors } = require('../../../utils/validation/field-validation-checks')
 const { response } = require('../../../utils/response')
 

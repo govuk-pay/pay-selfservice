@@ -94,7 +94,7 @@ const organisationDetailsSchema = {
       .notEmpty()
       .withMessage('Enter a telephone number')
       .bail()
-      .custom((telephoneNumber) => !invalidTelephoneNumber(telephoneNumber))
+      .custom((telephoneNumber: string) => !invalidTelephoneNumber(telephoneNumber))
       .withMessage('Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192'),
   },
   organisationUrl: {

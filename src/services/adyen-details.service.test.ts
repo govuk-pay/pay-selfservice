@@ -124,7 +124,7 @@ describe('Adyen details service', () => {
           vatNumber: 'GB123456789',
           support: {
             email: 'test@gov.uk',
-            phone: { number: '01234567890' },
+            phone: { number: '+44 1234 567890' },
           },
         },
       })

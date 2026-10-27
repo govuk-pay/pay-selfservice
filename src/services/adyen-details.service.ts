@@ -34,6 +34,7 @@ import { CreateSweepConfigurationV2 } from '@adyen/api-library/lib/src/typings/b
 import { createSweep } from './clients/adyen/adyen-balance-platform.client'
 import Service from '@models/service/Service.class'
 import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatform/accountHolder'
+import { formatPhoneNumberWithCountryCode } from '@utils/telephone-number-utils'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -95,7 +96,7 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
     support: {
       email: service.merchantDetails!.email,
       phone: {
-        number: service.merchantDetails!.telephoneNumber,
+        number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
       },
     },
   }
