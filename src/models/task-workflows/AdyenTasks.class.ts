@@ -152,7 +152,6 @@ class AdyenTask extends Task {
   static paymentTask(
     service: Service,
     gatewayAccount: GatewayAccount,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     accountSetup: AdyenAccountSetup,
     switchingCredential: GatewayAccountCredential,
     isVerified: boolean

@@ -52,9 +52,6 @@ async function canStartPspPaymentVerificationTask(req: ServiceRequest, _: Servic
   }
 
   const thisTask = tasks.findTaskById(GenericTaskIdentifiers.PAY)
-
-  // console.log(tasks)
-
   if (thisTask.status === TaskStatus.NOT_STARTED) {
     return next()
   } else {
