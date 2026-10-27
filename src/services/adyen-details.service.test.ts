@@ -432,7 +432,7 @@ describe('Adyen details service', () => {
         })
       })
 
-      it('should add the director and keep the existing associations', async () => {
+      it('should add the director, uboThroughOwnership and uboThroughControl types and keep the existing associations', async () => {
         await service.createServiceDirector(serviceDirectorSession, ORGANISATION_LEGAL_ENTITY_ID)
 
         expect(legalEntityClientMock.updateLegalEntity.firstCall.args[0]).to.equal(ORGANISATION_LEGAL_ENTITY_ID)
@@ -443,6 +443,14 @@ describe('Adyen details service', () => {
             {
               legalEntityId: PERSON_LEGAL_ENTITY_ID,
               type: 'director',
+            },
+            {
+              legalEntityId: PERSON_LEGAL_ENTITY_ID,
+              type: 'uboThroughOwnership',
+            },
+            {
+              legalEntityId: PERSON_LEGAL_ENTITY_ID,
+              type: 'uboThroughControl',
             },
           ],
         })
