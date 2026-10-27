@@ -150,4 +150,25 @@ describe('make a live payment task', () => {
       .parent()
       .contains('This service is ready to switch to Adyen')
   })
+
+  it('should be redirected back to the tasks index with an error message', () => {
+    setStubs([
+      connectorChargeStubs.getChargeSuccessByServiceExternalIdAndAccountType({
+        serviceExternalId: SERVICE_EXTERNAL_ID,
+        accountType: LIVE_ACCOUNT_TYPE,
+        chargeExternalId: CHARGE_EXTERNAL_ID,
+        status: 'cancelled',
+      }),
+    ])
+    cy.visit(SWITCH_TO_ADYEN_MAKE_A_PAYMENT_TASK_RETURN_URL)
+    cy.get('.govuk-notification-banner')
+      .should('have.class', 'govuk-notification-banner--error')
+      .should('have.class', 'system-messages')
+      .contains('There is a problem')
+      .parent()
+      .parent()
+      .contains(
+        'The payment has failed, please try again. If you need help, contact govuk-pay-support@digital.cabinet-office.gov.uk'
+      )
+  })
 })
