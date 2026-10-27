@@ -1,5 +1,6 @@
 import { UserFixture } from '@test/fixtures/user/user.fixture'
 import { ServiceFixture } from '@test/fixtures/service/service.fixture'
+import { MerchantDetailsFixture } from '@test/fixtures/service/merchant-details.fixture'
 import { GatewayAccountFixture } from '@test/fixtures/gateway-account/gateway-account.fixture'
 import { PaymentProvider } from '@models/constants/payment-provider'
 import { getUser } from '@test/cypress/stubs/simplified-account/user-stubs'
@@ -7,6 +8,7 @@ import * as GatewayAccountStubs from '@test/cypress/stubs/simplified-account/gat
 import { checkServiceNavigation } from '@test/cypress/integration/simplified-account/common/assertions'
 import { AdyenAccountSetupFixture } from '@test/fixtures/gateway-account/adyen-account-setup.fixture'
 import * as AdyenStubs from '@test/cypress/stubs/simplified-account/adyen-psp-stubs'
+import StripeStubs from '@test/cypress/stubs/stripe-psp-stubs'
 
 const USER_EXTERNAL_ID = 'user-123-abc'
 const SERVICE_EXTERNAL_ID = 'service456def'
@@ -39,6 +41,7 @@ const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
 const serviceFixture = new ServiceFixture({
   externalId: SERVICE_EXTERNAL_ID,
   gatewayAccountIds: [`${gatewayAccountFixture.id}`],
+  merchantDetails: new MerchantDetailsFixture({ telephoneNumber: '01234 567890' }),
 })
 const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
 
@@ -71,13 +74,42 @@ const setStubs = (additionalStubs = []) => {
       SERVICE_EXTERNAL_ID,
       LIVE_ACCOUNT_TYPE,
       ADYEN_CREDENTIAL_EXTERNAL_ID,
-      {
-        path: 'credentials',
-        value: { legal_entity_id: ADYEN_LEGAL_ENTITY_ID },
-        userExternalId: USER_EXTERNAL_ID,
-      }
+      USER_EXTERNAL_ID,
+      [
+        {
+          op: 'replace',
+          path: 'credentials',
+          value: { legal_entity_id: ADYEN_LEGAL_ENTITY_ID },
+        },
+        {
+          op: 'replace',
+          path: 'credentials',
+          value: { balance_account_id: 'balance-account-123' },
+        },
+        {
+          op: 'replace',
+          path: 'credentials',
+          value: { account_holder_id: 'account-holder-123' },
+        },
+      ]
+    ),
+    GatewayAccountStubs.patchUpdateCredentialsSuccessByServiceExternalIdAndType(
+      SERVICE_EXTERNAL_ID,
+      LIVE_ACCOUNT_TYPE,
+      ADYEN_CREDENTIAL_EXTERNAL_ID,
+      USER_EXTERNAL_ID,
+      [
+        {
+          op: 'replace',
+          path: 'credentials',
+          value: { store_id: 'store-123' },
+        },
+      ]
     ),
     AdyenStubs.createBalanceAccount().success({ id: 'balance-account-123', accountHolderId: 'account-holder-123' }),
+    AdyenStubs.createBusinessLine().success({ id: 'BL123' }),
+    StripeStubs.retrieveAccountDetails({ stripeAccountId: 'a-stripe-account', statementDescriptor: 'TEST SERVICE' }),
+    AdyenStubs.createStore().success({ id: 'store-123' }),
     ...additionalStubs,
   ])
 }
@@ -143,10 +175,10 @@ describe(`Organisation details, company registration and VAT registration`, () =
         .should('be.visible')
         .and('contain', 'There is a problem')
         .and('contain', 'You must make a selection')
-      cy.get('#takingPaymentsFor-error').should('be.visible').and('contain', 'You must make a selection')
+      cy.get('#governmentActivity-error').should('be.visible').and('contain', 'You must make a selection')
 
       //// happy path
-      cy.get('[data-cy="radio-government-activities"]').check()
+      cy.get('[data-cy="radio-general-local"]').check()
       cy.get('#reason-for-taking-payments-submit').click()
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)

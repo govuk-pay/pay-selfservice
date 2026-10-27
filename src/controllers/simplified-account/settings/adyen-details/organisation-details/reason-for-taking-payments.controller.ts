@@ -6,16 +6,37 @@ import { markTaskAsComplete } from '@services/adyen-setup.service'
 import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
-import { OrganisationDetailsSession } from './constants'
-import { createOrganisation } from '@services/adyen-details.service'
+import { OrganisationDetailsSession, GovernmentActivity } from './constants'
+import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
+import { getStripeStatementDescriptor } from '@services/stripe-details.service'
+import { PaymentProvider } from '@models/constants/payment-provider'
+import { InvalidConfigurationError } from '@root/errors'
 
-function getBackLink(req: ServiceRequest) {
+interface ReasonForTakingPaymentsBody {
+  governmentActivity: GovernmentActivity
+}
+
+function getBackLink(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
   return formatServiceAndAccountPathsFor(
     paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
     req.service.externalId,
     req.account.type,
     req.account.getSwitchingCredential().externalId
   )
+}
+
+async function getStoreDetailsForStripeMigration(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
+  const telephoneNumber = req.service.merchantDetails?.telephoneNumber
+
+  if (!telephoneNumber) {
+    throw new InvalidConfigurationError(
+      `No telephone number set in merchant details [service_external_id: ${req.service.externalId}]`
+    )
+  }
+
+  const statementDescriptor = await getStripeStatementDescriptor(req.account)
+
+  return { telephoneNumber, statementDescriptor }
 }
 
 function get(req: ServiceRequest, res: ServiceResponse) {
@@ -36,12 +57,12 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   })
 }
 
-async function post(req: ServiceRequest, res: ServiceResponse) {
+async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
 
-  const validations = [adyenDetailsSchema.selectTakingPaymentsFor.validate]
+  const validations = [adyenDetailsSchema.selectGovernmentActivity.validate]
 
   await Promise.all(validations.map((validation) => validation.run(req)))
   const errors = validationResult(req)
@@ -60,17 +81,38 @@ async function post(req: ServiceRequest, res: ServiceResponse) {
 
   const completeSession = new OrganisationDetailsSession({
     ...currentSession,
-  } as OrganisationDetailsSession)
+  })
 
-  await createOrganisation(
+  const { governmentActivity } = req.body
+
+  const storeDetails =
+    req.account.paymentProvider === PaymentProvider.STRIPE ? await getStoreDetailsForStripeMigration(req) : undefined
+
+  if (!storeDetails) {
+    throw new Error(`Merchant details not returned from Stripe for [service_external_id: ${req.service.externalId}]`)
+  }
+
+  const { businessLine, balanceAccount } = await createOrganisation(
     completeSession,
+    governmentActivity,
     req.service.name,
     req.service.externalId,
     req.account.type,
     switchingCredentialId,
     req.user.externalId
   )
+
+  const store = await createStore({
+    ...storeDetails,
+    businessLineId: businessLine.id,
+    balanceAccountId: balanceAccount.id,
+    serviceName: req.service.name,
+    organisationDetails: completeSession,
+  })
+
+  await setAdyenStoreId(req.service.externalId, req.account.type, switchingCredentialId, req.user.externalId, store.id!)
   await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'organisationDetails')
+
   OrganisationDetailsSession.clear(req)
 
   return res.redirect(

@@ -32,7 +32,7 @@ export class OrganisationDetailsSession {
   companyRegistrationNumber?: string
   vatRegistrationNumber?: string
 
-  constructor(data: OrganisationDetailsSession) {
+  constructor(data: Partial<OrganisationDetailsSession>) {
     Object.assign(this, data)
   }
 
@@ -51,4 +51,12 @@ export class OrganisationDetailsSession {
   isEmpty() {
     return lodash.isEmpty(lodash.omitBy(this, (v) => lodash.isUndefined(v)))
   }
+}
+
+export type GovernmentActivity = 'general-local' | 'police-safety' | 'everything-else'
+
+export const INDUSTRY_CODE_MAP: Record<GovernmentActivity, string> = {
+  'general-local': '921',
+  'police-safety': '92219',
+  'everything-else': '92B',
 }
