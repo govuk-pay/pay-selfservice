@@ -19,6 +19,7 @@ async function get(req: ServiceRequest, res: ServiceResponse) {
   return response(req, res, 'simplified-account/settings/switch-psp/switch-to-adyen/index.njk', {
     currentPsp: req.account.paymentProvider,
     adyenTasks,
+    messages: res.locals.flash?.messages ?? [],
   })
 }
 

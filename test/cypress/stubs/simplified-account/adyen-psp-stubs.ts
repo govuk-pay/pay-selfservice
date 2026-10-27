@@ -96,6 +96,38 @@ export function createAccountHolder() {
   }
 }
 
+export function getAccountHolder(accountHolderId: string) {
+  const path = `/bcl/v2/accountHolders/${accountHolderId}`
+
+  return {
+    success: function (accountHolder: { id: string; legalEntityId: string }) {
+      const capabilities = {
+        receiveFromPlatformPayments: {
+          allowed: true,
+        },
+        sendToTransferInstrument: {
+          allowed: true,
+        },
+        receiveFromBalanceAccount: {
+          allowed: true,
+        },
+        sendToBalanceAccount: {
+          allowed: true,
+        },
+        receivePayments: {
+          allowed: true,
+        },
+      }
+      return stubBuilder('GET', path, 200, {
+        response: {
+          ...accountHolder,
+          capabilities,
+        },
+      })
+    },
+  }
+}
+
 export function createBalanceAccount() {
   const path = `/bcl/v2/balanceAccounts`
 
