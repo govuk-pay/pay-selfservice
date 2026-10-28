@@ -15,6 +15,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     addressCity: currentSession.addressCity ?? '',
     addressPostcode: currentSession.addressPostcode ?? '',
     addressCountry: currentSession.addressCountry ?? 'GB',
+    email: currentSession.email ?? '',
   }
 
   return response(req, res, 'simplified-account/settings/adyen-details/organisation-details', {
@@ -42,6 +43,7 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
     addressPostcode: req.body.addressPostcode,
     addressCountry: req.body.addressCountry,
     hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
+    email: req.body.email,
   } as OrganisationDetailsSession)
 
   return res.redirect(

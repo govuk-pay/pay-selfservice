@@ -65,13 +65,13 @@ describe('Adyen details service', () => {
       addressCountry: 'GB',
       companyRegistrationNumber: '12345678',
       vatRegistrationNumber: 'GB123456789',
+      email: 'test@gov.uk',
     } as OrganisationDetailsSession
 
     const serviceFixture = new ServiceFixture({
       name: 'Test Service',
       externalId: 'service_id',
       merchantDetails: new MerchantDetailsFixture({
-        email: 'test@gov.uk',
         telephoneNumber: '01234567890',
         url: 'https://service.gov.uk',
       }),
@@ -127,6 +127,7 @@ describe('Adyen details service', () => {
             email: 'test@gov.uk',
             phone: { number: '+44 1234 567890' },
           },
+          phone: { number: '01234567890' },
         },
       })
 

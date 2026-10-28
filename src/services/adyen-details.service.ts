@@ -101,10 +101,13 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
     doingBusinessAs: service.name,
     countryOfGoverningLaw: 'GB',
     support: {
-      email: service.merchantDetails!.email,
+      email: session.email,
       phone: {
         number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
       },
+    },
+    phone: {
+      number: service.merchantDetails!.telephoneNumber,
     },
   }
 

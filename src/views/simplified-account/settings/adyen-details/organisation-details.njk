@@ -117,6 +117,31 @@
       }}
     {% endcall %}
 
+    {%
+      call govukFieldset({
+        legend: {
+          text: "Organisation contact details",
+          classes: "govuk-fieldset__legend--m",
+          isPageHeading: false
+        }
+      })
+    %}
+      {{
+        govukInput({
+          label: {
+            html: 'Email address'
+          },
+          classes: "govuk-!-width-three-quarters",
+          id: "email",
+          name: "email",
+          type: "email",
+          autocomplete: "email",
+          spellcheck: false,
+          value: organisationDetails.email
+        })
+      }}
+    {% endcall %}
+
     {{
       govukRadios({
         idPrefix: "has-company-registration-number",
