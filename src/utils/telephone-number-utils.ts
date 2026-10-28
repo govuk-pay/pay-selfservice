@@ -1,9 +1,7 @@
-'use strict'
-
-const { PhoneNumberUtil, PhoneNumberFormat } = require('google-libphonenumber')
+import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 const phoneNumberUtilInstance = PhoneNumberUtil.getInstance()
 
-function invalidTelephoneNumber (telephoneNumber) {
+function invalidTelephoneNumber(telephoneNumber?: string) {
   if (!telephoneNumber) {
     return true
   }
@@ -11,17 +9,15 @@ function invalidTelephoneNumber (telephoneNumber) {
   try {
     const parsedTelephoneNumber = phoneNumberUtilInstance.parseAndKeepRawInput(telephoneNumber, 'GB')
     return !phoneNumberUtilInstance.isValidNumber(parsedTelephoneNumber)
-  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e: unknown) {
     return true
   }
 }
 
-function formatPhoneNumberWithCountryCode (telephoneNumber) {
+function formatPhoneNumberWithCountryCode(telephoneNumber: string): string {
   const parsedNumber = phoneNumberUtilInstance.parseAndKeepRawInput(telephoneNumber, 'GB')
   return phoneNumberUtilInstance.format(parsedNumber, PhoneNumberFormat.INTERNATIONAL)
 }
 
-module.exports = {
-  invalidTelephoneNumber,
-  formatPhoneNumberWithCountryCode
-}
+export { invalidTelephoneNumber, formatPhoneNumberWithCountryCode }

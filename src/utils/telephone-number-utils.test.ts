@@ -1,8 +1,6 @@
-'use strict'
+import { expect } from 'chai'
 
-const { expect } = require('chai')
-
-const { invalidTelephoneNumber, formatPhoneNumberWithCountryCode } = require('./telephone-number-utils')
+import { invalidTelephoneNumber, formatPhoneNumberWithCountryCode } from './telephone-number-utils'
 
 describe('telephone number utils', () => {
   describe('telephone number validation', () => {

@@ -2,18 +2,18 @@
 
 const { response } = require('../../../utils/response')
 const paths = require('../../../paths')
-const { invalidTelephoneNumber } = require('../../../utils/telephone-number-utils')
+const { invalidTelephoneNumber } = require('@utils/telephone-number-utils')
 const { validationErrors } = require('../../../utils/validation/field-validation-checks')
 const userService = require('../../../services/user.service')
 
-module.exports = async function submitPhoneNumber (req, res, next) {
+module.exports = async function submitPhoneNumber(req, res, next) {
   const { phone } = req.body
   if (invalidTelephoneNumber(phone)) {
     const pageData = {
       phone,
       errors: {
-        phone: validationErrors.invalidTelephoneNumber
-      }
+        phone: validationErrors.invalidTelephoneNumber,
+      },
     }
     return response(req, res, 'two-factor-auth/phone-number', pageData)
   }
