@@ -65,7 +65,7 @@ describe('Adyen details service', () => {
       addressCountry: 'GB',
       companyRegistrationNumber: '12345678',
       vatRegistrationNumber: 'GB123456789',
-      email: 'test@gov.uk'
+      email: 'test@gov.uk',
     } as OrganisationDetailsSession
 
     const serviceFixture = new ServiceFixture({

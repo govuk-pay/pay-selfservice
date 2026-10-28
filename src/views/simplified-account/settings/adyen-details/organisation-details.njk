@@ -3,19 +3,21 @@
 {% set settingsPageTitle = "Organisation details" %}
 
 {% block settingsContent %}
-<h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
+  <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
 
-<form id="organisation-details-form" method="post">
-  <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+  <form id="organisation-details-form" method="post">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
 
-  {% set organisationNameHint %}
-  <div>
-    <p>Do not enter the name of a local office or individual department unless that is the organisation's official
-      name.</p>
-  </div>
-  {% endset %}
+    {% set organisationNameHint %}
+      <div>
+        <p
+          >Do not enter the name of a local office or individual department unless that is the organisation's official
+          name.</p
+        >
+      </div>
+    {% endset %}
 
-  {{
+    {{
       govukInput({
         label: {
           text: "Organisation name",
@@ -33,7 +35,7 @@
       })
     }}
 
-  {%
+    {%
       call govukFieldset({
         legend: {
           text: "Organisation address",
@@ -42,7 +44,7 @@
         }
       })
     %}
-  {{
+      {{
         govukInput({
           label: {
             html: 'Address line 1 <span class="govuk-visually-hidden">line 1 of 2</span>'
@@ -59,7 +61,7 @@
         })
       }}
 
-  {{
+      {{
         govukInput({
           label: {
             html: 'Address line 2 (optional)<span class="govuk-visually-hidden">Building and street line 2 of 2</span>'
@@ -73,7 +75,7 @@
         })
       }}
 
-  {{
+      {{
         govukInput({
           label: {
             text: "Town or city"
@@ -87,7 +89,7 @@
         })
       }}
 
-  {{
+      {{
         govukSelect({
           id: "address-country",
           classes: "govuk-!-width-two-thirds",
@@ -100,7 +102,7 @@
         })
       }}
 
-  {{
+      {{
         govukInput({
           label: {
             text: "Postcode"
@@ -113,9 +115,9 @@
           value: organisationDetails.addressPostcode
         })
       }}
-  {% endcall %}
+    {% endcall %}
 
-  {%
+    {%
       call govukFieldset({
         legend: {
           text: "Organisation contact details",
@@ -124,7 +126,7 @@
         }
       })
     %}
-  {{
+      {{
         govukInput({
           label: {
             html: 'Email address'
@@ -138,9 +140,9 @@
           value: organisationDetails.email
         })
       }}
-  {% endcall %}
+    {% endcall %}
 
-  {{
+    {{
       govukRadios({
         idPrefix: "has-company-registration-number",
         name: "hasCompanyRegistrationNumber",
@@ -166,7 +168,7 @@
       })
     }}
 
-  {{
+    {{
       govukButton({
         text: "Continue",
         attributes: {
@@ -175,5 +177,5 @@
         preventDoubleClick: true
       })
     }}
-</form>
+  </form>
 {% endblock %}
