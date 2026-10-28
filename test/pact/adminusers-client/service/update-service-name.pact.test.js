@@ -36,6 +36,7 @@ describe('adminusers client - update service name', function () {
   })
   after(() => provider.finalize())
 
+  // this failed in CI
   describe('success with en and cy', () => {
     const serviceName = {
       en: 'en-name',
