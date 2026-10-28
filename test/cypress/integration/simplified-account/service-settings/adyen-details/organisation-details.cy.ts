@@ -139,12 +139,14 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.get('#address-country').should('exist')
       cy.get('#address-postcode').should('exist')
       cy.get('#has-company-registration-number').should('exist')
+      cy.get('#email').should('exist')
 
       cy.get('#organisation-name').type('Test Organisation')
       cy.get('#address-line1').type('1 Test Street')
       cy.get('#address-city').type('Testville')
       cy.get('#address-postcode').type('T3 5TT')
       cy.get('#has-company-registration-number').check('true')
+      cy.get('#email').type('some-tax@example.com')
       cy.get('#organisation-details-submit').click()
 
       // company registration number
