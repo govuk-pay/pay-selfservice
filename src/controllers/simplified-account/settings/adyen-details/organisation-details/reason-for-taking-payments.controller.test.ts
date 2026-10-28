@@ -15,7 +15,9 @@ const SERVICE_TYPE = 'live'
 const TELEPHONE_NUMBER = '01234 567890'
 const serviceFixture = new ServiceFixture({
   externalId: SERVICE_EXTERNAL_ID,
-  merchantDetails: new MerchantDetailsFixture({ telephoneNumber: TELEPHONE_NUMBER }),
+  merchantDetails: new MerchantDetailsFixture({
+    telephoneNumber: TELEPHONE_NUMBER,
+  }),
 })
 
 const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.STRIPE, PaymentProvider.ADYEN, [], [], {
@@ -119,6 +121,7 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
           },
         })
       })
+
       it('should create Adyen legal entity and mark organisation details task as complete and redirect to the switch to adyen task list', async () => {
         await call('post')
 

@@ -73,6 +73,7 @@ describe('Adyen details service', () => {
       merchantDetails: new MerchantDetailsFixture({
         email: 'test@gov.uk',
         telephoneNumber: '01234567890',
+        url: 'https://service.gov.uk',
       }),
     })
 
@@ -249,12 +250,43 @@ describe('Adyen details service', () => {
         industryCode: '921',
         legalEntityId: 'LE123',
         salesChannels: ['eCommerce'],
+        webData: [{ webAddress: 'https://service.gov.uk' }],
       })
       sinon.assert.callOrder(
         legalEntityClientMock.createLegalEntity,
         legalEntityClientMock.createBusinessLine,
         balancePlatformClientMock.createAccountHolder
       )
+    })
+
+    it('should throw an error if the service does not have URL', async () => {
+      const serviceFixtureWithoutUrl = new ServiceFixture({
+        name: 'Test Service',
+        externalId: 'service_id',
+        merchantDetails: new MerchantDetailsFixture({
+          email: 'test@gov.uk',
+          telephoneNumber: '01234567890',
+          url: undefined,
+        }),
+      })
+
+      let error: unknown
+      try {
+        await service.createOrganisation(
+          fullOrganisationSession,
+          'general-local',
+          serviceFixtureWithoutUrl.toService(),
+          'live',
+          'credential_id',
+          'user_id'
+        )
+      } catch (err) {
+        error = err
+      }
+
+      sinon.assert.match(error, {
+        message: `No URL set in merchant details [service_external_id: service_id]`,
+      })
     })
 
     it('should map police-safety to industry code 92219', async () => {
