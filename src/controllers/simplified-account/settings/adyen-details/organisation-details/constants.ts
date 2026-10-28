@@ -19,6 +19,7 @@ export interface OrganisationDetailsBody {
   addressPostcode: string
   addressCountry: string
   hasCompanyRegistrationNumber: string
+  email: string
 }
 
 export class OrganisationDetailsSession {
@@ -31,6 +32,7 @@ export class OrganisationDetailsSession {
   hasCompanyRegistrationNumber?: string
   companyRegistrationNumber?: string
   vatRegistrationNumber?: string
+  email?: string
 
   constructor(data: Partial<OrganisationDetailsSession>) {
     Object.assign(this, data)
