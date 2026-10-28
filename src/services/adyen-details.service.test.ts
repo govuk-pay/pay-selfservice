@@ -443,14 +443,17 @@ describe('Adyen details service', () => {
             {
               legalEntityId: PERSON_LEGAL_ENTITY_ID,
               type: 'director',
+              jobTitle: 'Director',
             },
             {
               legalEntityId: PERSON_LEGAL_ENTITY_ID,
               type: 'uboThroughOwnership',
+              jobTitle: 'Director',
             },
             {
               legalEntityId: PERSON_LEGAL_ENTITY_ID,
               type: 'uboThroughControl',
+              jobTitle: 'Director',
             },
           ],
         })
