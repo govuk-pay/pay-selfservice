@@ -82,7 +82,6 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
       })
     })
 
-
     describe('with organisation details already in session and company number selected', () => {
       beforeEach(async () => {
         nextRequest({
@@ -91,7 +90,7 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
               organisationDetails: {
                 organisationName: 'Test Organisation',
                 vatRegistrationNumber: 'GB123456789',
-                hasCompanyRegistrationNumber: 'true'
+                hasCompanyRegistrationNumber: 'true',
               },
             },
           },
@@ -162,4 +161,3 @@ describe('post', () => {
     )
   })
 })
-

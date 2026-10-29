@@ -67,7 +67,7 @@ const VALID_SESSION: Partial<OrganisationDetailsSession> = {
   addressCountry: 'GB',
   companyRegistrationNumber: '01234567',
   vatRegistrationNumber: 'GB123456789',
-  hasCompanyRegistrationNumber: 'true'
+  hasCompanyRegistrationNumber: 'true',
 }
 
 describe('Controller: settings/adyen-details/reason-for-taking-payments', () => {
