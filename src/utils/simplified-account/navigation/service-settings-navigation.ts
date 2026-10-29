@@ -79,6 +79,18 @@ export = (account: GatewayAccount, service: Service, currentUrl: string, permiss
       alwaysViewable: true, // worldpay test accounts are user configurable so details should always be visible
     })
     .add({
+      id: 'adyen-details',
+      name: 'adyen details',
+      path: formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.index,
+        service.externalId,
+        account.type,
+        account.getCurrentCredential()!.externalId
+      ),
+      hasPermission: UserPermissions.settings.stripe.stripeAccountDetailsUpdate,
+      conditions: account.paymentProvider === ADYEN && account.type === GatewayAccountType.LIVE,
+    })
+    .add({
       id: 'switch-psp', // sits under settings/switch-psp/switch-to-worldpay
       name: isMigratingWorldpayCredentials(account) ? 'switch Worldpay credentials' : 'switch to Worldpay',
       path: formatServiceAndAccountPathsFor(

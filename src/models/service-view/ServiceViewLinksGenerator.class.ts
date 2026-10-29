@@ -28,6 +28,14 @@ export class ServiceTransactionLinks {
     this.defaultSearches = new TransactionDefaultSearchLinks(this.serviceViewGenerator, searchParams)
   }
 
+  get index() {
+    return formatServiceAndAccountPathsFor(
+      paths.simplifiedAccount.transactions.index,
+      this.serviceViewGenerator.serviceExternalId,
+      this.serviceViewGenerator.accountType
+    )
+  }
+
   get downloadCsv() {
     return formatServiceAndAccountPathsFor(
       paths.simplifiedAccount.transactions.downloadCsv,

@@ -4,13 +4,42 @@ import HttpClientException from '@adyen/api-library/lib/src/httpClient/httpClien
 
 const logger = createLogger('adyen-request-wrapper.ts')
 
+type Metadata = Record<string, string> & {
+  adyen_api_method: string
+}
+
+export const Metadata = {
+  Get: (metadata: Record<string, string>): Metadata => {
+    return {
+      adyen_api_method: 'GET',
+      ...metadata,
+    }
+  },
+
+  Post: (metadata: Record<string, string> = {}): Metadata => {
+    return {
+      adyen_api_method: 'POST',
+      ...metadata,
+    }
+  },
+
+  Patch: (metadata: Record<string, string> = {}): Metadata => {
+    return {
+      adyen_api_method: 'PATCH',
+      ...metadata,
+    }
+  },
+}
+
 export class AdyenRequest {
   readonly adyenApi: AdyenAPI
   readonly requestDescription: string
+  readonly metadata: Metadata
 
-  constructor(adyenApi: AdyenAPI, requestDescription: string) {
+  constructor(adyenApi: AdyenAPI, requestDescription: string, metadata: Metadata = { adyen_api_method: 'UNKNOWN' }) {
     this.adyenApi = adyenApi
     this.requestDescription = requestDescription
+    this.metadata = metadata
   }
 
   async execute<T>(executor: () => Promise<T>): Promise<T> {
@@ -19,6 +48,7 @@ export class AdyenRequest {
     logger.info(`Calling Adyen to ${this.requestDescription}`, {
       adyen_api: this.adyenApi.toLowerCase(),
       description: this.requestDescription,
+      ...this.metadata,
     })
 
     return executor()
@@ -42,14 +72,16 @@ export class AdyenRequest {
             error_body: error.responseBody,
             name: error.name,
           },
+          ...this.metadata,
         })
         throw new AdyenApiError(error.message)
       })
       .finally(() => {
         const responseTime = Date.now() - startTime
         logger.info(`Calling Adyen to ${this.requestDescription} ended - elapsed time: ${responseTime} ms`, {
-          service: this.adyenApi.toLowerCase(),
+          adyen_api: this.adyenApi.toLowerCase(),
           description: this.requestDescription,
+          ...this.metadata,
         })
       })
   }

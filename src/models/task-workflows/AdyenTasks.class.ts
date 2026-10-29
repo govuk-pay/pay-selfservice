@@ -189,7 +189,7 @@ class AdyenTask extends Task {
       'Finish switching to Adyen',
       AdyenTaskIdentifier.FINISH_SWITCHING,
       formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+        paths.simplifiedAccount.settings.switchPsp.switchToAdyen.confirm,
         service.externalId,
         gatewayAccount.type,
         switchingCredential.externalId
