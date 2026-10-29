@@ -52,17 +52,17 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
 
   const redirectPath = hasCompanyRegistrationNumber
     ? formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
     : formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
 
   return res.redirect(redirectPath)
 }
