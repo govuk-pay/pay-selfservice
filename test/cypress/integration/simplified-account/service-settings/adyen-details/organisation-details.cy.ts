@@ -219,7 +219,7 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.location('pathname').should('eq', VAT_REGISTRATION_PATH)
       cy.a11yCheck()
       cy.get('h1').should('contain.text', 'Tell us your VAT registration number')
-      cy.get('.govuk-back-link').should('have.attr', 'href', COMPANY_REGISTRATION_PATH)
+      cy.get('.govuk-back-link').should('have.attr', 'href', TASK_LIST_PATH)
       cy.get('#vat-registration-number').should('exist')
     })
   })
