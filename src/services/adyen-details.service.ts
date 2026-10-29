@@ -26,6 +26,7 @@ import Service from '@models/service/Service.class'
 import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatform/accountHolder'
 import { formatPhoneNumberWithCountryCode } from '@utils/telephone-number-utils'
 import { LegalEntityAssociation } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityAssociation'
+import { InvalidConfigurationError } from '@root/errors'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -117,6 +118,10 @@ const createOrganisation = async (
   switchingCredentialId: string,
   userExternalId: string
 ) => {
+  if (!service.merchantDetails?.url) {
+    throw new InvalidConfigurationError(`No URL set in merchant details [service_external_id: ${service.externalId}]`)
+  }
+
   const legalEntity = await createOrganisationLegalEntity(session, service)
 
   const businessLine = await AdyenLEMClient.createBusinessLine({
@@ -124,6 +129,7 @@ const createOrganisation = async (
     industryCode: INDUSTRY_CODE_MAP[governmentActivity],
     legalEntityId: legalEntity.id,
     salesChannels: ['eCommerce'],
+    webData: [{ webAddress: service.merchantDetails.url }],
   })
   const accountHolder = await createAccountHolder(legalEntity.id, service.name)
   const balanceAccount = await createBalanceAccount(accountHolder.id, service.name)
