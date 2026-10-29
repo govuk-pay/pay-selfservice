@@ -461,6 +461,7 @@ const createServiceDirector = async (
         ...currentAssociations,
         ...SERVICE_DIRECTOR_ASSOCIATION_TYPES.map((type) => ({
           legalEntityId: serviceDirector.id,
+          jobTitle: 'Director',
           type,
         })),
       ],
