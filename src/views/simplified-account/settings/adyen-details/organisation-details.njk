@@ -157,12 +157,18 @@
           {
             value: "true",
             text: "Yes",
-            checked: hasCompanyRegistrationNumber === "true"
+            checked: hasCompanyRegistrationNumber === "true",
+            attributes: {
+              "data-cy": "radio-yes"
+            }
           },
           {
             value: "false",
             text: "No",
-            checked: hasCompanyRegistrationNumber === "false"
+            checked: hasCompanyRegistrationNumber === "false",
+            attributes: {
+              "data-cy": "radio-no"
+            }
           }
         ]
       })

@@ -145,8 +145,8 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.get('#address-line1').type('1 Test Street')
       cy.get('#address-city').type('Testville')
       cy.get('#address-postcode').type('T3 5TT')
-      cy.get('#has-company-registration-number').check('true')
       cy.get('#email').type('some-tax@example.com')
+      cy.get('[data-cy="radio-yes"]').check()
       cy.get('#organisation-details-submit').click()
 
       // company registration number
@@ -185,6 +185,42 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.get('#reason-for-taking-payments-submit').click()
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)
+    })
+
+    it('should walk through organisation details and VAT registration in sequence, without company registration', () => {
+      setStubs()
+
+      // organisation details
+      cy.visit(ORGANISATION_DETAILS_PATH)
+      cy.a11yCheck()
+
+      checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
+      cy.get('h1').should('contain.text', 'Organisation details')
+      cy.get('.govuk-back-link').should('have.attr', 'href', TASK_LIST_PATH)
+
+      cy.get('#organisation-name').should('exist')
+      cy.get('#address-line1').should('exist')
+      cy.get('#address-line2').should('exist')
+      cy.get('#address-city').should('exist')
+      cy.get('#address-country').should('exist')
+      cy.get('#address-postcode').should('exist')
+      cy.get('#email').should('exist')
+      cy.get('#has-company-registration-number').should('exist')
+
+      cy.get('#organisation-name').type('Test Organisation')
+      cy.get('#address-line1').type('1 Test Street')
+      cy.get('#address-city').type('Testville')
+      cy.get('#address-postcode').type('T3 5TT')
+      cy.get('#email').type('some-tax@example.com')
+      cy.get('[data-cy="radio-no"]').check()
+      cy.get('#organisation-details-submit').click()
+
+      // VAT registration number
+      cy.location('pathname').should('eq', VAT_REGISTRATION_PATH)
+      cy.a11yCheck()
+      cy.get('h1').should('contain.text', 'Tell us your VAT registration number')
+      cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
+      cy.get('#vat-registration-number').should('exist')
     })
   })
 

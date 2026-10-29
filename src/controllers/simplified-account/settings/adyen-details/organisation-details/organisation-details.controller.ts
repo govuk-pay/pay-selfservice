@@ -33,9 +33,9 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
 export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
-  const currentSession = OrganisationDetailsSession.extract(req)
+  const existingSession = OrganisationDetailsSession.extract(req)
 
-  OrganisationDetailsSession.set(req, currentSession, {
+  const updatedSession = {
     organisationName: req.body.organisationName,
     addressLine1: req.body.addressLine1,
     addressLine2: req.body.addressLine2,
@@ -44,14 +44,25 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
     addressCountry: req.body.addressCountry,
     hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
     email: req.body.email,
-  } as OrganisationDetailsSession)
+  } as OrganisationDetailsSession
 
-  return res.redirect(
-    formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
-  )
+  OrganisationDetailsSession.set(req, existingSession, updatedSession)
+
+  const hasCompanyRegistrationNumber = req.body.hasCompanyRegistrationNumber === 'true'
+
+  const redirectPath = hasCompanyRegistrationNumber
+    ? formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
+    : formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
+
+  return res.redirect(redirectPath)
 }
