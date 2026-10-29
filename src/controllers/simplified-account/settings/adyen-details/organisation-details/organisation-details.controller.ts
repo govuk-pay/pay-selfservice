@@ -20,7 +20,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
 
   return response(req, res, 'simplified-account/settings/adyen-details/organisation-details', {
     organisationDetails,
-    hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber ?? '',
+    hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber,
     countries: utils.countries.govukFrontendFormatted(organisationDetails.addressCountry),
     backLink: formatServiceAndAccountPathsFor(
       paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
@@ -35,7 +35,7 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
 
-  OrganisationDetailsSession.set(req, currentSession, {
+  const updatedDetails = {
     organisationName: req.body.organisationName,
     addressLine1: req.body.addressLine1,
     addressLine2: req.body.addressLine2,
@@ -44,14 +44,23 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
     addressCountry: req.body.addressCountry,
     hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
     email: req.body.email,
-  } as OrganisationDetailsSession)
+  } as OrganisationDetailsSession
 
-  return res.redirect(
-    formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+  OrganisationDetailsSession.set(req, currentSession, updatedDetails)
+
+  const hasCompanyRegistrationNumber = req.body.hasCompanyRegistrationNumber === 'true'
+
+  const redirectPath = hasCompanyRegistrationNumber ? formatServiceAndAccountPathsFor(
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+    req.service.externalId,
+    req.account.type,
+    switchingCredentialId
+  ) : formatServiceAndAccountPathsFor(
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+    req.service.externalId,
+    req.account.type,
+    switchingCredentialId
   )
+
+  return res.redirect(redirectPath)
 }
