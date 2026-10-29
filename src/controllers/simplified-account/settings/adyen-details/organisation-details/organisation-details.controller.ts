@@ -20,7 +20,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
 
   return response(req, res, 'simplified-account/settings/adyen-details/organisation-details', {
     organisationDetails,
-    hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber,
+    hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber ?? '',
     countries: utils.countries.govukFrontendFormatted(organisationDetails.addressCountry),
     backLink: formatServiceAndAccountPathsFor(
       paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
@@ -52,17 +52,17 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
 
   const redirectPath = hasCompanyRegistrationNumber
     ? formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
     : formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
 
   return res.redirect(redirectPath)
 }
