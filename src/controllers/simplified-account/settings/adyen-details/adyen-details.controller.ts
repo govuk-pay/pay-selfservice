@@ -8,13 +8,11 @@ interface Params extends ServiceRequestParams {
 }
 
 async function get(req: ServiceRequest<never, Params>, res: ServiceResponse) {
-  const credential = req.account.gatewayAccountCredentials.find(
-    (credential) => credential.externalId === req.params.credentialExternalId
-  )
+  const credential = req.account.getCurrentCredential()
   if (!credential?.credentials.legalEntityId) {
     throw new Error('Account not fully configured')
   }
-  const organisationDetailsSummary = await getOrganisationDetailsSummary(credential?.credentials.legalEntityId)
+  const organisationDetailsSummary = await getOrganisationDetailsSummary(credential.credentials.legalEntityId)
 
   return response(req, res, 'simplified-account/settings/adyen-details/adyen-details', {
     organisationDetailsSummary,

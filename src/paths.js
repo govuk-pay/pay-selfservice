@@ -306,7 +306,7 @@ module.exports = {
         },
       },
       adyenDetails: {
-        index: '/settings/adyen-details/:credentialExternalId/',
+        index: '/settings/adyen-details/',
         responsiblePerson: {
           index: '/settings/adyen-details/:credentialId/responsible-person/details',
           address: '/settings/adyen-details/:credentialId/responsible-person/address',

@@ -81,8 +81,7 @@ async function post(req: ServiceRequest, res: ServiceResponse) {
     formatServiceAndAccountPathsFor(
       paths.simplifiedAccount.settings.adyenDetails.index,
       req.service.externalId,
-      req.account.type,
-      switchingCredentialId
+      req.account.type
     )
   )
 }

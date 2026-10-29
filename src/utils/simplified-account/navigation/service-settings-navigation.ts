@@ -84,8 +84,7 @@ export = (account: GatewayAccount, service: Service, currentUrl: string, permiss
       path: formatServiceAndAccountPathsFor(
         paths.simplifiedAccount.settings.adyenDetails.index,
         service.externalId,
-        account.type,
-        account.getCurrentCredential()!.externalId
+        account.type
       ),
       hasPermission: UserPermissions.settings.stripe.stripeAccountDetailsUpdate,
       conditions: account.paymentProvider === ADYEN && account.type === GatewayAccountType.LIVE,
