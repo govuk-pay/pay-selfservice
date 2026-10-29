@@ -33,9 +33,9 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
 export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
-  const currentSession = OrganisationDetailsSession.extract(req)
+  const existingSession = OrganisationDetailsSession.extract(req)
 
-  const updatedDetails = {
+  const updatedSession = {
     organisationName: req.body.organisationName,
     addressLine1: req.body.addressLine1,
     addressLine2: req.body.addressLine2,
@@ -46,7 +46,7 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
     email: req.body.email,
   } as OrganisationDetailsSession
 
-  OrganisationDetailsSession.set(req, currentSession, updatedDetails)
+  OrganisationDetailsSession.set(req, existingSession, updatedSession)
 
   const hasCompanyRegistrationNumber = req.body.hasCompanyRegistrationNumber === 'true'
 
