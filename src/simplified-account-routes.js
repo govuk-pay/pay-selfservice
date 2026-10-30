@@ -1125,6 +1125,9 @@ simplifiedAccount.post(
   serviceSettingsController.adyenDetails.serviceDirector.checkYourAnswers.post
 )
 
+/*
+These routes are not currently required and should be inaccesible, but will be in the future
+
 simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.statementDescriptors.user,
   enforceLiveAccountOnly,
@@ -1172,6 +1175,7 @@ simplifiedAccount.post(
   permission('stripe-account-details:update'),
   serviceSettingsController.adyenDetails.statementDescriptors.checkYourAnswers.post
 )
+  */
 
 // stripe details
 const stripeDetailsPath = paths.simplifiedAccount.settings.stripeDetails
