@@ -392,7 +392,7 @@ const createBalanceAccount = async (accountHolderId: string, serviceName: string
     accountHolderId,
     defaultCurrencyCode: 'GBP',
     description: serviceName,
-    timeZone: 'UTC'
+    timeZone: 'UTC',
   }
 
   return AdyenBalancePlatformClient.createBalanceAccount(balanceAccountInfo)

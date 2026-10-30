@@ -167,7 +167,7 @@ describe('Adyen details service', () => {
         accountHolderId: 'AH123',
         defaultCurrencyCode: 'GBP',
         description: SERVICE_NAME,
-        timeZone: 'UTC'
+        timeZone: 'UTC',
       })
       sinon.assert.callOrder(
         balancePlatformClientMock.createAccountHolder,
@@ -721,7 +721,7 @@ describe('Adyen details service', () => {
         accountHolderId: ACCOUNT_HOLDER_ID,
         defaultCurrencyCode: 'GBP',
         description: SERVICE_NAME,
-        timeZone: 'UTC'
+        timeZone: 'UTC',
       })
       expect(result).to.equal(balanceAccount)
     })
