@@ -7,7 +7,7 @@
 
   {{
     govukInsetText({
-      html: "Copy your key to somewhere safe.<br><br>You won’t be able to see it again once you leave this page."
+      html: "Copy your API key and store it securely.<br><br>You will not be able to see it again after you leave this page."
     })
   }}
 
@@ -19,22 +19,21 @@
   {{
     govukWarningText(
       {
-        text: 'API security',
+        text: 'Keep your API key secure',
         iconFallbackText: 'Warning'
       }
     )
   }}
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>You must store your API keys securely.</li>
-    <li>You must not share this key in publicly accessible documents or repositories.</li>
-    <li>You must not share it with anyone who should not be using the GOV.UK Pay API directly.</li>
+    <li>You must not include your API key in emails, support tickets or other messages to GOV.UK Pay.</li>
+    <li>You must not put your API key in publicly accessible documents or repositories.</li>
+    <li>Share your API key only with people or organisations that need it.</li>
   </ul>
 
   <p class="govuk-body">
-    More about
     <a class="govuk-link" href="https://docs.payments.service.gov.uk/security/#securing-your-developer-keys">
-      securing your API keys</a
+      Read more about securing your API keys</a
     >.
   </p>
 
