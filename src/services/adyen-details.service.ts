@@ -11,17 +11,7 @@ import { BankAccountAccountIdentification } from '@adyen/api-library/lib/src/typ
 import { UKLocalAccountIdentification } from '@adyen/api-library/lib/src/typings/balancePlatform/uKLocalAccountIdentification'
 import { TransferInstrumentInfo } from '@adyen/api-library/lib/src/typings/legalEntityManagement/transferInstrumentInfo'
 import createLogger from '@utils/logger'
-import {
-  acceptTermsOfService,
-  createBusinessLine,
-  createLegalEntity,
-  createTransferInstrument,
-  getLegalEntity,
-  getTermsOfService,
-  updateLegalEntity,
-  generatePciQuestionnaire,
-  signPciQuestionnaire,
-} from '@services/clients/adyen/adyen-legal-entity-management.client'
+import * as AdyenLEMClient from '@services/clients/adyen/adyen-legal-entity-management.client'
 import { createStore as createAdyenStore, requestPaymentMethod } from '@services/clients/adyen/adyen-management.client'
 import * as AdyenBalancePlatformClient from '@services/clients/adyen/adyen-balance-platform.client'
 import { ServiceDirectorSession } from '@controllers/simplified-account/settings/adyen-details/service-director/constants'
@@ -35,6 +25,7 @@ import { createSweep } from './clients/adyen/adyen-balance-platform.client'
 import Service from '@models/service/Service.class'
 import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatform/accountHolder'
 import { formatPhoneNumberWithCountryCode } from '@utils/telephone-number-utils'
+import { LegalEntityAssociation } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityAssociation'
 import { InvalidConfigurationError } from '@root/errors'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
@@ -107,7 +98,7 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
       },
     },
     phone: {
-      number: service.merchantDetails!.telephoneNumber,
+      number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
     },
   }
 
@@ -116,7 +107,7 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
     organization,
   }
 
-  return createLegalEntity(legalEntityInfo)
+  return AdyenLEMClient.createLegalEntity(legalEntityInfo)
 }
 
 const createOrganisation = async (
@@ -127,13 +118,13 @@ const createOrganisation = async (
   switchingCredentialId: string,
   userExternalId: string
 ) => {
-  const legalEntity = await createOrganisationLegalEntity(session, service)
-
   if (!service.merchantDetails?.url) {
     throw new InvalidConfigurationError(`No URL set in merchant details [service_external_id: ${service.externalId}]`)
   }
 
-  const businessLine = await createBusinessLine({
+  const legalEntity = await createOrganisationLegalEntity(session, service)
+
+  const businessLine = await AdyenLEMClient.createBusinessLine({
     service: BusinessLineInfo.ServiceEnum.PaymentProcessing,
     industryCode: INDUSTRY_CODE_MAP[governmentActivity],
     legalEntityId: legalEntity.id,
@@ -277,7 +268,7 @@ const createBankDetails = async (
     },
   }
 
-  const transferInstrument = await createTransferInstrument(transferInstrumentInfo)
+  const transferInstrument = await AdyenLEMClient.createTransferInstrument(transferInstrumentInfo)
 
   if (!transferInstrument) {
     throw new Error('Transfer instrument creation failed')
@@ -343,9 +334,9 @@ const createResponsiblePerson = async (session: ResponsiblePersonSession, organi
     individual,
   }
 
-  const responsiblePerson = await createLegalEntity(individualLegalEntityInfo)
+  const responsiblePerson = await AdyenLEMClient.createLegalEntity(individualLegalEntityInfo)
 
-  const organisation = await getLegalEntity(organisationLegalEntityId)
+  const organisation = await AdyenLEMClient.getLegalEntity(organisationLegalEntityId)
 
   const existingAssociations = organisation.entityAssociations ?? []
 
@@ -360,7 +351,7 @@ const createResponsiblePerson = async (session: ResponsiblePersonSession, organi
     ],
   }
 
-  await updateLegalEntity(organisationLegalEntityId, entityAssociationsPayload)
+  await AdyenLEMClient.updateLegalEntity(organisationLegalEntityId, entityAssociationsPayload)
 
   const { termsOfServiceDocumentId } = await generateTermsOfService(organisationLegalEntityId)
 
@@ -408,7 +399,7 @@ const createServiceDirector = async (
 ) => {
   let organisationLegalEntity
   try {
-    organisationLegalEntity = await getLegalEntity(organisationLegalEntityId)
+    organisationLegalEntity = await AdyenLEMClient.getLegalEntity(organisationLegalEntityId)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     throw new Error(`Organisation legal entity with ID ${organisationLegalEntityId} not found: ${errorMessage}`)
@@ -446,7 +437,7 @@ const createServiceDirector = async (
 
   let serviceDirector
   try {
-    serviceDirector = await createLegalEntity(serviceDirectorLegalEntity)
+    serviceDirector = await AdyenLEMClient.createLegalEntity(serviceDirectorLegalEntity)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     throw new Error(`Service director legal entity creation failed: ${errorMessage}`)
@@ -456,7 +447,7 @@ const createServiceDirector = async (
 
   // update the organisation with the person
   try {
-    await updateLegalEntity(organisationLegalEntityId, {
+    await AdyenLEMClient.updateLegalEntity(organisationLegalEntityId, {
       entityAssociations: [
         ...currentAssociations,
         ...SERVICE_DIRECTOR_ASSOCIATION_TYPES.map((type) => ({
@@ -477,7 +468,7 @@ const createServiceDirector = async (
   let pciQuestionnaire: GeneratePciDescriptionResponse
 
   try {
-    pciQuestionnaire = await generatePciQuestionnaire(organisationLegalEntityId)
+    pciQuestionnaire = await AdyenLEMClient.generatePciQuestionnaire(organisationLegalEntityId)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     throw new Error(`Could not create PCI questionnaire for (${serviceDirector.id}): ${errorMessage}`)
@@ -491,7 +482,7 @@ const createServiceDirector = async (
 
   // Sign PCI questionnaire
   try {
-    await signPciQuestionnaire(organisationLegalEntityId, {
+    await AdyenLEMClient.signPciQuestionnaire(organisationLegalEntityId, {
       pciTemplateReferences,
       signedBy: serviceDirector.id,
     })
@@ -520,7 +511,7 @@ const generateTermsOfService = async (legalEntityId: string) => {
     termsOfServiceDocumentFormat: 'TXT',
   }
 
-  return getTermsOfService(legalEntityId, getTermsOfServiceDocumentRequest)
+  return AdyenLEMClient.getTermsOfService(legalEntityId, getTermsOfServiceDocumentRequest)
 }
 
 const signTermsOfService = async (legalEntityId: string, termsOfServiceDocumentId: string, acceptedBy: string) => {
@@ -528,7 +519,7 @@ const signTermsOfService = async (legalEntityId: string, termsOfServiceDocumentI
     acceptedBy,
   }
 
-  return acceptTermsOfService(legalEntityId, termsOfServiceDocumentId, acceptTermsOfServiceRequest)
+  return AdyenLEMClient.acceptTermsOfService(legalEntityId, termsOfServiceDocumentId, acceptTermsOfServiceRequest)
 }
 
 const createStore = async ({
@@ -574,6 +565,69 @@ const createStore = async ({
   return store
 }
 
+interface OrganisationDetailsSummary {
+  bankDetails: BankDetailsSummary
+  responsiblePerson: { name: string }
+  serviceDirector: { name: string }
+  registrationDetails: {
+    companyRegistrationNumber: string
+    vatRegistrationNumber: string
+  }
+}
+
+const getOrganisationDetailsSummary = async (legalEntityId: string): Promise<OrganisationDetailsSummary> => {
+  const legalEntity = await AdyenLEMClient.getLegalEntity(legalEntityId).catch((_) => undefined)
+
+  const responsiblePersonEntity = legalEntity?.entityAssociations?.find(
+    (association) => association.type === LegalEntityAssociation.TypeEnum.Signatory
+  )
+  const serviceDirectorEntity = legalEntity?.entityAssociations?.find(
+    (association) => association.type === LegalEntityAssociation.TypeEnum.Director
+  )
+
+  return {
+    bankDetails: await getBankAccountSummary(legalEntity?.transferInstruments?.[0].id),
+    responsiblePerson: {
+      name: responsiblePersonEntity?.name ?? 'Data unavailable',
+    },
+    serviceDirector: {
+      name: serviceDirectorEntity?.name ?? 'Data unavailable',
+    },
+    registrationDetails: {
+      companyRegistrationNumber: legalEntity?.organization?.registrationNumber ? 'Provided' : 'Not provided',
+      vatRegistrationNumber: legalEntity?.organization?.vatNumber ? 'Provided' : 'Not provided',
+    },
+  }
+}
+
+interface BankDetailsSummary {
+  sortCode: string
+  accountNumber: string
+}
+
+const getBankAccountSummary = async (transferInstrumentId?: string): Promise<BankDetailsSummary> => {
+  if (!transferInstrumentId) {
+    return Promise.resolve({
+      sortCode: 'Data unavailable',
+      accountNumber: 'Data unavailable',
+    })
+  }
+
+  const transferInstrumentInfo = await AdyenLEMClient.getTransferInstrument(transferInstrumentId).catch(
+    (_) => undefined
+  )
+
+  const accountInfo = transferInstrumentInfo?.bankAccount.accountIdentification as
+    UKLocalAccountIdentification | undefined
+  const sortCode = accountInfo?.sortCode
+  const accountNumber = accountInfo?.accountNumber
+
+  return {
+    sortCode: sortCode ?? 'Data unavailable',
+    accountNumber: accountNumber ? `●●●●${accountNumber.slice(-4)}` : 'Data unavailable',
+  }
+}
+
 const getAccountHolder = async (accountHolderId: string): Promise<AccountHolder> => {
   return AdyenBalancePlatformClient.getAccountHolder(accountHolderId)
 }
@@ -600,6 +654,7 @@ export {
   createAccountHolder,
   createBalanceAccount,
   createStore,
+  getOrganisationDetailsSummary,
   getAccountHolder,
   isAccountHolderVerified,
 }
