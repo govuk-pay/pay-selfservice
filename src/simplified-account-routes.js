@@ -22,7 +22,7 @@ const permission = require('@middleware/permission')
 const paths = require('./paths')
 const serviceSettingsController = require('@controllers/simplified-account/settings')
 const servicesController = require('@controllers/simplified-account/services')
-const { STRIPE, WORLDPAY, ADYEN, SANDBOX } = require('@models/constants/payment-providers')
+const { STRIPE, WORLDPAY, ADYEN } = require('@models/constants/payment-providers')
 const {
   GOV_ENTITY_DOC_FORM_FIELD_NAME,
 } = require('@controllers/simplified-account/settings/stripe-details/government-entity-document/constants')

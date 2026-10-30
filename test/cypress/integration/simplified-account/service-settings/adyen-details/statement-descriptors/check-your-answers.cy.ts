@@ -166,6 +166,7 @@ describe(`Statement descriptors - check your answers`, () => {
         ])
       })
 
+      // skipped as this page should not be accessible at present
       it.skip('should return a 404 when attempting to get the statement descriptor payout page', () => {
         cy.request({
           url: STATEMENT_DESCRIPTOR_REVIEW_PATH,
