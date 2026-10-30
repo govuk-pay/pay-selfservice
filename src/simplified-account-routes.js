@@ -22,7 +22,7 @@ const permission = require('@middleware/permission')
 const paths = require('./paths')
 const serviceSettingsController = require('@controllers/simplified-account/settings')
 const servicesController = require('@controllers/simplified-account/services')
-const { STRIPE, WORLDPAY, ADYEN } = require('@models/constants/payment-providers')
+const { STRIPE, WORLDPAY, ADYEN, SANDBOX } = require('@models/constants/payment-providers')
 const {
   GOV_ENTITY_DOC_FORM_FIELD_NAME,
 } = require('@controllers/simplified-account/settings/stripe-details/government-entity-document/constants')
@@ -1125,6 +1125,9 @@ simplifiedAccount.post(
   serviceSettingsController.adyenDetails.serviceDirector.checkYourAnswers.post
 )
 
+/*
+These routes are not currently required and should be inaccesible, but will be in the future
+
 simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.statementDescriptors.user,
   enforceLiveAccountOnly,
@@ -1172,6 +1175,7 @@ simplifiedAccount.post(
   permission('stripe-account-details:update'),
   serviceSettingsController.adyenDetails.statementDescriptors.checkYourAnswers.post
 )
+  */
 
 // stripe details
 const stripeDetailsPath = paths.simplifiedAccount.settings.stripeDetails

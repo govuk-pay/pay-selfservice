@@ -57,7 +57,8 @@ describe(`Statement descritors - user`, () => {
       setStubs()
     })
 
-    it('shows the page correctly', () => {
+    // skipped as this page should not be accessible at present
+    it.skip('shows the page correctly', () => {
       cy.visit(STATEMENT_DESCRIPTORS_PATH)
 
       cy.log('accessibility check')
@@ -118,7 +119,8 @@ describe(`Statement descritors - user`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to get the statement descriptor user page', () => {
+      // skipped as this page should not be accessible at present
+      it.skip('should return a 404 when attempting to get the statement descriptor user page', () => {
         cy.request({
           url: STATEMENT_DESCRIPTORS_PATH,
           failOnStatusCode: false,

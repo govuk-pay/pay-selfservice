@@ -80,7 +80,8 @@ describe(`Statement descriptors - check your answers`, () => {
         cy.get('#payout-descriptor-submit').click()
       })
 
-      it('shows the page correctly', () => {
+      // skipped as this page should not be accessible at present
+      it.skip('shows the page correctly', () => {
         cy.visit(STATEMENT_DESCRIPTOR_REVIEW_PATH)
 
         cy.log('accessibility check')
@@ -100,7 +101,8 @@ describe(`Statement descriptors - check your answers`, () => {
         cy.location('pathname').should('eq', TASK_LIST_PATH)
       })
 
-      it('shows the correct descriptor values and change journey', () => {
+      // skipped as this page should not be accessible at present
+      it.skip('shows the correct descriptor values and change journey', () => {
         cy.visit(STATEMENT_DESCRIPTOR_REVIEW_PATH)
 
         cy.contains('our user descriptor')
@@ -119,7 +121,8 @@ describe(`Statement descriptors - check your answers`, () => {
     })
 
     context('when the descriptor pages have not been completed', () => {
-      it('redirects to the task list', () => {
+      // skipped as this page should not be accessible at present
+      it.skip('redirects to the task list', () => {
         setStubs()
 
         cy.visit(STATEMENT_DESCRIPTOR_REVIEW_PATH)
@@ -163,7 +166,7 @@ describe(`Statement descriptors - check your answers`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to get the statement descriptor payout page', () => {
+      it.skip('should return a 404 when attempting to get the statement descriptor payout page', () => {
         cy.request({
           url: STATEMENT_DESCRIPTOR_REVIEW_PATH,
           failOnStatusCode: false,
