@@ -127,7 +127,7 @@ describe('Adyen details service', () => {
             email: 'test@gov.uk',
             phone: { number: '+44 1234 567890' },
           },
-          phone: { number: '01234567890' },
+          phone: { number: '+44 1234 567890' },
         },
       })
 

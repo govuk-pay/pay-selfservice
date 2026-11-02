@@ -17,6 +17,20 @@ abstract class Task {
     this.status = status
     return this
   }
+
+  /**
+   * Returns true iff the task can be completed for the first time
+   */
+  canStart() {
+    return this.status === TaskStatus.NOT_STARTED
+  }
+
+  /**
+   * Returns true if the task can be completed, either for the first time or can be redone
+   */
+  canComplete() {
+    return this.status === TaskStatus.NOT_STARTED || this.status === TaskStatus.COMPLETED
+  }
 }
 
 abstract class Tasks<T extends Task> {

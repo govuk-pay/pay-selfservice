@@ -1,0 +1,89 @@
+{% extends "../settings-layout.njk" %}
+{% from "macro/spinner.njk" import spinner %}
+{% from "macro/task-list.njk" import taskList %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% set settingsPageTitle = "Adyen details" %}
+
+{% block settingsContent %}
+  <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
+  <p class="govuk-body">
+    This information has been sent to Adyen so that your service can take payments. For security reasons we cannot show
+    all the information submitted to Adyen.
+  </p>
+
+  {{
+    govukSummaryList({
+      card: {
+        title: {
+          text: "Organisation bank details"
+        }
+      },
+      rows: [{
+        key: {
+          text: "Sort code"
+        },
+        value: {
+          text: organisationDetailsSummary.bankDetails.sortCode
+        }
+      }, {
+        key: {
+          text: "Account number"
+        },
+        value: {
+          text: organisationDetailsSummary.bankDetails.accountNumber
+        }
+      }]
+    })
+  }}
+
+  {{
+    govukSummaryList({
+      card: {
+        title: {
+          text: "Organisation contact"
+        }
+      },
+      rows: [{
+        key: {
+          text: "Responsible person"
+        },
+        value: {
+          text: organisationDetailsSummary.responsiblePerson.name
+        }
+      }, {
+        key: {
+          text: "Service director"
+        },
+        value: {
+          text: organisationDetailsSummary.serviceDirector.name
+        }
+      }]
+    })
+  }}
+
+  {{
+    govukSummaryList({
+      card: {
+        title: {
+          text: "Company registration details"
+        }
+      },
+      rows: [{
+        key: {
+          text: "Company registration number"
+        },
+        value: {
+          text: organisationDetailsSummary.registrationDetails.companyRegistrationNumber
+        }
+      }, {
+        key: {
+          text: "VAT registration number"
+        },
+        value: {
+          text: organisationDetailsSummary.registrationDetails.vatRegistrationNumber
+        }
+      }]
+    })
+  }}
+{% endblock %}

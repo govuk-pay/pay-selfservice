@@ -1,0 +1,43 @@
+{% extends "simplified-account/settings/settings-layout.njk" %}
+
+{% set settingsPageTitle = 'Confirm switch to Adyen' %}
+
+{% block settingsContent %}
+  <h1 class="govuk-heading-l">Finish switching to Adyen</h1>
+
+  <p class="govuk-body"
+    >If you’ve made a payment to make sure money reaches your organisation’s bank account, you must check it’s arrived
+    before finishing the switch to Adyen.</p
+  >
+
+  <p class="govuk-body"
+    >Check
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ routes.payouts.list }}" target="_blank"
+      >payments to your bank account (opens in a new tab)</a
+    >.</p
+  >
+
+  <p class="govuk-body"
+    >You can refund the payment in
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ serviceView.links.transactions.index }}">Transactions</a
+    >. Make sure you’ve waited at least 2 full working days before refunding the payment.</p
+  >
+
+  {{
+    govukWarningText({
+      text: "When you switch, your service will immediately start taking payments through Adyen. You can still refund previous payments through GOV.UK Pay.",
+      iconFallbackText: "Warning"
+    })
+  }}
+
+  <form id="switch-psp" method="post">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+    {{
+      govukButton({
+        id: 'confirm-switch-submit',
+        text: "Switch to Adyen",
+        preventDoubleClick: true
+      })
+    }}
+  </form>
+{% endblock %}

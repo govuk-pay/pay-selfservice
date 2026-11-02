@@ -923,8 +923,29 @@ simplifiedAccount.get(
   serviceSettingsController.switchPsp.makeTestPayment.getInbound,
   pspSwitchRedirect
 )
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.switchPsp.switchToAdyen.confirm,
+  permission('gateway-credentials:update'),
+  restrictToSwitchingAccount(ADYEN),
+  serviceSettingsController.switchPsp.switchToAdyen.confirm.get,
+  pspSwitchRedirect
+)
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.switchPsp.switchToAdyen.confirm,
+  permission('gateway-credentials:update'),
+  restrictToSwitchingAccount(ADYEN),
+  serviceSettingsController.switchPsp.switchToAdyen.confirm.post,
+  pspSwitchRedirect
+)
 
 // adyen details
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.index,
+  permission('stripe-account-details:update'),
+  enforcePaymentProviderType(ADYEN),
+  serviceSettingsController.adyenDetails.get,
+  pspSwitchRedirect
+)
 simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.bankDetails,
   enforceLiveAccountOnly,
