@@ -20,10 +20,6 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     dobYear: currentSession.dobYear ?? '',
   }
 
-  const email = {
-    email: currentSession.email ?? '',
-  }
-
   const switchToAdyenLink = formatServiceAndAccountPathsFor(
     paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
     req.service.externalId,
@@ -43,7 +39,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     backLink,
     name,
     dob,
-    email,
+    email: currentSession.email ?? '',
   })
 }
 

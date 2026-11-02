@@ -3,9 +3,9 @@
 {% set settingsPageTitle = 'Service director details' %}
 
 {% block settingsContent %}
-  <form id="bank-details-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
-    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
-    {%
+<form id="bank-details-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
+  <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+  {%
       call govukFieldset({
         legend: {
           text: settingsPageTitle,
@@ -14,39 +14,32 @@
         }
       })
     %}
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        Adyen needs details of the director of the service or someone at director level in your organisation.</p
-      >
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        <a
-          class="govuk-link"
-          href="https://www.payments.service.gov.uk/required-responsible-person-and-director-information/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Check who can be a service director (opens in new tab)
-        </a>
-      </p>
+  <p class="govuk-body govuk-!-margin-bottom-6">
+    Adyen needs details of the director of the service or someone at director level in your organisation.</p>
+  <p class="govuk-body govuk-!-margin-bottom-6">
+    <a class="govuk-link"
+      href="https://www.payments.service.gov.uk/required-responsible-person-and-director-information/" target="_blank"
+      rel="noopener noreferrer">
+      Check who can be a service director (opens in new tab)
+    </a>
+  </p>
 
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        If your organisation does not have someone in one of these roles, email <br />
-        <a
-          class="govuk-link govuk-link--no-visited-state"
-          href="mailto:govuk-pay-support@digital.cabinet-office.gov.uk"
-        >
-          govuk-pay-support@digital.cabinet-office.gov.uk </a
-        >. Adyen may accept another senior person who is authorised to transfer funds for the organisation.
-      </p>
+  <p class="govuk-body govuk-!-margin-bottom-6">
+    If your organisation does not have someone in one of these roles, email <br />
+    <a class="govuk-link govuk-link--no-visited-state" href="mailto:govuk-pay-support@digital.cabinet-office.gov.uk">
+      govuk-pay-support@digital.cabinet-office.gov.uk </a>. Adyen may accept another senior person who is authorised to
+    transfer funds for the organisation.
+  </p>
 
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        The service director must be different from the responsible person.
-      </p>
+  <p class="govuk-body govuk-!-margin-bottom-6">
+    The service director must be different from the responsible person.
+  </p>
 
-      <p class="govuk-body govuk-!-margin-bottom-6">
-        This information will be held securely and will not be shared with anyone unnecessarily.
-      </p>
+  <p class="govuk-body govuk-!-margin-bottom-6">
+    This information will be held securely and will not be shared with anyone unnecessarily.
+  </p>
 
-      {{
+  {{
         govukInput({
           label: {
             text: "First name"
@@ -62,7 +55,7 @@
         })
       }}
 
-      {{
+  {{
         govukInput({
           label: {
             text: "Last name"
@@ -77,16 +70,16 @@
           classes: "govuk-!-width-three-quarters"
         })
       }}
-      {% include "simplified-account/settings/partials/_dob.njk" %}
+  {% include "simplified-account/settings/partials/_dob.njk" %}
 
-      {{
+  {{
         govukInput({
           label: {
             text: "Work email address"
           },
           id: "email",
           name: "email",
-          value: contact.email,
+          value: email,
           type: "email",
           autocomplete: "email",
           spellcheck: false,
@@ -95,13 +88,13 @@
         })
       }}
 
-      {{
+  {{
         govukButton({
           id: "service-director-details-submit",
           text: "Continue",
           preventDoubleClick: true
         })
       }}
-    {% endcall %}
-  </form>
+  {% endcall %}
+</form>
 {% endblock %}
