@@ -170,7 +170,6 @@ async function addCardPaymentMethods(storeId: string, businessLineId: string, me
     PaymentMethodSetupInfo.TypeEnum.Jcb,
     PaymentMethodSetupInfo.TypeEnum.Maestro,
     PaymentMethodSetupInfo.TypeEnum.Discover,
-    PaymentMethodSetupInfo.TypeEnum.Diners,
     PaymentMethodSetupInfo.TypeEnum.Cup,
     PaymentMethodSetupInfo.TypeEnum.Amex,
   ]
