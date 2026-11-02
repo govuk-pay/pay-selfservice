@@ -24,7 +24,7 @@ async function get(req: ServiceRequest, res: ServiceResponse) {
     })
     return res.redirect(
       formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.switchPsp.switchToStripe.index,
+        paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
         req.service.externalId,
         req.account.type
       )
@@ -33,7 +33,7 @@ async function get(req: ServiceRequest, res: ServiceResponse) {
 
   return response(req, res, 'simplified-account/settings/switch-psp/switch-to-adyen/confirm', {
     backLink: formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.switchPsp.switchToStripe.index,
+      paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
       req.service.externalId,
       req.account.type
     ),
@@ -57,7 +57,7 @@ async function post(req: ServiceRequest, res: ServiceResponse) {
     })
     return res.redirect(
       formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.switchPsp.switchToStripe.index,
+        paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
         req.service.externalId,
         req.account.type
       )
