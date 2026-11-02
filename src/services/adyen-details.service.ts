@@ -124,6 +124,10 @@ const createOrganisation = async (
 
   const legalEntity = await createOrganisationLegalEntity(session, service)
 
+  if (!session.hasCompanyRegistrationNumber) {
+    await createDocument(legalEntity.id, session.organisationName!)
+  }
+
   const businessLine = await AdyenLEMClient.createBusinessLine({
     service: BusinessLineInfo.ServiceEnum.PaymentProcessing,
     industryCode: INDUSTRY_CODE_MAP[governmentActivity],
@@ -389,9 +393,32 @@ const createBalanceAccount = async (accountHolderId: string, serviceName: string
   return AdyenBalancePlatformClient.createBalanceAccount(balanceAccountInfo)
 }
 
+const createDocument = async (legalEntityId: string, organisationName: string) => {
+  const ownerEntity: Types.legalEntityManagement.OwnerEntity = {
+    id: legalEntityId,
+    type: 'legalEntity'
+  };
+
+  const attachment = {
+    content: 'JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBv+f/ub0j6JPRX+E3EmC==' // pragma: allowlist secret 
+    // Value here will be the base64 encoded string of the file. This example is from the adyen public docs and not a secret 
+  } as Types.legalEntityManagement.Attachment;
+
+  const document: Types.legalEntityManagement.Document = {
+    owner: ownerEntity,
+    attachments: [attachment],
+    description: `Registration document for service ${organisationName}`, // we can format this to meet Adyen requirements if required
+    type: Types.legalEntityManagement.Document.TypeEnum.RegistrationDocument
+  };
+
+  const documentId = (await AdyenLEMClient.uploadDocument(document)).id
+
+  logger.info(`Successfully uploaded a document: ${documentId}`)
+}
+
 const toUkInternationalNumber = (input: string): string => {
   const cleaned = input.replace(/[\s().-]/g, '')
-  return cleaned.startsWith('+') ? cleaned : `+44${cleaned.replace(/^0/, '')}`
+  return cleaned.startsWith('+') ? cleaned : `+ 44${cleaned.replace(/^0/, '')} `
 }
 
 const createServiceDirector = async (
@@ -403,7 +430,7 @@ const createServiceDirector = async (
     organisationLegalEntity = await AdyenLEMClient.getLegalEntity(organisationLegalEntityId)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    throw new Error(`Organisation legal entity with ID ${organisationLegalEntityId} not found: ${errorMessage}`)
+    throw new Error(`Organisation legal entity with ID ${organisationLegalEntityId} not found: ${errorMessage} `)
   }
 
   if (!serviceDirectorSession.firstName || !serviceDirectorSession.lastName) {
@@ -441,7 +468,7 @@ const createServiceDirector = async (
     serviceDirector = await AdyenLEMClient.createLegalEntity(serviceDirectorLegalEntity)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    throw new Error(`Service director legal entity creation failed: ${errorMessage}`)
+    throw new Error(`Service director legal entity creation failed: ${errorMessage} `)
   }
 
   const currentAssociations = organisationLegalEntity.entityAssociations ?? []
@@ -659,3 +686,4 @@ export {
   getAccountHolder,
   isAccountHolderVerified,
 }
+
