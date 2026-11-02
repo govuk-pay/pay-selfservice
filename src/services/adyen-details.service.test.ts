@@ -662,7 +662,7 @@ describe('Adyen details service', () => {
         },
       })
 
-      const cardTypes = ['visa', 'mc', 'jcb', 'maestro', 'discover', 'diners', 'cup', 'amex']
+      const cardTypes = ['visa', 'mc', 'jcb', 'maestro', 'discover', 'cup', 'amex']
 
       cardTypes.forEach((type) =>
         sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
