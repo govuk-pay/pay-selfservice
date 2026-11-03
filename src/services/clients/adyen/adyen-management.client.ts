@@ -1,7 +1,7 @@
 import { Client, EnvironmentEnum, HttpURLConnectionClient, ManagementAPI, Types } from '@adyen/api-library'
 import { PaymentMethod } from '@adyen/api-library/lib/src/typings/checkout/paymentMethod'
 import { PaymentMethodSetupInfo } from '@adyen/api-library/lib/src/typings/management/paymentMethodSetupInfo'
-import { AdyenAPI, AdyenRequest } from './adyen-request-wrapper'
+import { AdyenAPI, AdyenRequest, Metadata } from './adyen-request-wrapper'
 import { AdyenMockServerHttpClient } from './adyen-mock-server-http-client'
 
 const ADYEN_COMPANY_ACCOUNT_API_KEY = process.env.ADYEN_COMPANY_ACCOUNT_API_KEY
@@ -33,13 +33,22 @@ export async function requestPaymentMethod(
   merchantId: string,
   paymentMethodSetupInfo: PaymentMethodSetupInfo
 ): Promise<PaymentMethod> {
-  return new AdyenRequest(AdyenAPI.MANAGEMENT, 'request payment method').execute(() =>
-    managementAPI.PaymentMethodsMerchantLevelApi.requestPaymentMethod(merchantId, paymentMethodSetupInfo)
-  )
+  return new AdyenRequest(
+    AdyenAPI.MANAGEMENT,
+    'request payment method',
+    Metadata.Post({
+      business_line_id: paymentMethodSetupInfo.businessLineId!,
+      store_id: paymentMethodSetupInfo.storeIds![0],
+    })
+  ).execute(() => managementAPI.PaymentMethodsMerchantLevelApi.requestPaymentMethod(merchantId, paymentMethodSetupInfo))
 }
 
 export async function createStore(storeCreationRequest: StoreCreationWithMerchantCodeRequest): Promise<Store> {
-  return new AdyenRequest(AdyenAPI.MANAGEMENT, 'create store').execute(() =>
-    managementAPI.AccountStoreLevelApi.createStore(storeCreationRequest)
-  )
+  return new AdyenRequest(
+    AdyenAPI.MANAGEMENT,
+    'create store',
+    Metadata.Post({
+      business_line_id: storeCreationRequest.businessLineIds![0],
+    })
+  ).execute(() => managementAPI.AccountStoreLevelApi.createStore(storeCreationRequest))
 }

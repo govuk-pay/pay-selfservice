@@ -686,7 +686,7 @@ describe('Adyen details service', () => {
         type: 'googlepay',
         storeIds: [store.id],
         businessLineId: 'BL123',
-        googlePay: { merchantId: 'MERCHANT123' },
+        googlePay: { merchantId: 'GOOGLEPAYMERCHANTID123', reuseMerchantId: true },
         countries: ['GB'],
         currencies: ['GBP'],
       })

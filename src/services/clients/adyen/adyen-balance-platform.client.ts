@@ -1,7 +1,7 @@
 import { BalancePlatformAPI, Client, EnvironmentEnum, HttpURLConnectionClient, Types } from '@adyen/api-library'
 import { CreateSweepConfigurationV2 } from '@adyen/api-library/lib/src/typings/balancePlatform/createSweepConfigurationV2'
 import { AdyenMockServerHttpClient } from '@services/clients/adyen/adyen-mock-server-http-client'
-import { AdyenAPI, AdyenRequest } from '@services/clients/adyen/adyen-request-wrapper'
+import { AdyenAPI, AdyenRequest, Metadata } from '@services/clients/adyen/adyen-request-wrapper'
 
 const ADYEN_BALANCE_PLATFORM_API_KEY = process.env.ADYEN_BALANCE_PLATFORM_API_KEY
 const ADYEN_ENVIRONMENT = process.env.ADYEN_ENVIRONMENT === 'LIVE' ? EnvironmentEnum.LIVE : EnvironmentEnum.TEST
@@ -31,25 +31,41 @@ if (
 const balancePlatformAPI = new BalancePlatformAPI(client)
 
 export async function getAccountHolder(accountHolderId: string): Promise<AccountHolder> {
-  return new AdyenRequest(AdyenAPI.BALANCE_PLATFORM, 'get account holder').execute(() =>
-    balancePlatformAPI.AccountHoldersApi.getAccountHolder(accountHolderId)
-  )
+  return new AdyenRequest(
+    AdyenAPI.BALANCE_PLATFORM,
+    'get account holder',
+    Metadata.Get({
+      account_holder_id: accountHolderId,
+    })
+  ).execute(() => balancePlatformAPI.AccountHoldersApi.getAccountHolder(accountHolderId))
 }
 
 export async function createSweep(balanceAccountId: string, sweepConfiguration: CreateSweepConfigurationV2) {
-  return new AdyenRequest(AdyenAPI.BALANCE_PLATFORM, 'create account holder').execute(() =>
-    balancePlatformAPI.CustomPayoutSchedulesSweepsApi.createSweep(balanceAccountId, sweepConfiguration)
-  )
+  return new AdyenRequest(
+    AdyenAPI.BALANCE_PLATFORM,
+    'create sweep',
+    Metadata.Post({
+      balance_account_id: balanceAccountId,
+    })
+  ).execute(() => balancePlatformAPI.CustomPayoutSchedulesSweepsApi.createSweep(balanceAccountId, sweepConfiguration))
 }
 
 export async function createAccountHolder(accountHolderInfo: AccountHolderInfo): Promise<AccountHolder> {
-  return new AdyenRequest(AdyenAPI.BALANCE_PLATFORM, 'create account holder').execute(() =>
-    balancePlatformAPI.AccountHoldersApi.createAccountHolder(accountHolderInfo)
-  )
+  return new AdyenRequest(
+    AdyenAPI.BALANCE_PLATFORM,
+    'create account holder',
+    Metadata.Post({
+      legal_entity_id: accountHolderInfo.legalEntityId,
+    })
+  ).execute(() => balancePlatformAPI.AccountHoldersApi.createAccountHolder(accountHolderInfo))
 }
 
 export async function createBalanceAccount(balanceAccountInfo: BalanceAccountInfo): Promise<BalanceAccount> {
-  return new AdyenRequest(AdyenAPI.BALANCE_PLATFORM, 'create balance account').execute(() =>
-    balancePlatformAPI.BalanceAccountsApi.createBalanceAccount(balanceAccountInfo)
-  )
+  return new AdyenRequest(
+    AdyenAPI.BALANCE_PLATFORM,
+    'create balance account',
+    Metadata.Post({
+      account_holder_id: balanceAccountInfo.accountHolderId,
+    })
+  ).execute(() => balancePlatformAPI.BalanceAccountsApi.createBalanceAccount(balanceAccountInfo))
 }
