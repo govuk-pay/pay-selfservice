@@ -2,7 +2,7 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
-import { CompanyRegistrationBody, OrganisationDetailsSession } from './constants'
+import { CompanyRegistrationBody, OrganisationDetailsSession } from '../constants'
 
 export function get(req: ServiceRequest, res: ServiceResponse) {
   const { account } = req
@@ -19,10 +19,9 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  return response(req, res, 'simplified-account/settings/adyen-details/company-registration-number', {
-    companyRegistrationNumber: currentSession.companyRegistrationNumber ?? '',
+  return response(req, res, 'simplified-account/settings/adyen-details/company-registration/has-company-registration-number', {
     backLink: formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
       req.service.externalId,
       req.account.type,
       switchingCredentialId
@@ -35,13 +34,13 @@ export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceR
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
 
-  OrganisationDetailsSession.set(req, currentSession, {
-    companyRegistrationNumber: req.body.companyRegistrationNumber,
-  } as OrganisationDetailsSession)
+  // OrganisationDetailsSession.set(req, currentSession, {
+  //   companyRegistrationNumber: req.body.companyRegistrationNumber,
+  // } as OrganisationDetailsSession)
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
       req.service.externalId,
       req.account.type,
       switchingCredentialId
