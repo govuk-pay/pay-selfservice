@@ -4,8 +4,14 @@ import HttpClientException from '@adyen/api-library/lib/src/httpClient/httpClien
 
 const logger = createLogger('adyen-request-wrapper.ts')
 
-type Metadata = Record<string, string> & {
+interface Metadata {
   adyen_api_method: string
+  legal_entity_id?: string
+  account_holder_id?: string
+  balance_account_id?: string
+  transfer_instrument_id?: string
+  business_line_id?: string
+  store_id?: string
 }
 
 export const Metadata = {

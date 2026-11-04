@@ -32,6 +32,8 @@ type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRe
 type Organization = Types.legalEntityManagement.Organization
 type StoreCreationWithMerchantCodeRequest = Types.management.StoreCreationWithMerchantCodeRequest
 
+const GOOGLE_PAY_MERCHANT_ID = process.env.GOOGLE_PAY_MERCHANT_ID!
+
 export interface CreateStoreParams {
   businessLineId: string
   balanceAccountId: string
@@ -198,7 +200,8 @@ async function addGooglePayPaymentMethods(storeId: string, businessLineId: strin
   const googlePayPaySetupInfo: PaymentMethodSetupInfo = {
     type: googlePayPaymentType,
     googlePay: {
-      merchantId,
+      merchantId: GOOGLE_PAY_MERCHANT_ID,
+      reuseMerchantId: true,
     },
     storeIds: [storeId],
     businessLineId: businessLineId,
