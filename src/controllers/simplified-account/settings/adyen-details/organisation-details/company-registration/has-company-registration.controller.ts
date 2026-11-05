@@ -32,11 +32,6 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
 export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
-  const currentSession = OrganisationDetailsSession.extract(req)
-
-  // OrganisationDetailsSession.set(req, currentSession, {
-  //   companyRegistrationNumber: req.body.companyRegistrationNumber,
-  // } as OrganisationDetailsSession)
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
