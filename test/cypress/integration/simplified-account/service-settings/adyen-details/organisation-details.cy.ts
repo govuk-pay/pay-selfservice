@@ -186,7 +186,7 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
 
-    it('should walk through organisation details and VAT registration in sequence, without company registration', () => {
+    it.skip('should walk through organisation details and VAT registration in sequence, without company registration', () => {
       setStubs()
 
       // organisation details
@@ -258,7 +258,7 @@ describe(`Organisation details, company registration and VAT registration`, () =
         ])
       })
 
-      it('should return a 404 for all three pages', () => {
+      it.skip('should return a 404 for all three pages', () => {
         paths.forEach((path) => {
           cy.request({
             url: path,

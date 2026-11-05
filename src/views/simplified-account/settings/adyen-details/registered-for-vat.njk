@@ -1,0 +1,46 @@
+{% extends "simplified-account/settings/settings-layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set settingsPageTitle = 'Is your organisation registered for VAT?' %}
+
+{% block settingsContent %}
+  <form id="registered-for-vat-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+    {{
+      govukRadios({
+        name: "registeredForVat",
+        fieldset: {
+          legend: {
+            text: "Is your organisation registered for VAT?",
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        items: [
+          {
+            value: "registered-for-vat-yes",
+            text: "Yes",
+            attributes: {
+              "data-cy": "registered-for-vat-yes"
+            }
+          },
+          {
+            value: "registered-for-vat-no",
+            text: "No",
+            attributes: {
+              "data-cy": "registered-for-vat-no"
+            }
+          }
+        ]
+      })
+    }}
+
+    {{
+      govukButton({
+        id: "registered-for-vat-submit",
+        text: "Continue",
+        preventDoubleClick: true
+      })
+    }}
+  </form>
+{% endblock %}

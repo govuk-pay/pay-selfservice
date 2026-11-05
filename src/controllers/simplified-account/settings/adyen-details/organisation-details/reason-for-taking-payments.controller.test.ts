@@ -39,7 +39,7 @@ const setAdyenStoreId = sinon.stub().resolves()
 
 const TEMPLATE = 'simplified-account/settings/adyen-details/reason-for-taking-payments'
 const BACK_LINK = formatServiceAndAccountPathsFor(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
   SERVICE_EXTERNAL_ID,
   SERVICE_TYPE,
   GATEWAY_ACCOUNT.getSwitchingCredential().externalId
@@ -122,8 +122,19 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
           },
         })
       })
-
-      it('should create Adyen legal entity and mark organisation details task as complete and redirect to the switch to adyen task list', async () => {
+      it('should redirect to the registered for VAT page', async () => {
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
+      })
+      it('should create Adyen legal entity and mark organisation details task as complete', async () => {
         await call('post')
 
         sinon.assert.calledOnceWithExactly(
@@ -160,15 +171,6 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
           setAdyenStoreId,
           markTaskAsComplete
         )
-
-        sinon.assert.calledOnceWithExactly(
-          res.redirect,
-          formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE
-          )
-        )
       })
 
       it('should create a store for the business line using the Stripe statement descriptor', async () => {
@@ -184,47 +186,42 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
           organisationDetails: new OrganisationDetailsSession(VALID_SESSION as OrganisationDetailsSession),
         })
       })
+    })
+  })
 
-      it('should clear the session organisation details', async () => {
-        const thisCall = await call('post')
-        expect(thisCall.req.session).to.deep.include({ otherSessionData: 'keep', pageData: {} })
+  describe('when no selection is made', () => {
+    beforeEach(() => {
+      nextRequest({
+        body: {},
+        session: {
+          pageData: {
+            organisationDetails: VALID_SESSION,
+          },
+        },
       })
     })
+    it('should not complete the task, create an organisation or redirect', async () => {
+      await call('post')
+      sinon.assert.notCalled(markTaskAsComplete)
+      sinon.assert.notCalled(createOrganisation)
+      sinon.assert.notCalled(res.redirect)
+    })
+    it('should re-render the taking payments for page with the backLink', async () => {
+      await call('post')
+      const expectedContext = { backLink: BACK_LINK }
+      sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+    })
+    it('should show the summary error', async () => {
+      await call('post')
+      const expectedContext = {
+        errors: { summary: [{ text: 'You must make a selection', href: '#government-activity' }] },
+      }
+      sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+    })
 
-    describe('when no selection is made', () => {
-      beforeEach(() => {
-        nextRequest({
-          body: {},
-          session: {
-            pageData: {
-              organisationDetails: VALID_SESSION,
-            },
-          },
-        })
-      })
-      it('should not complete the task, create an organisation or redirect', async () => {
-        await call('post')
-        sinon.assert.notCalled(markTaskAsComplete)
-        sinon.assert.notCalled(createOrganisation)
-        sinon.assert.notCalled(res.redirect)
-      })
-      it('should re-render the taking payments for page with the backLink', async () => {
-        await call('post')
-        const expectedContext = { backLink: BACK_LINK }
-        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
-      })
-      it('should show the summary error', async () => {
-        await call('post')
-        const expectedContext = {
-          errors: { summary: [{ text: 'You must make a selection', href: '#government-activity' }] },
-        }
-        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
-      })
-
-      it('should not clear the session organisation details', async () => {
-        const thisCall = await call('post')
-        expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
-      })
+    it('should not clear the session organisation details', async () => {
+      const thisCall = await call('post')
+      expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
     })
   })
 })

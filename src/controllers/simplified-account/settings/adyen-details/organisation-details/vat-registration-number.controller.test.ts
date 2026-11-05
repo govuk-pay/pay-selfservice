@@ -23,7 +23,7 @@ const markTaskAsComplete = sinon.stub().resolves()
 const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/vat-registration-number'
 
 const { res, call, nextRequest } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/organisation-details/vat-registration.controller'
+  '@controllers/simplified-account/settings/adyen-details/organisation-details/vat-registration-number.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
   .withAccount(GATEWAY_ACCOUNT)
@@ -68,12 +68,12 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
         mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
       })
 
-      it('should call the response method with the vatRegistrationNumber and backLink', () => {
+      it('should call the response method with the registeredForVat and backLink', () => {
         const context = mockResponse.firstCall.lastArg as { vatRegistrationNumber: string; backLink: string }
         sinon.assert.match(context, {
           vatRegistrationNumber: 'GB123456789',
           backLink: formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
@@ -98,12 +98,12 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
         await call('get')
       })
 
-      it('should call the response method with the vatRegistrationNumber and backLink', () => {
+      it('should call the response method with the registeredForVat and backLink', () => {
         const context = mockResponse.firstCall.lastArg as { vatRegistrationNumber: string; backLink: string }
         sinon.assert.match(context, {
           vatRegistrationNumber: 'GB123456789',
           backLink: formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
