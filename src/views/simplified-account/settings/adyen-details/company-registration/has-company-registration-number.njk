@@ -6,18 +6,19 @@
 {% block settingsContent %}
 
 
-{% set companyRegistrationNumberHint %}
-<p>You can find the registration number on the
-  <a class="govuk-link" href="example.com" target="_blank" rel="noopener noreferrer">Companies House
-    register (opens in new tab)</a>, your certificate of incorporation or official letters from Companies House.
-</p>
-{% endset %}
+  {% set companyRegistrationNumberHint %}
+    <p
+      >You can find the registration number on the
+      <a class="govuk-link" href="example.com" target="_blank" rel="noopener noreferrer"
+        >Companies House register (opens in new tab)</a
+      >, your certificate of incorporation or official letters from Companies House.
+    </p>
+  {% endset %}
 
-
-<h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
-<form id="has-company-registration-number-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
-  <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
-  {{
+  <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
+  <form id="has-company-registration-number-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+    {{
       govukRadios({
         idPrefix: "has-company-registration-number",
         name: "hasCompanyRegistrationNumber",
@@ -46,13 +47,12 @@
       })
     }}
 
-
-  {{
+    {{
       govukButton({
         id: "has-company-registration-number-submit",
         text: "Continue",
         preventDoubleClick: true
       })
     }}
-</form>
+  </form>
 {% endblock %}

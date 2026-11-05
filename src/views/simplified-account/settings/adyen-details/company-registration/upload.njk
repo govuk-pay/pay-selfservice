@@ -4,34 +4,41 @@
 {% set settingsPageTitle = "Upload a copy of your company registration number" %}
 
 {% block settingsContent %}
-<h1 class="govuk-heading-l govuk-!-margin-bottom-6">{{ settingsPageTitle }}</h1>
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-6">{{ settingsPageTitle }}</h1>
 
-<p class="govuk-body">The file must:</p>
-<ul class="govuk-list govuk-list--bullet">
-  <li>be a JPG, PNG or PDF</li>
-  <li>be 10MB or smaller</li>
-  <li>clearly show the organisation's name, address and company registration number</li>
-</ul>
+  <p class="govuk-body">The file must:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>be a JPG, PNG or PDF</li>
+    <li>be 10MB or smaller</li>
+    <li>clearly show the organisation's name, address and company registration number</li>
+  </ul>
 
-<form id="company-registration-document-form" method="post" enctype="multipart/form-data" novalidate
-  action="?csrfToken={{ csrf }}">
-  {{ govukFileUpload({
-      id: "company-registration-document",
-      name: uploadField,
-      errorMessage: { text: errors.formErrors[uploadField] } if errors.formErrors[uploadField] else false
-    }) }}
+  <form
+    id="company-registration-document-form"
+    method="post"
+    enctype="multipart/form-data"
+    novalidate
+    action="?csrfToken={{ csrf }}"
+  >
+    {{
+      govukFileUpload({
+        id: "company-registration-document",
+        name: uploadField,
+        errorMessage: { text: errors.formErrors[uploadField] } if errors.formErrors[uploadField] else false
+      })
+    }}
 
-  {{ govukButton({ text: "Upload and continue", id: "company-registration-document-submit" }) }}
-</form>
+    {{ govukButton({ text: "Upload and continue", id: "company-registration-document-submit" }) }}
+  </form>
 
-<script>
-  // progressively enhance the submit button to be disabled during form submission as it takes a few seconds to talk to Stripe
-  const submitButton = document.getElementById('company-registration-document-submit')
-  document.getElementById('company-registration-document-form').addEventListener('submit', function () {
-    submitButton.setAttribute('disabled', 'true')
-    submitButton.setAttribute('aria-disabled', 'true')
-    submitButton.setAttribute('class', 'govuk-button govuk-button--disabled')
-    submitButton.textContent = 'Submitting...'
-  })
-</script>
+  <script>
+    // progressively enhance the submit button to be disabled during form submission as it takes a few seconds to talk to Stripe
+    const submitButton = document.getElementById('company-registration-document-submit')
+    document.getElementById('company-registration-document-form').addEventListener('submit', function () {
+      submitButton.setAttribute('disabled', 'true')
+      submitButton.setAttribute('aria-disabled', 'true')
+      submitButton.setAttribute('class', 'govuk-button govuk-button--disabled')
+      submitButton.textContent = 'Submitting...'
+    })
+  </script>
 {% endblock %}

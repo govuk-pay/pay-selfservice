@@ -19,14 +19,19 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  return response(req, res, 'simplified-account/settings/adyen-details/company-registration/has-company-registration-number', {
-    backLink: formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    ),
-  })
+  return response(
+    req,
+    res,
+    'simplified-account/settings/adyen-details/company-registration/has-company-registration-number',
+    {
+      backLink: formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      ),
+    }
+  )
 }
 
 export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceResponse) {
