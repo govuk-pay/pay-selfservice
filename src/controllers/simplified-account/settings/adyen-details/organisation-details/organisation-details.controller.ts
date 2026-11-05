@@ -48,21 +48,12 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
 
   OrganisationDetailsSession.set(req, existingSession, updatedSession)
 
-  const hasCompanyRegistrationNumber = req.body.hasCompanyRegistrationNumber === 'true'
-
-  const redirectPath = hasCompanyRegistrationNumber
-    ? formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
-    : formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
-
-  return res.redirect(redirectPath)
+  return res.redirect(
+    formatServiceAndAccountPathsFor(
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
+  )
 }

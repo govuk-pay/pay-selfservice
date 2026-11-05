@@ -22,24 +22,14 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  const backLink =
-    currentSession.hasCompanyRegistrationNumber === 'true'
-      ? formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-          req.service.externalId,
-          req.account.type,
-          switchingCredentialId
-        )
-      : formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
-          req.service.externalId,
-          req.account.type,
-          switchingCredentialId
-        )
-
   return response(req, res, 'simplified-account/settings/adyen-details/vat-registration-number', {
     vatRegistrationNumber: currentSession.vatRegistrationNumber ?? '',
-    backLink,
+    backLink: formatServiceAndAccountPathsFor(
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    ),
   })
 }
 
@@ -63,7 +53,7 @@ async function post(req: ServiceRequest<VatRegistrationBody>, res: ServiceRespon
       },
       vatRegistrationNumber: req.body.vatRegistrationNumber,
       backLink: formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
         req.service.externalId,
         req.account.type,
         switchingCredentialId
