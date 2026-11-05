@@ -323,9 +323,10 @@ module.exports = {
         organisationDetails: {
           index: '/settings/adyen-details/:credentialId/organisation-details/details',
           companyRegistration: '/settings/adyen-details/:credentialId/organisation-details/company-registration-number',
-          vatRegistration: '/settings/adyen-details/:credentialId/organisation-details/vat-number',
+          vatRegistrationNumber: '/settings/adyen-details/:credentialId/organisation-details/vat-number',
           reasonForTakingPayments:
             '/settings/adyen-details/:credentialId/organisation-details/reason-for-taking-payments',
+          registeredForVat: '/settings/adyen-details/:credentialId/organisation-details/registered-for-vat',
         },
         statementDescriptors: {
           user: '/settings/adyen-details/:credentialId/statement-descriptors/user',

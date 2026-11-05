@@ -100,7 +100,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
           SERVICE_EXTERNAL_ID,
           SERVICE_TYPE,
           GATEWAY_ACCOUNT.getSwitchingCredential().externalId

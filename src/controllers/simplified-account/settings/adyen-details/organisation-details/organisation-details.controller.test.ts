@@ -124,12 +124,12 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
       })
     })
 
-    it('should redirect to the company registration number page', async () => {
+    it('should redirect to the reason for taking payments page', async () => {
       await call('post')
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
           SERVICE_EXTERNAL_ID,
           SERVICE_TYPE,
           GATEWAY_ACCOUNT.getSwitchingCredential().externalId

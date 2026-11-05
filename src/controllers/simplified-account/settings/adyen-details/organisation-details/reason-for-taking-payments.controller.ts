@@ -18,7 +18,7 @@ interface ReasonForTakingPaymentsBody {
 
 function getBackLink(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
   return formatServiceAndAccountPathsFor(
-    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
     req.service.externalId,
     req.account.type,
     req.account.getSwitchingCredential().externalId
@@ -112,13 +112,12 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
   await setAdyenStoreId(req.service.externalId, req.account.type, switchingCredentialId, req.user.externalId, store.id!)
   await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'organisationDetails')
 
-  OrganisationDetailsSession.clear(req)
-
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
       req.service.externalId,
-      req.account.type
+      req.account.type,
+      switchingCredentialId
     )
   )
 }
