@@ -25,7 +25,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     'simplified-account/settings/adyen-details/company-registration/has-company-registration-number',
     {
       backLink: formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
         req.service.externalId,
         req.account.type,
         switchingCredentialId
