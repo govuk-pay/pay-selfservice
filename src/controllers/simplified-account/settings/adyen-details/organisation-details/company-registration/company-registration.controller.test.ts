@@ -16,12 +16,12 @@ const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.ST
   type: 'live',
 }).toGatewayAccount()
 
-const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration-number'
+const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration/company-registration-number'
 
 const mockResponse = sinon.stub()
 
 const { res, call, nextRequest } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration.controller'
+  '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/company-registration.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
   .withAccount(GATEWAY_ACCOUNT)
@@ -31,7 +31,7 @@ const { res, call, nextRequest } = new ControllerTestBuilder(
   })
   .build()
 
-describe('Controller: settings/adyen-details/organisation-details/company-registration', () => {
+describe('Controller: settings/adyen-details/organisation-details/company-registration/company-registration', () => {
   describe('get', () => {
     describe('with no organisation details in session', () => {
       beforeEach(async () => {
@@ -71,7 +71,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         sinon.assert.match(context, {
           companyRegistrationNumber: '01234567',
           backLink: formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
