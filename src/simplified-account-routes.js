@@ -947,6 +947,20 @@ simplifiedAccount.get(
   pspSwitchRedirect
 )
 simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.financeOrgDetails,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.financeOrgDetails.get
+)
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.financeOrgDetails,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.financeOrgDetails.post
+)
+simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.bankDetails,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),

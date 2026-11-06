@@ -1,0 +1,115 @@
+{% extends "simplified-account/settings/settings-layout.njk" %}
+
+{% set settingsPageTitle = 'Size of your organisation' %}
+
+{% block settingsContent %}
+  <form id="finance-org-details-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+    {%
+      call govukFieldset({
+        legend: {
+          text: 'Size of your organisation',
+          classes: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
+          isPageHeading: true
+        }
+      })
+    %}
+
+      {{
+        govukRadios({
+          idPrefix: 'what-is-your-operating-budget',
+          name: 'what-is-your-operating-budget',
+          fieldset: {
+            legend: {
+              text: 'What is your operating budget?',
+              classes: 'govuk-fieldset__legend--m'
+            }
+          },
+          hint: {
+            text: 'Use the figure from your latest annual accounts'
+          },
+
+          items: [
+            {
+              value: '0',
+              text: 'Up to £1 million'
+            },
+            {
+              value: '1',
+              text: '£1 million to £20 million'
+            },
+            {
+              value: '20',
+              text: '£20 million to £500 million'
+            },
+            {
+              value: '500',
+              text: 'Over £500 million'
+            }
+          ]
+        })
+      }}
+
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+
+      {{
+        govukDateInput({
+          id: 'what-date-figures-relate-to',
+          fieldset: {
+            legend: {
+              classes: 'govuk-fieldset__legend--m',
+              text: 'What date do these figures relate to?'
+            }
+          },
+          hint: {
+            text: 'This is the date for the operating budget you selected above'
+          }
+        })
+      }}
+
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+
+      {{
+        govukRadios({
+          idPrefix: 'how-many-people-in-organisation',
+          name: 'how-many-people-in-organisation',
+          fieldset: {
+            legend: {
+              text: 'How many people worked for your organisation on the date above?',
+              classes: 'govuk-fieldset__legend--m'
+            }
+          },
+          hint: {
+            text: 'Include full-time and part-time employees. Do not include contractors or volunteers'
+          },
+          items: [
+            {
+              value: '1',
+              text: 'Up to 249'
+            },
+            {
+              value: '250',
+              text: '250 to 999'
+            },
+            {
+              value: '1000',
+              text: '1,000 to 9,999'
+            },
+            {
+              value: '10000',
+              text: '10,000+'
+            }
+          ]
+        })
+      }}
+
+      {{
+        govukButton({
+          id: "continue",
+          text: "Continue",
+          preventDoubleClick: true
+        })
+      }}
+    {% endcall %}
+  </form>
+{% endblock %}

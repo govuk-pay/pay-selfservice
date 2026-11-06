@@ -4,6 +4,16 @@ import * as legalTerms from './legal-terms.controller'
 import * as serviceDirector from './service-director'
 import * as organisationDetails from './organisation-details'
 import * as statementDescriptors from './statement-descriptors'
+import * as financeOrgDetails from './finance-org-details.controller'
 import { get } from './adyen-details.controller'
 
-export { get, responsiblePerson, bankDetails, legalTerms, serviceDirector, organisationDetails, statementDescriptors }
+export {
+  get,
+  responsiblePerson,
+  bankDetails,
+  legalTerms,
+  serviceDirector,
+  organisationDetails,
+  statementDescriptors,
+  financeOrgDetails,
+}
