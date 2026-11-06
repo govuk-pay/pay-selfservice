@@ -121,7 +121,7 @@ describe(`Organisation details, company registration and VAT registration`, () =
   })
 
   describe('for a service that is migrating to adyen', () => {
-    // skipped as seuence has changed - will be address in subsequent PR
+    // skipped as sequence has changed - will be address in subsequent PR
     it.skip('should walk through organisation details, company registration and VAT registration in sequence', () => {
       setStubs()
 
