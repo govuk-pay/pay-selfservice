@@ -3,46 +3,64 @@
 
 {% set settingsPageTitle = "Upload a document showing your organisation's registration" %}
 {% block settingsContent %}
-<h1 class="govuk-heading-l govuk-!-margin-bottom-6">{{ settingsPageTitle }}</h1>
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-6">{{ settingsPageTitle }}</h1>
 
-<p class="govuk-body">Examples of documents include:</p>
-<ul class="govuk-list govuk-list--bullet">
-  <li>D-U-N-S (Dun & Bradstreet number) certificate</li>
-  <li>HM Revenue & Customs account statement</li>
-  <li>Charity Commission document</li>
-  <li>Office of the Scottish Charity Regulator document</li>
-  <li>NHS ODS (Organisation Data Service) organisation record or extract</li>
-  <li>local authority constitution or other official council document</li>
-  <li>annual report and accounts or audited public-sector accounts, for example an Annual Governance and Accountability
-    Return (AGAR) report</li>
-  <li>Cabinet Office Public Bodies Directory record</li>
-  <li>Act of Parliament, Royal Charter, or Statutory Instrument establishing the organisation, together with recent
-    evidence confirming its current status</li>
-  <li>official letter from a sponsoring government department confirming the organisation’s legal status</li>
-</ul>
+  <p class="govuk-body">Examples of documents include:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>D-U-N-S (Dun & Bradstreet number) certificate</li>
+    <li>HM Revenue & Customs account statement</li>
+    <li>Charity Commission document</li>
+    <li>Office of the Scottish Charity Regulator document</li>
+    <li>NHS ODS (Organisation Data Service) organisation record or extract</li>
+    <li>local authority constitution or other official council document</li>
+    <li
+      >annual report and accounts or audited public-sector accounts, for example an Annual Governance and Accountability
+      Return (AGAR) report</li
+    >
+    <li>Cabinet Office Public Bodies Directory record</li>
+    <li
+      >Act of Parliament, Royal Charter, or Statutory Instrument establishing the organisation, together with recent
+      evidence confirming its current status</li
+    >
+    <li>official letter from a sponsoring government department confirming the organisation’s legal status</li>
+  </ul>
 
-<p class="govuk-body">Documents should be dated in the last 12 months or should show that the organisation is still
-  active.</p>
+  <p class="govuk-body"
+    >Documents should be dated in the last 12 months or should show that the organisation is still active.</p
+  >
 
-<p class="govuk-body"><strong>If your organisation is not registered with any official registry or public authority and
-    does not have an
-    official registration number,</strong>
-  you can download and complete this form and upload it instead:<br /><a class="govuk-link" href="" target="_blank"
-    rel="noopener noreferrer">GOV.UK Pay public sector entity confirmation (PDF, 903KB, 2 pages)</a></p>
+  <p class="govuk-body"
+    ><strong
+      >If your organisation is not registered with any official registry or public authority and does not have an
+      official registration number,</strong
+    >
+    you can download and complete this form and upload it instead:<br /><a
+      class="govuk-link"
+      href=""
+      target="_blank"
+      rel="noopener noreferrer"
+      >GOV.UK Pay public sector entity confirmation (PDF, 903KB, 2 pages)</a
+    ></p
+  >
 
-<h2 class="govuk-heading-m govuk-!-margin-bottom-6">
-  <label class="govuk-label govuk-label--m" for="government-entity-document"> Upload a file </label>
-</h2>
-<p class="govuk-body">The file must:</p>
-<ul class="govuk-list govuk-list--bullet">
-  <li>be a JPG, PNG or PDF</li>
-  <li>be 10MB or smaller</li>
-  <li>clearly show the organisation's name, address and company registration number</li>
-</ul>
+  <h2 class="govuk-heading-m govuk-!-margin-bottom-6">
+    <label class="govuk-label govuk-label--m" for="government-entity-document"> Upload a file </label>
+  </h2>
+  <p class="govuk-body">The file must:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>be a JPG, PNG or PDF</li>
+    <li>be 10MB or smaller</li>
+    <li>clearly show the organisation's name, address and company registration number</li>
+  </ul>
 
-<form id="company-registration-document-form" method="post" enctype="multipart/form-data" novalidate
-  action="?csrfToken={{ csrf }}">
-  {{
+  <form
+    id="company-registration-document-form"
+    method="post"
+    enctype="multipart/form-data"
+    novalidate
+    action="?csrfToken={{ csrf }}"
+  >
+    {{
       govukFileUpload({
         id: "company-registration-document",
         name: uploadField,
@@ -50,17 +68,17 @@
       })
     }}
 
-  {{ govukButton({ text: "Upload and continue", id: "company-registration-document-submit" }) }}
-</form>
+    {{ govukButton({ text: "Upload and continue", id: "company-registration-document-submit" }) }}
+  </form>
 
-<script>
-  // progressively enhance the submit button to be disabled during form submission
-  const submitButton = document.getElementById('company-registration-document-submit')
-  document.getElementById('company-registration-document-form').addEventListener('submit', function () {
-    submitButton.setAttribute('disabled', 'true')
-    submitButton.setAttribute('aria-disabled', 'true')
-    submitButton.setAttribute('class', 'govuk-button govuk-button--disabled')
-    submitButton.textContent = 'Submitting...'
-  })
-</script>
+  <script>
+    // progressively enhance the submit button to be disabled during form submission
+    const submitButton = document.getElementById('company-registration-document-submit')
+    document.getElementById('company-registration-document-form').addEventListener('submit', function () {
+      submitButton.setAttribute('disabled', 'true')
+      submitButton.setAttribute('aria-disabled', 'true')
+      submitButton.setAttribute('class', 'govuk-button govuk-button--disabled')
+      submitButton.textContent = 'Submitting...'
+    })
+  </script>
 {% endblock %}

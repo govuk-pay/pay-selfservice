@@ -16,7 +16,7 @@ const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.ST
   type: 'live',
 }).toGatewayAccount()
 
-const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration/organisation-document-upload'
+const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration/organisation-registration-upload'
 
 const mockResponse = sinon.stub()
 
