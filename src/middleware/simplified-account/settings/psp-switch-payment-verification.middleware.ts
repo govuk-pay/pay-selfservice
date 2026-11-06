@@ -52,7 +52,8 @@ async function canStartPspPaymentVerificationTask(req: ServiceRequest, _: Servic
   }
 
   const thisTask = tasks.findTaskById(GenericTaskIdentifiers.PAY)
-  if (thisTask.status === TaskStatus.NOT_STARTED) {
+  // when switching to Adyen we allow the task to be completed multiple times 
+  if (thisTask.status === TaskStatus.NOT_STARTED || credential.paymentProvider === ADYEN) {
     return next()
   } else {
     return next(
