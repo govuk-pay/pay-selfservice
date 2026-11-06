@@ -2,7 +2,7 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
-import { CompanyRegistrationBody, OrganisationDetailsSession } from './constants'
+import { CompanyRegistrationBody, OrganisationDetailsSession } from '../constants'
 
 export function get(req: ServiceRequest, res: ServiceResponse) {
   const { account } = req
@@ -19,10 +19,10 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  return response(req, res, 'simplified-account/settings/adyen-details/company-registration-number', {
+  return response(req, res, 'simplified-account/settings/adyen-details/company-registration/company-registration-number', {
     companyRegistrationNumber: currentSession.companyRegistrationNumber ?? '',
     backLink: formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
       req.service.externalId,
       req.account.type,
       switchingCredentialId
@@ -41,7 +41,7 @@ export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceR
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
       req.service.externalId,
       req.account.type,
       switchingCredentialId

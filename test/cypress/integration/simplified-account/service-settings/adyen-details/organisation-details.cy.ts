@@ -121,6 +121,7 @@ describe(`Organisation details, company registration and VAT registration`, () =
   })
 
   describe('for a service that is migrating to adyen', () => {
+    // skipped as sequence has changed - will be address in subsequent PR
     it.skip('should walk through organisation details, company registration and VAT registration in sequence', () => {
       setStubs()
 
@@ -138,7 +139,6 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.get('#address-city').should('exist')
       cy.get('#address-country').should('exist')
       cy.get('#address-postcode').should('exist')
-      cy.get('#has-company-registration-number').should('exist')
       cy.get('#email').should('exist')
 
       cy.get('#organisation-name').type('Test Organisation')
@@ -146,7 +146,6 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.get('#address-city').type('Testville')
       cy.get('#address-postcode').type('T3 5TT')
       cy.get('#email').type('some-tax@example.com')
-      cy.get('[data-cy="radio-yes"]').check()
       cy.get('#organisation-details-submit').click()
 
       // company registration number
@@ -205,14 +204,12 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.get('#address-country').should('exist')
       cy.get('#address-postcode').should('exist')
       cy.get('#email').should('exist')
-      cy.get('#has-company-registration-number').should('exist')
 
       cy.get('#organisation-name').type('Test Organisation')
       cy.get('#address-line1').type('1 Test Street')
       cy.get('#address-city').type('Testville')
       cy.get('#address-postcode').type('T3 5TT')
       cy.get('#email').type('some-tax@example.com')
-      cy.get('[data-cy="radio-no"]').check()
       cy.get('#organisation-details-submit').click()
 
       // VAT registration number
