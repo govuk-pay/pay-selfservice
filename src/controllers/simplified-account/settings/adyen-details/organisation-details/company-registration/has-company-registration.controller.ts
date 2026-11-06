@@ -56,7 +56,7 @@ export function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servi
         switchingCredentialId
       )
     : formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.uploadCompanyRegistration,
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.uploadOrganisationRegistration,
         req.service.externalId,
         req.account.type,
         switchingCredentialId
