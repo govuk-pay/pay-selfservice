@@ -19,7 +19,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  return response(req, res, 'simplified-account/settings/adyen-details/company-registration/upload', {
+  return response(req, res, 'simplified-account/settings/adyen-details/company-registration/organisation-document-upload', {
     companyRegistrationNumber: currentSession.companyRegistrationNumber ?? '',
     backLink: formatServiceAndAccountPathsFor(
       paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
