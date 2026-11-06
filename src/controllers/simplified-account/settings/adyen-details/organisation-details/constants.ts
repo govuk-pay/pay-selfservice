@@ -7,6 +7,10 @@ export interface CompanyRegistrationBody {
   companyRegistrationNumber: string
 }
 
+export interface HasCompanyRegistrationBody {
+  hasCompanyRegistrationNumber: string
+}
+
 export interface VatRegistrationBody {
   vatRegistrationNumber: string
 }
@@ -18,7 +22,6 @@ export interface OrganisationDetailsBody {
   addressCity: string
   addressPostcode: string
   addressCountry: string
-  hasCompanyRegistrationNumber: string
   email: string
 }
 

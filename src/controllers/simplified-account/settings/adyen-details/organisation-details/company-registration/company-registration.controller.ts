@@ -41,7 +41,7 @@ export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceR
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
       req.service.externalId,
       req.account.type,
       switchingCredentialId
