@@ -51,7 +51,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           session: {
             pageData: {
               organisationDetails: {
-                organisationName: 'Test Organisation'
+                organisationName: 'Test Organisation',
               },
             },
           },

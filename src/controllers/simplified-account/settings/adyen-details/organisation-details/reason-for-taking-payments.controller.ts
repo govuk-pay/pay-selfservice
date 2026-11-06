@@ -52,6 +52,8 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
+  console.log(currentSession)
+
   return response(req, res, 'simplified-account/settings/adyen-details/reason-for-taking-payments', {
     backLink: getBackLink(req),
   })
