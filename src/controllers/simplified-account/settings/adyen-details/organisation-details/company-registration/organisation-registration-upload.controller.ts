@@ -24,7 +24,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     res,
     'simplified-account/settings/adyen-details/company-registration/organisation-registration-upload',
     {
-      companyRegistrationNumber: currentSession.companyRegistrationNumber ?? '',
+      hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber ?? '',
       backLink: formatServiceAndAccountPathsFor(
         paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
         req.service.externalId,

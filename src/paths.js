@@ -324,7 +324,7 @@ module.exports = {
           index: '/settings/adyen-details/:credentialId/organisation-details/details',
           hasCompanyRegistration:
             '/settings/adyen-details/:credentialId/organisation-details/has-company-registration-number',
-          uploadOrganisationRegistration:
+          organisationRegistrationUpload:
             '/settings/adyen-details/:credentialId/organisation-details/organisation-registration/upload',
           companyRegistration: '/settings/adyen-details/:credentialId/organisation-details/company-registration-number',
           vatRegistrationNumber: '/settings/adyen-details/:credentialId/organisation-details/vat-number',

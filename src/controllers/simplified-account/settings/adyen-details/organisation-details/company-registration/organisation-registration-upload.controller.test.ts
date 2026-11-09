@@ -52,6 +52,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             pageData: {
               organisationDetails: {
                 organisationName: 'Test Organisation',
+                hasCompanyRegistrationNumber: 'false',
               },
             },
           },
@@ -64,10 +65,11 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
       })
 
-      it('should call the response method with the companyRegistrationNumber and backLink', () => {
+      it('should call the response method with hasCompanyRegistrationNumber and backLink', () => {
         mockResponse.should.have.been.calledOnce
-        const context = mockResponse.firstCall.lastArg as { backLink: string }
+        const context = mockResponse.firstCall.lastArg as { hasCompanyRegistrationNumber: string; backLink: string }
         sinon.assert.match(context, {
+          hasCompanyRegistrationNumber: 'false',
           backLink: formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
             SERVICE_EXTERNAL_ID,
