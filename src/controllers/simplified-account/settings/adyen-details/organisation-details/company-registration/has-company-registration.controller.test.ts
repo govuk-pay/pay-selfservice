@@ -69,7 +69,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         const context = mockResponse.firstCall.lastArg as { backLink: string }
         sinon.assert.match(context, {
           backLink: formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId

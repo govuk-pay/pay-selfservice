@@ -1,0 +1,46 @@
+{% extends "simplified-account/settings/settings-layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set settingsPageTitle = 'Why is your organisation not registered for VAT?' %}
+
+{% block settingsContent %}
+  <form id="registered-for-vat-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+    {{
+      govukRadios({
+        name: "notRegisteredForVat",
+        fieldset: {
+          legend: {
+            text: "Why is your organisation not registered for VAT?",
+            isPageHeading: true,
+            classes: "govuk-fieldset__legend--l"
+          }
+        },
+        items: [
+          {
+            value: "below-vat-threshold",
+            text: "Turnover is below the VAT registration threshold",
+            attributes: {
+              "data-cy": "below-vat-threshold"
+            }
+          },
+          {
+            value: "exempt",
+            text: "Organisation is exempt from VAT registration",
+            attributes: {
+              "data-cy": "exempt"
+            }
+          }
+        ]
+      })
+    }}
+
+    {{
+      govukButton({
+        id: "not-registered-for-vat-submit",
+        text: "Continue",
+        preventDoubleClick: true
+      })
+    }}
+  </form>
+{% endblock %}

@@ -1,5 +1,5 @@
 import { ServiceRequest, ServiceResponse } from '@utils/types/express'
-import { OrganisationDetailsSession } from './constants'
+import { OrganisationDetailsSession, RegisteredForVatBody } from './constants'
 import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
@@ -27,16 +27,25 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
   })
 }
 
-export function post(req: ServiceRequest, res: ServiceResponse) {
+export function post(req: ServiceRequest<RegisteredForVatBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
 
-  return res.redirect(
-    formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
-  )
+  const isOrgRegisteredForVAT = req.body.registeredForVat === 'true'
+
+  const redirectPath = isOrgRegisteredForVAT
+    ? formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
+    : formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
+
+  return res.redirect(redirectPath)
 }

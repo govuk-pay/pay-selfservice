@@ -105,11 +105,11 @@ describe('Controller: settings/adyen-details/registered-for-vat', () => {
     })
   })
   describe('post', () => {
-    describe('when a selection is made', () => {
+    describe('when a yes selection is made', () => {
       beforeEach(() => {
         nextRequest({
           body: {
-            registeredForVat: true,
+            registeredForVat: 'true',
           },
           session: {
             otherSessionData: 'keep',
@@ -125,6 +125,33 @@ describe('Controller: settings/adyen-details/registered-for-vat', () => {
           res.redirect,
           formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
+      })
+    })
+    describe('when a no selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {
+            registeredForVat: 'false',
+          },
+          session: {
+            otherSessionData: 'keep',
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
+          },
+        })
+      })
+      it('should redirect to the enter your not registered page', async () => {
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId

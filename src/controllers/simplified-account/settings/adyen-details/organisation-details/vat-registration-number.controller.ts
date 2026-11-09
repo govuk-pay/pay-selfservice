@@ -65,14 +65,14 @@ async function post(req: ServiceRequest<VatRegistrationBody>, res: ServiceRespon
     vatRegistrationNumber: req.body.vatRegistrationNumber,
   } as OrganisationDetailsSession)
 
-  return res.redirect(
-    formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+  const nextPagePath = formatServiceAndAccountPathsFor(
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+    req.service.externalId,
+    req.account.type,
+    switchingCredentialId
   )
+
+  return res.redirect(`${nextPagePath}?from=vat-number`)
 }
 
 export { get, post }

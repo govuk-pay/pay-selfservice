@@ -1115,7 +1115,7 @@ simplifiedAccount.post(
 )
 
 simplifiedAccount.get(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
@@ -1123,11 +1123,27 @@ simplifiedAccount.get(
 )
 
 simplifiedAccount.post(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
   serviceSettingsController.adyenDetails.organisationDetails.vatRegistrationNumber.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.notRegisteredForVat.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.notRegisteredForVat.post
 )
 
 simplifiedAccount.get(

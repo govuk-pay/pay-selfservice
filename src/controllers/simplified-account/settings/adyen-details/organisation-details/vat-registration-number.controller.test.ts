@@ -112,52 +112,50 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
       })
     })
   })
-})
-
-describe('post', () => {
-  beforeEach(() => {
-    nextRequest({
-      body: { vatRegistrationNumber: 'GB123456789' },
-      session: {
-        pageData: {
-          organisationDetails: {
-            organisationName: 'Test Organisation',
-            addressLine1: '1 Test Street',
-            addressCity: 'swansea',
-            addressPostcode: 'T3 5TT',
-            addressCountry: 'GB',
-            hasCompanyRegistrationNumber: 'true',
+  describe('post', () => {
+    beforeEach(() => {
+      nextRequest({
+        body: { vatRegistrationNumber: 'GB123456789' },
+        session: {
+          pageData: {
+            organisationDetails: {
+              organisationName: 'Test Organisation',
+              addressLine1: '1 Test Street',
+              addressCity: 'swansea',
+              addressPostcode: 'T3 5TT',
+              addressCountry: 'GB',
+              hasCompanyRegistrationNumber: 'true',
+            },
           },
         },
-      },
-    })
-  })
-
-  afterEach(() => {
-    sinon.resetHistory()
-  })
-
-  it('should save the VAT number to the session and redirect to reason for taking payments', async () => {
-    const { req } = (await call('post')) as { req: ServiceRequest<VatRegistrationBody> }
-
-    sinon.assert.match(OrganisationDetailsSession.extract(req), {
-      organisationName: 'Test Organisation',
-      addressLine1: '1 Test Street',
-      addressCity: 'swansea',
-      addressPostcode: 'T3 5TT',
-      addressCountry: 'GB',
-      hasCompanyRegistrationNumber: 'true',
-      vatRegistrationNumber: 'GB123456789',
+      })
     })
 
-    sinon.assert.calledOnceWithExactly(
-      res.redirect,
-      formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
+    afterEach(() => {
+      sinon.resetHistory()
+    })
+
+    it('should save the VAT number to the session and redirect to company registration number with query', async () => {
+      const { req } = (await call('post')) as { req: ServiceRequest<VatRegistrationBody> }
+
+      sinon.assert.match(OrganisationDetailsSession.extract(req), {
+        organisationName: 'Test Organisation',
+        addressLine1: '1 Test Street',
+        addressCity: 'swansea',
+        addressPostcode: 'T3 5TT',
+        addressCountry: 'GB',
+        hasCompanyRegistrationNumber: 'true',
+        vatRegistrationNumber: 'GB123456789',
+      })
+
+      const nextPagePath = formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
         SERVICE_EXTERNAL_ID,
         SERVICE_TYPE,
         GATEWAY_ACCOUNT.getSwitchingCredential().externalId
       )
-    )
+
+      sinon.assert.calledOnceWithExactly(res.redirect, `${nextPagePath}?from=vat-number`)
+    })
   })
 })

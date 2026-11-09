@@ -95,12 +95,12 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       })
     })
 
-    it('should redirect to the VAT registration number page', async () => {
+    it('should redirect to the task list page', async () => {
       await call('post')
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
           SERVICE_EXTERNAL_ID,
           SERVICE_TYPE,
           GATEWAY_ACCOUNT.getSwitchingCredential().externalId
