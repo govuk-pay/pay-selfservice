@@ -87,8 +87,6 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
     companyRegistrationNumber,
   })
 
-  // console.log(completeSession)
-
   const { governmentActivity } = req.body
 
   const storeDetails =
