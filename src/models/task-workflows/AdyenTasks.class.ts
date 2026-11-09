@@ -159,7 +159,7 @@ class AdyenTask extends Task {
     const paymentCompleted = switchingCredential.state === 'VERIFIED_WITH_LIVE_PAYMENT'
 
     const status = paymentCompleted
-      ? TaskStatus.CANNOT_START
+      ? TaskStatus.COMPLETED
       : isVerified
         ? TaskStatus.NOT_STARTED
         : TaskStatus.CANNOT_START
