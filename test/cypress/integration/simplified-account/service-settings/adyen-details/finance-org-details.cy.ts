@@ -75,50 +75,29 @@ describe(`Organisation's bank details`, () => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
 
-  it('accessibility check', () => {
+  it('shows the page correctly', () => {
     setStubs()
-
     cy.visit(FINANCE_ORG_DETAILS_PATH)
+
+    cy.log('accessibility check')
     cy.a11yCheck()
-  })
 
-  it('should display correct page title and headings', () => {
-    setStubs()
-
-    cy.visit(FINANCE_ORG_DETAILS_PATH)
-
+    cy.log('should display correct page title and headings')
     checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
     cy.get('h1').should('contain.text', `Size of your organisation`)
-  })
 
-  describe('for a service that is migrating to adyen', () => {
-    it('should display a back link to the switch-to-adyen task list', () => {
-      setStubs()
+    cy.log('should display a back link to the switch-to-adyen task list')
+    cy.get('.govuk-back-link').should('have.attr', 'href', TASK_LIST_PATH)
 
-      cy.visit(FINANCE_ORG_DETAILS_PATH)
+    cy.log('should display inputs for finance details')
+    cy.get('#how-many-people-in-organisation').should('exist')
+    cy.get('#what-is-your-operating-budget').should('exist')
+    cy.get('#what-date-figures-relate-to').should('exist')
 
-      cy.get('.govuk-back-link').should('have.attr', 'href', TASK_LIST_PATH)
-    })
+    cy.log('should redirect to the task list when continue is pressed')
+    cy.get('#continue').click()
 
-    it('should display inputs for finance details', () => {
-      setStubs()
-
-      cy.visit(FINANCE_ORG_DETAILS_PATH)
-
-      cy.get('#how-many-people-in-organisation').should('exist')
-      cy.get('#what-is-your-operating-budget').should('exist')
-      cy.get('#what-date-figures-relate-to').should('exist')
-    })
-
-    it('should redirect to the task list when continue is pressed', () => {
-      setStubs()
-
-      cy.visit(FINANCE_ORG_DETAILS_PATH)
-
-      cy.get('#continue').click()
-
-      cy.location('pathname').should('eq', TASK_LIST_PATH)
-    })
+    cy.location('pathname').should('eq', TASK_LIST_PATH)
   })
 
   describe('for a service not migrating to Adyen', () => {
