@@ -190,117 +190,117 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
         expect(thisCall.req.session).to.deep.include({ otherSessionData: 'keep', pageData: {} })
       })
     })
-  })
 
-  describe('when a selection is made and no company number exists', () => {
-    const partialOrganisationDetailsSession: Partial<OrganisationDetailsSession> = {
-      organisationName: 'Test Organisation',
-      addressLine1: '1 Test Street',
-      addressCity: 'swansea',
-      addressPostcode: 'T3 5TT',
-      addressCountry: 'GB',
-      vatRegistrationNumber: 'GB123456789',
-      hasCompanyRegistrationNumber: 'false',
-    }
-
-    it('should create Adyen legal entity with a placeholder value for company number', async () => {
-      nextRequest({
-        body: {
-          governmentActivity: 'general-local',
-        },
-        session: {
-          otherSessionData: 'keep',
-          pageData: {
-            organisationDetails: partialOrganisationDetailsSession,
-          },
-        },
-      })
-      await call('post')
-
-      const completeOrganisationSession = new OrganisationDetailsSession({
-        ...partialOrganisationDetailsSession,
-        companyRegistrationNumber: '00000000',
-      })
-
-      sinon.assert.calledOnceWithExactly(
-        createOrganisation,
-        completeOrganisationSession,
-        'general-local',
-        serviceFixture.toService(),
-        GATEWAY_ACCOUNT.type,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        USER.externalId
-      )
-
-      sinon.assert.calledOnceWithExactly(
-        setAdyenStoreId,
-        SERVICE_EXTERNAL_ID,
-        SERVICE_TYPE,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        USER.externalId,
-        'ST123'
-      )
-
-      sinon.assert.calledOnceWithExactly(
-        markTaskAsComplete,
-        SERVICE_EXTERNAL_ID,
-        SERVICE_TYPE,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        'organisationDetails'
-      )
-
-      sinon.assert.callOrder(
-        getStripeStatementDescriptor,
-        createOrganisation,
-        createStore,
-        setAdyenStoreId,
-        markTaskAsComplete
-      )
-
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE
-        )
-      )
-    })
-  })
-
-  describe('when no selection is made', () => {
-    beforeEach(() => {
-      nextRequest({
-        body: {},
-        session: {
-          pageData: {
-            organisationDetails: VALID_SESSION,
-          },
-        },
-      })
-    })
-    it('should not complete the task, create an organisation or redirect', async () => {
-      await call('post')
-      sinon.assert.notCalled(markTaskAsComplete)
-      sinon.assert.notCalled(createOrganisation)
-      sinon.assert.notCalled(res.redirect)
-    })
-    it('should re-render the taking payments for page with the backLink', async () => {
-      await call('post')
-      const expectedContext = { backLink: BACK_LINK }
-      sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
-    })
-    it('should show the summary error', async () => {
-      await call('post')
-      const expectedContext = {
-        errors: { summary: [{ text: 'You must make a selection', href: '#government-activity' }] },
+    describe('when a selection is made and no company number exists', () => {
+      const partialOrganisationDetailsSession: Partial<OrganisationDetailsSession> = {
+        organisationName: 'Test Organisation',
+        addressLine1: '1 Test Street',
+        addressCity: 'swansea',
+        addressPostcode: 'T3 5TT',
+        addressCountry: 'GB',
+        vatRegistrationNumber: 'GB123456789',
+        hasCompanyRegistrationNumber: 'false',
       }
-      sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+
+      it('should create Adyen legal entity with a placeholder value for company number', async () => {
+        nextRequest({
+          body: {
+            governmentActivity: 'general-local',
+          },
+          session: {
+            otherSessionData: 'keep',
+            pageData: {
+              organisationDetails: partialOrganisationDetailsSession,
+            },
+          },
+        })
+        await call('post')
+
+        const completeOrganisationSession = new OrganisationDetailsSession({
+          ...partialOrganisationDetailsSession,
+          companyRegistrationNumber: '00000000',
+        })
+
+        sinon.assert.calledOnceWithExactly(
+          createOrganisation,
+          completeOrganisationSession,
+          'general-local',
+          serviceFixture.toService(),
+          GATEWAY_ACCOUNT.type,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          USER.externalId
+        )
+
+        sinon.assert.calledOnceWithExactly(
+          setAdyenStoreId,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          USER.externalId,
+          'ST123'
+        )
+
+        sinon.assert.calledOnceWithExactly(
+          markTaskAsComplete,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          'organisationDetails'
+        )
+
+        sinon.assert.callOrder(
+          getStripeStatementDescriptor,
+          createOrganisation,
+          createStore,
+          setAdyenStoreId,
+          markTaskAsComplete
+        )
+
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE
+          )
+        )
+      })
     })
 
-    it('should not clear the session organisation details', async () => {
-      const thisCall = await call('post')
-      expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
+    describe('when no selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {},
+          session: {
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
+          },
+        })
+      })
+      it('should not complete the task, create an organisation or redirect', async () => {
+        await call('post')
+        sinon.assert.notCalled(markTaskAsComplete)
+        sinon.assert.notCalled(createOrganisation)
+        sinon.assert.notCalled(res.redirect)
+      })
+      it('should re-render the taking payments for page with the backLink', async () => {
+        await call('post')
+        const expectedContext = { backLink: BACK_LINK }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+      })
+      it('should show the summary error', async () => {
+        await call('post')
+        const expectedContext = {
+          errors: { summary: [{ text: 'You must make a selection', href: '#government-activity' }] },
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+      })
+
+      it('should not clear the session organisation details', async () => {
+        const thisCall = await call('post')
+        expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
+      })
     })
   })
 })
