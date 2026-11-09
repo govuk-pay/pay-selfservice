@@ -79,8 +79,12 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
     })
   }
 
+  const companyRegistrationNumber =
+    currentSession.hasCompanyRegistrationNumber === 'true' ? currentSession.companyRegistrationNumber : '00000000'
+
   const completeSession = new OrganisationDetailsSession({
     ...currentSession,
+    companyRegistrationNumber,
   })
 
   const { governmentActivity } = req.body

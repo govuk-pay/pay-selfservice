@@ -108,7 +108,7 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
     })
   })
   describe('post', () => {
-    describe('when a selection is made', () => {
+    describe('when a selection is made and company number exists', () => {
       beforeEach(() => {
         nextRequest({
           body: {
@@ -188,6 +188,82 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
       it('should clear the session organisation details', async () => {
         const thisCall = await call('post')
         expect(thisCall.req.session).to.deep.include({ otherSessionData: 'keep', pageData: {} })
+      })
+    })
+
+    describe('when a selection is made and no company number exists', () => {
+      const partialOrganisationDetailsSession: Partial<OrganisationDetailsSession> = {
+        organisationName: 'Test Organisation',
+        addressLine1: '1 Test Street',
+        addressCity: 'swansea',
+        addressPostcode: 'T3 5TT',
+        addressCountry: 'GB',
+        vatRegistrationNumber: 'GB123456789',
+        hasCompanyRegistrationNumber: 'false',
+      }
+
+      it('should create Adyen legal entity with a placeholder value for company number', async () => {
+        nextRequest({
+          body: {
+            governmentActivity: 'general-local',
+          },
+          session: {
+            otherSessionData: 'keep',
+            pageData: {
+              organisationDetails: partialOrganisationDetailsSession,
+            },
+          },
+        })
+        await call('post')
+
+        const completeOrganisationSession = new OrganisationDetailsSession({
+          ...partialOrganisationDetailsSession,
+          companyRegistrationNumber: '00000000',
+        })
+
+        sinon.assert.calledOnceWithExactly(
+          createOrganisation,
+          completeOrganisationSession,
+          'general-local',
+          serviceFixture.toService(),
+          GATEWAY_ACCOUNT.type,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          USER.externalId
+        )
+
+        sinon.assert.calledOnceWithExactly(
+          setAdyenStoreId,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          USER.externalId,
+          'ST123'
+        )
+
+        sinon.assert.calledOnceWithExactly(
+          markTaskAsComplete,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          'organisationDetails'
+        )
+
+        sinon.assert.callOrder(
+          getStripeStatementDescriptor,
+          createOrganisation,
+          createStore,
+          setAdyenStoreId,
+          markTaskAsComplete
+        )
+
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE
+          )
+        )
       })
     })
 
