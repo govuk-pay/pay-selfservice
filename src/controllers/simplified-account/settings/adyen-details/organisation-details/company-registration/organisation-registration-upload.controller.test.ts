@@ -16,12 +16,12 @@ const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.ST
   type: 'live',
 }).toGatewayAccount()
 
-const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration-number'
+const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration/organisation-registration-upload'
 
 const mockResponse = sinon.stub()
 
 const { res, call, nextRequest } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration.controller'
+  '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/organisation-registration-upload.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
   .withAccount(GATEWAY_ACCOUNT)
@@ -31,7 +31,7 @@ const { res, call, nextRequest } = new ControllerTestBuilder(
   })
   .build()
 
-describe('Controller: settings/adyen-details/organisation-details/company-registration', () => {
+describe('Controller: settings/adyen-details/organisation-details/company-registration/organisation-registration-upload', () => {
   describe('get', () => {
     describe('with no organisation details in session', () => {
       beforeEach(async () => {
@@ -52,7 +52,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             pageData: {
               organisationDetails: {
                 organisationName: 'Test Organisation',
-                companyRegistrationNumber: '01234567',
+                hasCompanyRegistrationNumber: 'false',
               },
             },
           },
@@ -65,13 +65,13 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
       })
 
-      it('should call the response method with the companyRegistrationNumber and backLink', () => {
+      it('should call the response method with hasCompanyRegistrationNumber and backLink', () => {
         mockResponse.should.have.been.calledOnce
-        const context = mockResponse.firstCall.lastArg as { companyRegistrationNumber: string; backLink: string }
+        const context = mockResponse.firstCall.lastArg as { hasCompanyRegistrationNumber: string; backLink: string }
         sinon.assert.match(context, {
-          companyRegistrationNumber: '01234567',
+          hasCompanyRegistrationNumber: 'false',
           backLink: formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
@@ -100,7 +100,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
           SERVICE_EXTERNAL_ID,
           SERVICE_TYPE,
           GATEWAY_ACCOUNT.getSwitchingCredential().externalId

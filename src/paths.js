@@ -322,6 +322,10 @@ module.exports = {
         legalTerms: '/settings/adyen-details/:credentialId/legal-terms',
         organisationDetails: {
           index: '/settings/adyen-details/:credentialId/organisation-details/details',
+          hasCompanyRegistration:
+            '/settings/adyen-details/:credentialId/organisation-details/has-company-registration-number',
+          organisationRegistrationUpload:
+            '/settings/adyen-details/:credentialId/organisation-details/organisation-registration/upload',
           companyRegistration: '/settings/adyen-details/:credentialId/organisation-details/company-registration-number',
           vatRegistrationNumber: '/settings/adyen-details/:credentialId/organisation-details/vat-number',
           reasonForTakingPayments:

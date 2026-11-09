@@ -143,38 +143,6 @@
     {% endcall %}
 
     {{
-      govukRadios({
-        idPrefix: "has-company-registration-number",
-        name: "hasCompanyRegistrationNumber",
-        fieldset: {
-          legend: {
-            text: "Does your organisation have a company registration number?",
-            classes: "govuk-fieldset__legend--m"
-          }
-        },
-        errorMessage: { text: errors.formErrors['hasCompanyRegistrationNumber'] } if errors.formErrors['hasCompanyRegistrationNumber'] else false,
-        items: [
-          {
-            value: "true",
-            text: "Yes",
-            checked: hasCompanyRegistrationNumber === "true",
-            attributes: {
-              "data-cy": "radio-yes"
-            }
-          },
-          {
-            value: "false",
-            text: "No",
-            checked: hasCompanyRegistrationNumber === "false",
-            attributes: {
-              "data-cy": "radio-no"
-            }
-          }
-        ]
-      })
-    }}
-
-    {{
       govukButton({
         text: "Continue",
         attributes: {

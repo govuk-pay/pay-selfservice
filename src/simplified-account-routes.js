@@ -1051,11 +1051,27 @@ simplifiedAccount.post(
 )
 
 simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.has.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.has.post
+)
+
+simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.get
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.number.get
 )
 
 simplifiedAccount.post(
@@ -1063,7 +1079,23 @@ simplifiedAccount.post(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.post
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.number.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.upload.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.upload.post
 )
 
 simplifiedAccount.get(

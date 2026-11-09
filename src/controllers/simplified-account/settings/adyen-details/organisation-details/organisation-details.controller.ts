@@ -33,20 +33,17 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
 export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
-  const existingSession = OrganisationDetailsSession.extract(req)
+  const currentSession = OrganisationDetailsSession.extract(req)
 
-  const updatedSession = {
+  OrganisationDetailsSession.set(req, currentSession, {
     organisationName: req.body.organisationName,
     addressLine1: req.body.addressLine1,
     addressLine2: req.body.addressLine2,
     addressCity: req.body.addressCity,
     addressPostcode: req.body.addressPostcode,
     addressCountry: req.body.addressCountry,
-    hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
     email: req.body.email,
-  } as OrganisationDetailsSession
-
-  OrganisationDetailsSession.set(req, existingSession, updatedSession)
+  } as OrganisationDetailsSession)
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
