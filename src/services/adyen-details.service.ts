@@ -157,8 +157,11 @@ const createOrganisation = async (
 
 const addPaymentMethodsToStore = async (storeId: string, businessLineId: string, merchantId: string) => {
   await addCardPaymentMethods(storeId, businessLineId, merchantId)
-  await addGooglePayPaymentMethods(storeId, businessLineId, merchantId)
+  await addGooglePayPaymentMethod(storeId, businessLineId, merchantId)
+  /*
+  Temporarily removing this function call as it causes issues with Adyen, will be added back in when resolved
   await addPayByBankPaymentMethod(storeId, businessLineId, merchantId)
+  */
 
   logger.info(`Required payment methods added to store`, {
     store_id: storeId,
@@ -194,7 +197,7 @@ async function addCardPaymentMethods(storeId: string, businessLineId: string, me
   }
 }
 
-async function addGooglePayPaymentMethods(storeId: string, businessLineId: string, merchantId: string) {
+async function addGooglePayPaymentMethod(storeId: string, businessLineId: string, merchantId: string) {
   const googlePayPaymentType = PaymentMethodSetupInfo.TypeEnum.Googlepay
 
   const googlePayPaySetupInfo: PaymentMethodSetupInfo = {
