@@ -192,7 +192,6 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
     })
   })
 
-
   describe('when a selection is made and no company number exists', () => {
     const partialOrganisationDetailsSession: Partial<OrganisationDetailsSession> = {
       organisationName: 'Test Organisation',
@@ -220,7 +219,7 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
 
       const completeOrganisationSession = new OrganisationDetailsSession({
         ...partialOrganisationDetailsSession,
-        companyRegistrationNumber: '00000000'
+        companyRegistrationNumber: '00000000',
       })
 
       sinon.assert.calledOnceWithExactly(
