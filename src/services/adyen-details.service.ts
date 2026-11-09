@@ -220,6 +220,7 @@ async function addGooglePayPaymentMethod(storeId: string, businessLineId: string
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function addPayByBankPaymentMethod(storeId: string, businessLineId: string, merchantId: string) {
   const payByBankPaymentType = PaymentMethodSetupInfo.TypeEnum.Paybybank
   const payByBankSetupInfo: PaymentMethodSetupInfo = {
