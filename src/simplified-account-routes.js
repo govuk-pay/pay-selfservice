@@ -1103,7 +1103,7 @@ simplifiedAccount.get(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.registeredForVat.get
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.registeredForVat.get
 )
 
 simplifiedAccount.post(
@@ -1111,7 +1111,7 @@ simplifiedAccount.post(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.registeredForVat.post
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.registeredForVat.post
 )
 
 simplifiedAccount.get(
@@ -1119,7 +1119,7 @@ simplifiedAccount.get(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.vatRegistrationNumber.get
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.vatRegistrationNumber.get
 )
 
 simplifiedAccount.post(
@@ -1127,7 +1127,7 @@ simplifiedAccount.post(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.vatRegistrationNumber.post
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.vatRegistrationNumber.post
 )
 
 simplifiedAccount.get(
@@ -1135,7 +1135,7 @@ simplifiedAccount.get(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.notRegisteredForVat.get
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.notRegisteredForVat.get
 )
 
 simplifiedAccount.post(
@@ -1143,7 +1143,7 @@ simplifiedAccount.post(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.notRegisteredForVat.post
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.notRegisteredForVat.post
 )
 
 simplifiedAccount.get(

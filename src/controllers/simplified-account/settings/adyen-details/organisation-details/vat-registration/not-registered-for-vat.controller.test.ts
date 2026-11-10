@@ -7,7 +7,7 @@ import { MerchantDetailsFixture } from '@test/fixtures/service/merchant-details.
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
-import { OrganisationDetailsSession } from './constants'
+import { OrganisationDetailsSession } from '../constants'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -45,7 +45,7 @@ const BACK_LINK = formatServiceAndAccountPathsFor(
 )
 
 const { req, res, call, nextRequest } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/organisation-details/not-registered-for-vat.controller.ts'
+  '@controllers/simplified-account/settings/adyen-details/organisation-details/vat-registration/not-registered-for-vat.controller.ts'
 )
   .withService(serviceFixture.toService())
   .withAccount(GATEWAY_ACCOUNT)
