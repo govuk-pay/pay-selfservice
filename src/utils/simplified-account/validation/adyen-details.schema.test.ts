@@ -1,10 +1,6 @@
 import { adyenDetailsSchema } from './adyen-details.schema'
 import { validationResult } from 'express-validator'
 import { expect } from 'chai'
-import {
-  notRegisteredForVat,
-  registeredForVat,
-} from '@controllers/simplified-account/settings/adyen-details/organisation-details'
 
 describe('adyenDetailsSchema', () => {
   describe('acceptTerms', () => {
