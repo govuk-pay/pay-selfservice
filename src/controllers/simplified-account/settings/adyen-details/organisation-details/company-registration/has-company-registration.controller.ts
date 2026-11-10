@@ -19,6 +19,11 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
+  const NOT_REGISTERED_PATH = paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat
+  const VAT_NUMBER_PATH = paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber
+
+  const backLinkPath = req.query.from === 'not-registered' ? NOT_REGISTERED_PATH : VAT_NUMBER_PATH
+
   return response(
     req,
     res,
@@ -26,7 +31,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     {
       hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber ?? '',
       backLink: formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+        backLinkPath,
         req.service.externalId,
         req.account.type,
         switchingCredentialId

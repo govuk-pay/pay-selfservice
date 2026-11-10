@@ -19,15 +19,20 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  return response(req, res, 'simplified-account/settings/adyen-details/company-registration/company-registration-number', {
-    companyRegistrationNumber: currentSession.companyRegistrationNumber ?? '',
-    backLink: formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    ),
-  })
+  return response(
+    req,
+    res,
+    'simplified-account/settings/adyen-details/company-registration/company-registration-number',
+    {
+      companyRegistrationNumber: currentSession.companyRegistrationNumber ?? '',
+      backLink: formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      ),
+    }
+  )
 }
 
 export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceResponse) {
@@ -41,7 +46,7 @@ export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceR
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+      paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
       req.service.externalId,
       req.account.type,
       switchingCredentialId

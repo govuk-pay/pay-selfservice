@@ -16,16 +16,17 @@
             classes: "govuk-fieldset__legend--l"
           }
         },
+        errorMessage: { text: errors.formErrors['registeredForVat'] } if errors.formErrors['registeredForVat'] else false,
         items: [
           {
-            value: "registered-for-vat-yes",
+            value: "true",
             text: "Yes",
             attributes: {
               "data-cy": "registered-for-vat-yes"
             }
           },
           {
-            value: "registered-for-vat-no",
+            value: "false",
             text: "No",
             attributes: {
               "data-cy": "registered-for-vat-no"

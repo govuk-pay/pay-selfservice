@@ -105,11 +105,11 @@ describe('Controller: settings/adyen-details/registered-for-vat', () => {
     })
   })
   describe('post', () => {
-    describe('when a selection is made', () => {
+    describe('when a true selection is made', () => {
       beforeEach(() => {
         nextRequest({
           body: {
-            registeredForVat: true,
+            registeredForVat: 'true',
           },
           session: {
             otherSessionData: 'keep',
@@ -130,6 +130,61 @@ describe('Controller: settings/adyen-details/registered-for-vat', () => {
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
           )
         )
+      })
+    })
+    describe('when a false selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {
+            registeredForVat: 'false',
+          },
+          session: {
+            otherSessionData: 'keep',
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
+          },
+        })
+      })
+      it('should redirect to the not registered page', async () => {
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
+      })
+    })
+    describe('when no selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {},
+          session: {
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
+          },
+        })
+      })
+      it('should not redirect', async () => {
+        await call('post')
+        sinon.assert.notCalled(res.redirect)
+      })
+      it('should re-render the registered for vat page with the backLink', async () => {
+        await call('post')
+        const expectedContext = { backLink: BACK_LINK }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+      })
+      it('should show the summary error', async () => {
+        await call('post')
+        const expectedContext = {
+          errors: { summary: [{ text: 'You must make a selection', href: '#registered-for-vat' }] },
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
       })
     })
   })
