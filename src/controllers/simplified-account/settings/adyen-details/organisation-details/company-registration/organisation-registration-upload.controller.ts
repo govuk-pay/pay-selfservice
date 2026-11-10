@@ -44,8 +44,8 @@ export async function get(req: ServiceRequest, res: ServiceResponse, next: NextF
           req.account.type,
           switchingCredentialId
         ),
-        downloadLink
-      },
+        downloadLink,
+      }
     )
   } catch (err) {
     next(err)

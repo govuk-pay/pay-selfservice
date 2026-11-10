@@ -95,7 +95,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
           ),
-          downloadLink: 'html-url-link'
+          downloadLink: 'html-url-link',
         })
       })
     })
