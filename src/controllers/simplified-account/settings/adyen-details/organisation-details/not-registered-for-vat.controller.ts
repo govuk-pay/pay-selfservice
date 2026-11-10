@@ -3,8 +3,20 @@ import { NotRegisteredForVatBody, OrganisationDetailsSession } from './constants
 import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
+import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
+import { validationResult } from 'express-validator'
+import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 
-export function get(req: ServiceRequest, res: ServiceResponse) {
+function getBackLink(req: ServiceRequest<NotRegisteredForVatBody>) {
+  return formatServiceAndAccountPathsFor(
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+    req.service.externalId,
+    req.account.type,
+    req.account.getSwitchingCredential().externalId
+  )
+}
+
+function get(req: ServiceRequest, res: ServiceResponse) {
   const currentSession = OrganisationDetailsSession.extract(req)
 
   if (currentSession.isEmpty()) {
@@ -18,19 +30,31 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
   }
 
   return response(req, res, 'simplified-account/settings/adyen-details/not-registered-for-vat', {
-    backLink: formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
-      req.service.externalId,
-      req.account.type,
-      req.account.getSwitchingCredential().externalId
-    ),
+    backLink: getBackLink(req),
   })
 }
 
-export function post(req: ServiceRequest<NotRegisteredForVatBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<NotRegisteredForVatBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const existingSession = OrganisationDetailsSession.extract(req)
+
+  const validations = [adyenDetailsSchema.notRegisteredForVat.validate]
+
+  await Promise.all(validations.map((validation) => validation.run(req)))
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    const formattedErrors = formatValidationErrors(errors)
+
+    return response(req, res, 'simplified-account/settings/adyen-details/not-registered-for-vat', {
+      errors: {
+        summary: formattedErrors.errorSummary,
+        formErrors: formattedErrors.formErrors,
+      },
+      backLink: getBackLink(req),
+    })
+  }
 
   OrganisationDetailsSession.set(req, existingSession, {
     notRegisteredForVat: req.body.notRegisteredForVat,
@@ -45,3 +69,5 @@ export function post(req: ServiceRequest<NotRegisteredForVatBody>, res: ServiceR
 
   return res.redirect(`${nextPagePath}?from=not-registered`)
 }
+
+export { get, post }

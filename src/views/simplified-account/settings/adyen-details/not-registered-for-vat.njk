@@ -16,6 +16,7 @@
             classes: "govuk-fieldset__legend--l"
           }
         },
+        errorMessage: { text: errors.formErrors['notRegisteredForVat'] } if errors.formErrors['notRegisteredForVat'] else false,
         items: [
           {
             value: "below-vat-threshold",

@@ -16,6 +16,7 @@
             classes: "govuk-fieldset__legend--l"
           }
         },
+        errorMessage: { text: errors.formErrors['registeredForVat'] } if errors.formErrors['registeredForVat'] else false,
         items: [
           {
             value: "true",

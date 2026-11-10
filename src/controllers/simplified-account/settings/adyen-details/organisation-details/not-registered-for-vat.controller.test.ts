@@ -131,5 +131,33 @@ describe('Controller: settings/adyen-details/not-registered-for-vat', () => {
         sinon.assert.calledOnceWithExactly(res.redirect, `${nextPagePath}?from=not-registered`)
       })
     })
+    describe('when no selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {},
+          session: {
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
+          },
+        })
+      })
+      it('should not redirect', async () => {
+        await call('post')
+        sinon.assert.notCalled(res.redirect)
+      })
+      it('should re-render the not registered for vat page with the backLink', async () => {
+        await call('post')
+        const expectedContext = { backLink: BACK_LINK }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+      })
+      it('should show the summary error', async () => {
+        await call('post')
+        const expectedContext = {
+          errors: { summary: [{ text: 'You must make a selection', href: '#not-registered-for-vat' }] },
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+      })
+    })
   })
 })
