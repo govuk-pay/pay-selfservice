@@ -59,17 +59,17 @@ async function post(req: ServiceRequest<RegisteredForVatBody>, res: ServiceRespo
 
   const redirectPath = isOrgRegisteredForVAT
     ? formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
     : formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
 
   return res.redirect(redirectPath)
 }
