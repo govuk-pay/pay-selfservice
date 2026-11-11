@@ -6,7 +6,7 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
-import { OrganisationDetailsSession, VatRegistrationBody } from './constants'
+import { OrganisationDetailsSession, VatRegistrationBody } from '../constants'
 import { ServiceRequest } from '@utils/types/express'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
@@ -23,7 +23,7 @@ const markTaskAsComplete = sinon.stub().resolves()
 const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/vat-registration-number'
 
 const { res, call, nextRequest } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/organisation-details/vat-registration-number.controller'
+  '@controllers/simplified-account/settings/adyen-details/organisation-details/vat-registration/vat-registration-number.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
   .withAccount(GATEWAY_ACCOUNT)
