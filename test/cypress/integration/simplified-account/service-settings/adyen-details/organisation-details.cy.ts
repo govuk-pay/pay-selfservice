@@ -215,10 +215,7 @@ describe(`Organisation details, company registration and VAT registration`, () =
         cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
         cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
         expectedErrors.forEach(({ field, message }, index) => {
-          cy.get('.govuk-error-summary__list li')
-            .eq(index)
-            .find(`a[href="${field}"]`)
-            .should('contain', message)
+          cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
         })
       })
 

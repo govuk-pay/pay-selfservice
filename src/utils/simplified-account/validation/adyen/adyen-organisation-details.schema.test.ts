@@ -1,4 +1,7 @@
-import { adyenOrganisationDetailsSchema, ADYEN_ORGANISATION_DETAILS_VALIDATIONS } from './adyen-organisation-details.schema'
+import {
+  adyenOrganisationDetailsSchema,
+  ADYEN_ORGANISATION_DETAILS_VALIDATIONS,
+} from './adyen-organisation-details.schema'
 import { validationResult } from 'express-validator'
 import { expect } from 'chai'
 
