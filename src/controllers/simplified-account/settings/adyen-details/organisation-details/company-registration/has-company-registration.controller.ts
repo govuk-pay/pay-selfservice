@@ -82,8 +82,6 @@ async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servic
   if (!errors.isEmpty()) {
     const formattedErrors = formatValidationErrors(errors)
 
-    console.log(errors)
-
     return response(req, res, 'simplified-account/settings/adyen-details/company-registration/has-company-registration-number', {
       errors: {
         summary: formattedErrors.errorSummary,
