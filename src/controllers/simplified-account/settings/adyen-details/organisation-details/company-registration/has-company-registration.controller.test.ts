@@ -20,7 +20,7 @@ const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registr
 
 const mockResponse = sinon.stub()
 
-const { res, call, nextRequest } = new ControllerTestBuilder(
+const { req, res, call, nextRequest } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/has-company-registration.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
@@ -161,6 +161,42 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
           )
         )
+      })
+    })
+
+    describe('when no selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {},
+          session: {
+            organisationDetails: {
+              organisationName: 'Test Organisation',
+            },
+          },
+        })
+      })
+      it('should not redirect', async () => {
+        await call('post')
+        sinon.assert.notCalled(res.redirect)
+      })
+      it('should re-render the registered for vat page with the backLink', async () => {
+        await call('post')
+        const expectedContext = {
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE_PATH, expectedContext)
+      })
+      it('should show the summary error', async () => {
+        await call('post')
+        const expectedContext = {
+          errors: { summary: [{ text: 'You must make a selection', href: '#has-company-registration-number' }] },
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE_PATH, expectedContext)
       })
     })
   })
