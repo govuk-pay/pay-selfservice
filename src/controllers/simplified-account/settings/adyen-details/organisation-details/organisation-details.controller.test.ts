@@ -109,32 +109,132 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
   })
 
   describe('post', () => {
-    beforeEach(() => {
-      nextRequest({
-        body: {
-          organisationName: 'Test Organisation',
-          addressLine1: '1 Test Street',
-          addressLine2: '',
-          addressCity: 'swansea',
-          addressPostcode: 'T3 5TT',
-          addressCountry: 'GB',
-          hasCompanyRegistrationNumber: 'true',
-        },
-        session: {},
+    const VALID_BODY = {
+      organisationName: 'Test Organisation',
+      addressLine1: '1 Test Street',
+      addressLine2: '',
+      addressCity: 'swansea',
+      addressPostcode: 'T3 5TT',
+      addressCountry: 'GB',
+      email: 'test@example.com',
+      hasCompanyRegistrationNumber: 'true',
+    }
+
+    describe('with a valid body', () => {
+      it('should redirect to the company registration number page', async () => {
+        nextRequest({ body: VALID_BODY, session: {} })
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
+      })
+
+      it('should redirect to the VAT registration number page when there is no company registration number', async () => {
+        nextRequest({ body: { ...VALID_BODY, hasCompanyRegistrationNumber: 'false' }, session: {} })
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
+      })
+
+      it('should not render the page with errors', async () => {
+        nextRequest({ body: VALID_BODY, session: {} })
+        await call('post')
+        mockResponse.should.not.have.been.called
       })
     })
 
-    it('should redirect to the company registration number page', async () => {
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-        )
-      )
+    describe('with an empty body', () => {
+      beforeEach(async () => {
+        nextRequest({ body: {}, session: {} })
+        await call('post')
+      })
+
+      it('should not redirect', () => {
+        sinon.assert.notCalled(res.redirect)
+      })
+
+      it('should render the template with an error for every required field', () => {
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
+        const context = mockResponse.firstCall.lastArg as {
+          errors: { summary: { text: string; href: string }[]; formErrors: Record<string, string> }
+        }
+        sinon.assert.match(context.errors.formErrors, {
+          organisationName: 'Enter an organisation name',
+          addressLine1: 'Enter address line 1',
+          addressCity: 'Enter a town or city',
+          addressCountry: 'Select a country',
+          addressPostcode: 'Enter a postcode',
+          email: 'Enter an email address',
+          hasCompanyRegistrationNumber: 'Select yes if your organisation has a company registration number',
+        })
+        sinon.assert.match(context.errors.summary, [
+          { text: 'Enter an organisation name', href: '#organisation-name' },
+          { text: 'Enter address line 1', href: '#address-line1' },
+          { text: 'Enter a town or city', href: '#address-city' },
+          { text: 'Select a country', href: '#address-country' },
+          { text: 'Enter a postcode', href: '#address-postcode' },
+          { text: 'Enter an email address', href: '#email' },
+          {
+            text: 'Select yes if your organisation has a company registration number',
+            href: '#has-company-registration-number',
+          },
+        ])
+      })
+    })
+
+    describe('with an invalid field', () => {
+      beforeEach(async () => {
+        nextRequest({
+          body: { ...VALID_BODY, email: 'not-an-email', hasCompanyRegistrationNumber: 'false' },
+          session: {},
+        })
+        await call('post')
+      })
+
+      it('should render the template with the submitted values, error and backLink', () => {
+        mockResponse.should.have.been.calledOnce
+        const context = mockResponse.firstCall.lastArg as {
+          errors: { formErrors: Record<string, string> }
+          organisationDetails: object
+          hasCompanyRegistrationNumber: string
+          countries: unknown[]
+          backLink: string
+        }
+        sinon.assert.match(context, {
+          errors: { formErrors: { email: 'Enter a real email address' } },
+          organisationDetails: {
+            organisationName: 'Test Organisation',
+            addressLine1: '1 Test Street',
+            addressLine2: '',
+            addressCity: 'swansea',
+            addressPostcode: 'T3 5TT',
+            addressCountry: 'GB',
+            email: 'not-an-email',
+          },
+          hasCompanyRegistrationNumber: 'false',
+          countries: countries.govukFrontendFormatted('GB'),
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE
+          ),
+        })
+        sinon.assert.notCalled(res.redirect)
+      })
     })
   })
 })

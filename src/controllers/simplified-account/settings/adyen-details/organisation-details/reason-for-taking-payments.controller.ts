@@ -85,8 +85,7 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
 
   const { governmentActivity } = req.body
 
-  const storeDetails =
-    req.account.paymentProvider === PaymentProvider.STRIPE ? await getStoreDetailsForStripeMigration(req) : undefined
+  const storeDetails = 'ADYEN';
 
   if (!storeDetails) {
     throw new Error(`Merchant details not returned from Stripe for [service_external_id: ${req.service.externalId}]`)

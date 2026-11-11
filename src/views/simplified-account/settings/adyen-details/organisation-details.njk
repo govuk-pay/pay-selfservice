@@ -131,6 +131,7 @@
           label: {
             html: 'Email address'
           },
+          errorMessage: { text: errors.formErrors['email'] } if errors.formErrors['email'] else false,
           classes: "govuk-!-width-three-quarters",
           id: "email",
           name: "email",

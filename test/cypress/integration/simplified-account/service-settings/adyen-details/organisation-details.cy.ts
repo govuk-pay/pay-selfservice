@@ -187,6 +187,51 @@ describe(`Organisation details, company registration and VAT registration`, () =
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
 
+    describe('when the organisation details form is submitted empty', () => {
+      const expectedErrors = [
+        { field: '#organisation-name', message: 'Enter an organisation name' },
+        { field: '#address-line1', message: 'Enter address line 1' },
+        { field: '#address-city', message: 'Enter a town or city' },
+        { field: '#address-postcode', message: 'Enter a postcode' },
+        { field: '#email', message: 'Enter an email address' },
+        {
+          field: '#has-company-registration-number',
+          message: 'Select yes if your organisation has a company registration number',
+        },
+      ]
+
+      beforeEach(() => {
+        setStubs()
+        cy.visit(ORGANISATION_DETAILS_PATH)
+        cy.get('#organisation-details-submit').click()
+      })
+
+      it('should stay on the organisation details page', () => {
+        cy.location('pathname').should('eq', ORGANISATION_DETAILS_PATH)
+        cy.a11yCheck()
+      })
+
+      it('should display an error summary', () => {
+        cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
+        cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
+        expectedErrors.forEach(({ field, message }, index) => {
+          cy.get('.govuk-error-summary__list li')
+            .eq(index)
+            .find(`a[href="${field}"]`)
+            .should('contain', message)
+        })
+      })
+
+      it('should display an error for every field', () => {
+        expectedErrors.forEach(({ field, message }) => {
+          cy.get(`${field}-error`).should('be.visible').and('contain', message)
+        })
+        // address line 2 is optional and country always has a value (defaults to GB)
+        cy.get('#address-line2-error').should('not.exist')
+        cy.get('#address-country-error').should('not.exist')
+      })
+    })
+
     it('should walk through organisation details and VAT registration in sequence, without company registration', () => {
       setStubs()
 
