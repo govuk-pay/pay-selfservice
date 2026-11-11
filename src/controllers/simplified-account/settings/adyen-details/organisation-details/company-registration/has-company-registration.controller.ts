@@ -42,12 +42,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     'simplified-account/settings/adyen-details/company-registration/has-company-registration-number',
     {
       hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber ?? '',
-      backLink: formatServiceAndAccountPathsFor(
-        getBackLink(req),
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      ),
+      backLink: getBackLink(req),
     }
   )
 }

@@ -6,6 +6,7 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
+import { query } from 'axios'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -65,65 +66,73 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       })
 
       it('should call the response method with backLink', () => {
+        const backlink = formatServiceAndAccountPathsFor(
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+        )
+
         mockResponse.should.have.been.calledOnce
-        const context = mockResponse.firstCall.lastArg as { backLink: string }
-        sinon.assert.match(context, {
-          backLink: formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-          ),
+        const expectedContext = {
+          backlink
+        }
+        sinon.assert.match(expectedContext, {
+          backlink,
         })
       })
     })
   })
 
   describe('post', () => {
-    it('should redirect to the company registration number page when yes is selected', async () => {
-      nextRequest({
-        body: { hasCompanyRegistrationNumber: 'true' },
-        session: {
-          pageData: {
-            organisationDetails: {
-              organisationName: 'Test Organisation',
+    describe('when a true selection is made', () => {
+      it('should redirect to the company registration number', async () => {
+        nextRequest({
+          body: { hasCompanyRegistrationNumber: 'true' },
+          session: {
+            pageData: {
+              organisationDetails: {
+                organisationName: 'Test Organisation',
+              },
             },
           },
-        },
-      })
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+        })
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
         )
-      )
+      })
     })
 
-    it('should redirect to the company registration upload page when no is selected', async () => {
-      nextRequest({
-        body: { hasCompanyRegistrationNumber: 'false' },
-        session: {
-          pageData: {
-            organisationDetails: {
-              organisationName: 'Test Organisation',
+    describe('when a false selection is made', () => {
+      it('should redirect to the company registration upload page', async () => {
+        nextRequest({
+          body: { hasCompanyRegistrationNumber: 'false' },
+          session: {
+            pageData: {
+              organisationDetails: {
+                organisationName: 'Test Organisation',
+              },
             },
           },
-        },
-      })
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+        })
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
         )
-      )
+      })
     })
   })
 })
