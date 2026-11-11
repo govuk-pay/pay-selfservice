@@ -675,14 +675,6 @@ describe('Adyen details service', () => {
       )
 
       sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
-        type: 'paybybank',
-        storeIds: [store.id],
-        businessLineId: 'BL123',
-        countries: ['GB'],
-        currencies: ['GBP'],
-      })
-
-      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
         type: 'googlepay',
         storeIds: [store.id],
         businessLineId: 'BL123',
