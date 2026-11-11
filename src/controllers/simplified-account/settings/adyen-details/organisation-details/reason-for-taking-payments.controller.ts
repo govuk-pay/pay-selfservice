@@ -8,9 +8,9 @@ import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
 import { OrganisationDetailsSession, GovernmentActivity } from './constants'
 import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
-import { getStripeStatementDescriptor } from '@services/stripe-details.service'
 import { PaymentProvider } from '@models/constants/payment-provider'
 import { InvalidConfigurationError } from '@root/errors'
+import { getStripeStatementDescriptor } from '@services/stripe-details.service'
 
 interface ReasonForTakingPaymentsBody {
   governmentActivity: GovernmentActivity
@@ -89,7 +89,8 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
 
   const { governmentActivity } = req.body
 
-  const storeDetails = 'ADYEN';
+  const storeDetails =
+    req.account.paymentProvider === PaymentProvider.STRIPE ? await getStoreDetailsForStripeMigration(req) : undefined
 
   if (!storeDetails) {
     throw new Error(`Merchant details not returned from Stripe for [service_external_id: ${req.service.externalId}]`)
