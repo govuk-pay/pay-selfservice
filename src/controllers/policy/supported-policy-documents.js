@@ -53,6 +53,10 @@ const supportedPolicyDocuments = [
     title: 'Agreement: Schedule 7 (Adyen)',
     template: 'policy/document/v2/agreement-schedule-7-adyen',
   },
+  {
+    key: 'public-sector-entity-confirmation',
+    title: 'GOV.UK Pay public sector entity confirmation',
+  },
 ]
 
 const supportedPolicyDocumentsKeyIndex = supportedPolicyDocuments.reduce((index, policyDocument) => {

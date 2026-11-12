@@ -6,6 +6,7 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
+import { lookup } from '@controllers/policy/supported-policy-documents'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -20,6 +21,16 @@ const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registr
 
 const mockResponse = sinon.stub()
 
+const mockBucketGetLinkToPdf = sinon.spy(() => {
+  return new Promise((resolve) => {
+    resolve('html-url-link')
+  })
+})
+
+const mockBucketService = {
+  generatePrivateLink: mockBucketGetLinkToPdf,
+}
+
 const { res, call, nextRequest } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/organisation-registration-upload.controller'
 )
@@ -28,6 +39,7 @@ const { res, call, nextRequest } = new ControllerTestBuilder(
   .withUser(UserFixture.asServiceAdmin([serviceFixture]).toUser())
   .withStubs({
     '@utils/response': { response: mockResponse },
+    '@controllers/policy/aws-s3-policy-bucket': mockBucketService,
   })
   .build()
 
@@ -46,7 +58,10 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
     })
 
     describe('with organisation details already in session', () => {
+      let documentConfig: unknown
+
       beforeEach(async () => {
+        documentConfig = await lookup('public-sector-entity-confirmation')
         nextRequest({
           session: {
             pageData: {
@@ -65,7 +80,11 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
       })
 
-      it('should call the response method with hasCompanyRegistrationNumber and backLink', () => {
+      it('should call s3 bucket to generate a private link to for the entity document', () => {
+        mockBucketService.generatePrivateLink.should.have.been.calledWith(documentConfig)
+      })
+
+      it('should call the response method with hasCompanyRegistrationNumber, backLink and download link', () => {
         mockResponse.should.have.been.calledOnce
         const context = mockResponse.firstCall.lastArg as { hasCompanyRegistrationNumber: string; backLink: string }
         sinon.assert.match(context, {
@@ -76,6 +95,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
           ),
+          downloadLink: 'html-url-link',
         })
       })
     })
