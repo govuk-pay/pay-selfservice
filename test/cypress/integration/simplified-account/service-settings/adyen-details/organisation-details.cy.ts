@@ -211,6 +211,10 @@ describe(`Organisation details, company registration and VAT registration`, () =
         cy.a11yCheck()
       })
 
+      it('should prefix the page title with "Error:"', () => {
+        cy.title().should('match', /^Error: Organisation details - Settings - /)
+      })
+
       it('should display an error summary', () => {
         cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
         cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
