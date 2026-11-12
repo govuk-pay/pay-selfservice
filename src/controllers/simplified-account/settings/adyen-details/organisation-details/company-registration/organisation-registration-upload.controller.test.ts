@@ -87,7 +87,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         nextRequest({
           file: {
             size: 10 * 1024 * 1024,
-            mimetype: 'image/jpeg'
+            mimetype: 'image/jpeg',
           },
           body: { companyRegistrationNumber: '01234567' },
           session: {
@@ -114,14 +114,13 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       })
     })
 
-
     describe('when submitting invalid data', () => {
       describe('file is too large', () => {
         beforeEach(() => {
           nextRequest({
             file: {
               size: 11 * 1024 * 1024,
-              mimetype: 'image/jpeg'
+              mimetype: 'image/jpeg',
             },
             body: { companyRegistrationNumber: '01234567' },
             session: {
@@ -174,7 +173,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           nextRequest({
             file: {
               size: 10 * 1024 * 1024,
-              mimetype: 'application/json'
+              mimetype: 'application/json',
             },
             body: { companyRegistrationNumber: '01234567' },
             session: {

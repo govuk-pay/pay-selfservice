@@ -34,7 +34,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
         req.account.type,
         switchingCredentialId
       ),
-      uploadField: GOV_ENTITY_DOC_FORM_FIELD_NAME
+      uploadField: GOV_ENTITY_DOC_FORM_FIELD_NAME,
     }
   )
 }
@@ -44,21 +44,20 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
   const switchingCredentialId = account.getSwitchingCredential().externalId
 
   const validations = [
-    check(GOV_ENTITY_DOC_FORM_FIELD_NAME)
-      .custom(() => {
-        if (!file) {
-          throw new Error('Select a file to upload')
-        }
-        const maxSize = 10 * 1024 * 1024 // 10MB
-        if (file.size > maxSize) {
-          throw new Error('File size must be less than 10MB')
-        }
-        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
-        if (!allowedTypes.includes(file.mimetype)) {
-          throw new Error('File type must be PDF, JPG or PNG')
-        }
-        return true
-      })
+    check(GOV_ENTITY_DOC_FORM_FIELD_NAME).custom(() => {
+      if (!file) {
+        throw new Error('Select a file to upload')
+      }
+      const maxSize = 10 * 1024 * 1024 // 10MB
+      if (file.size > maxSize) {
+        throw new Error('File size must be less than 10MB')
+      }
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
+      if (!allowedTypes.includes(file.mimetype)) {
+        throw new Error('File type must be PDF, JPG or PNG')
+      }
+      return true
+    }),
   ]
 
   await Promise.all(validations.map((validation) => validation.run(req)))
@@ -67,18 +66,23 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
   if (!errors.isEmpty()) {
     const formattedErrors = formatValidationErrors(errors)
 
-    return response(req, res, 'simplified-account/settings/adyen-details/company-registration/organisation-registration-upload', {
-      errors: {
-        summary: formattedErrors.errorSummary,
-        formErrors: formattedErrors.formErrors,
-      },
-      backLink: formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
-    })
+    return response(
+      req,
+      res,
+      'simplified-account/settings/adyen-details/company-registration/organisation-registration-upload',
+      {
+        errors: {
+          summary: formattedErrors.errorSummary,
+          formErrors: formattedErrors.formErrors,
+        },
+        backLink: formatServiceAndAccountPathsFor(
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+          req.service.externalId,
+          req.account.type,
+          switchingCredentialId
+        ),
+      }
+    )
   }
 
   return res.redirect(

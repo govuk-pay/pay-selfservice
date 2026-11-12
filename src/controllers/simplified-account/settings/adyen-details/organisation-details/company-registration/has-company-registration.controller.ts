@@ -62,17 +62,17 @@ async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servic
 
   const redirectPath = hasCompanyRegistrationNumber
     ? formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
     : formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
 
   const validations = [adyenDetailsSchema.hasCompanyRegistrationNumber.validate]
 
@@ -82,13 +82,18 @@ async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servic
   if (!errors.isEmpty()) {
     const formattedErrors = formatValidationErrors(errors)
 
-    return response(req, res, 'simplified-account/settings/adyen-details/company-registration/has-company-registration-number', {
-      errors: {
-        summary: formattedErrors.errorSummary,
-        formErrors: formattedErrors.formErrors,
-      },
-      backLink: getBackLink(req),
-    })
+    return response(
+      req,
+      res,
+      'simplified-account/settings/adyen-details/company-registration/has-company-registration-number',
+      {
+        errors: {
+          summary: formattedErrors.errorSummary,
+          formErrors: formattedErrors.formErrors,
+        },
+        backLink: getBackLink(req),
+      }
+    )
   }
   return res.redirect(redirectPath)
 }

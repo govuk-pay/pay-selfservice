@@ -30,7 +30,7 @@ const adyenDetailsSchema = {
   },
   hasCompanyRegistrationNumber: {
     validate: body('hasCompanyRegistrationNumber').notEmpty().withMessage('You must make a selection'),
-  }
+  },
 }
 
 export { adyenDetailsSchema }
