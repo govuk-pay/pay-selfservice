@@ -179,7 +179,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         await call('post')
         sinon.assert.notCalled(res.redirect)
       })
-      it('should re-render the registered for vat page with the backLink', async () => {
+      it('should re-render the has company registration page with the backLink', async () => {
         await call('post')
         const expectedContext = {
           backLink: formatServiceAndAccountPathsFor(
