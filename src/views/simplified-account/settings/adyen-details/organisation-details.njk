@@ -5,7 +5,7 @@
 {% block settingsContent %}
   <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
 
-  <form id="organisation-details-form" method="post">
+  <form id="organisation-details-form" method="post" novalidate>
     <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
 
     {% set organisationNameHint %}
@@ -131,6 +131,7 @@
           label: {
             html: 'Email address'
           },
+          errorMessage: { text: errors.formErrors['email'] } if errors.formErrors['email'] else false,
           classes: "govuk-!-width-three-quarters",
           id: "email",
           name: "email",

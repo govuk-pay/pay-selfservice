@@ -8,9 +8,9 @@ import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
 import { OrganisationDetailsSession, GovernmentActivity } from './constants'
 import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
-import { getStripeStatementDescriptor } from '@services/stripe-details.service'
 import { PaymentProvider } from '@models/constants/payment-provider'
 import { InvalidConfigurationError } from '@root/errors'
+import { getStripeStatementDescriptor } from '@services/stripe-details.service'
 
 interface ReasonForTakingPaymentsBody {
   governmentActivity: GovernmentActivity
