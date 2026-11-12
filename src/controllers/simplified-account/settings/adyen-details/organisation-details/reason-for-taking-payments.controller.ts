@@ -6,17 +6,13 @@ import { markTaskAsComplete } from '@services/adyen-setup.service'
 import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
-import { OrganisationDetailsSession, GovernmentActivity } from './constants'
+import { OrganisationDetailsSession, GovernmentActivityBody } from './constants'
 import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
 import { getStripeStatementDescriptor } from '@services/stripe-details.service'
 import { PaymentProvider } from '@models/constants/payment-provider'
 import { InvalidConfigurationError } from '@root/errors'
 
-interface ReasonForTakingPaymentsBody {
-  governmentActivity: GovernmentActivity
-}
-
-function getBackLink(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
+function getBackLink(req: ServiceRequest<GovernmentActivityBody>) {
   return formatServiceAndAccountPathsFor(
     paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
     req.service.externalId,
@@ -25,7 +21,7 @@ function getBackLink(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
   )
 }
 
-async function getStoreDetailsForStripeMigration(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
+async function getStoreDetailsForStripeMigration(req: ServiceRequest<GovernmentActivityBody>) {
   const telephoneNumber = req.service.merchantDetails?.telephoneNumber
 
   if (!telephoneNumber) {
@@ -53,14 +49,15 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   }
 
   return response(req, res, 'simplified-account/settings/adyen-details/reason-for-taking-payments', {
+    governmentActivity: currentSession.governmentActivity ?? '',
     backLink: getBackLink(req),
   })
 }
 
-async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<GovernmentActivityBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
-  const currentSession = OrganisationDetailsSession.extract(req)
+  const existingSession = OrganisationDetailsSession.extract(req)
 
   const validations = [adyenDetailsSchema.selectGovernmentActivity.validate]
 
@@ -79,11 +76,15 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
     })
   }
 
-  const completeSession = new OrganisationDetailsSession({
-    ...currentSession,
-  })
+  const updatedSession = {
+    governmentActivity: req.body.governmentActivity,
+  } as OrganisationDetailsSession
 
-  const { governmentActivity } = req.body
+  OrganisationDetailsSession.set(req, existingSession, updatedSession)
+
+  const completeSession = new OrganisationDetailsSession({
+    ...existingSession,
+  })
 
   const storeDetails =
     req.account.paymentProvider === PaymentProvider.STRIPE ? await getStoreDetailsForStripeMigration(req) : undefined
@@ -94,7 +95,7 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
 
   const { businessLine, balanceAccount } = await createOrganisation(
     completeSession,
-    governmentActivity,
+    req.body.governmentActivity,
     req.service,
     req.account.type,
     switchingCredentialId,

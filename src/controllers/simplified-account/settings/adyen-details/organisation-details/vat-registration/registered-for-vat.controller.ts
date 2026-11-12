@@ -30,6 +30,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   }
 
   return response(req, res, 'simplified-account/settings/adyen-details/registered-for-vat', {
+    registeredForVat: currentSession.registeredForVat ?? '',
     backLink: getBackLink(req),
   })
 }
@@ -37,6 +38,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
 async function post(req: ServiceRequest<RegisteredForVatBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
+  const existingSession = OrganisationDetailsSession.extract(req)
 
   const validations = [adyenDetailsSchema.registeredForVat.validate]
 
@@ -54,6 +56,12 @@ async function post(req: ServiceRequest<RegisteredForVatBody>, res: ServiceRespo
       backLink: getBackLink(req),
     })
   }
+
+  const updatedSession = {
+    registeredForVat: req.body.registeredForVat,
+  } as OrganisationDetailsSession
+
+  OrganisationDetailsSession.set(req, existingSession, updatedSession)
 
   const isOrgRegisteredForVAT = req.body.registeredForVat === 'true'
 

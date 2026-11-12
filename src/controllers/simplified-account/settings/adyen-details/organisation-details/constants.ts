@@ -23,6 +23,10 @@ export interface NotRegisteredForVatBody {
   notRegisteredForVat: string
 }
 
+export interface GovernmentActivityBody {
+  governmentActivity: GovernmentActivity
+}
+
 export interface OrganisationDetailsBody {
   organisationName: string
   addressLine1: string
@@ -44,7 +48,7 @@ export class OrganisationDetailsSession {
   companyRegistrationNumber?: string
   vatRegistrationNumber?: string
   email?: string
-  reasonForTakingPayments?: string
+  governmentActivity?: GovernmentActivity
   registeredForVat?: string
   notRegisteredForVat?: string
 

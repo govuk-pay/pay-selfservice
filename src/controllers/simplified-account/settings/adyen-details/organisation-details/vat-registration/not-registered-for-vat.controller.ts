@@ -30,6 +30,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   }
 
   return response(req, res, 'simplified-account/settings/adyen-details/not-registered-for-vat', {
+    notRegisteredForVat: currentSession.notRegisteredForVat ?? '',
     backLink: getBackLink(req),
   })
 }
