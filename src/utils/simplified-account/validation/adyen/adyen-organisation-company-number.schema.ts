@@ -9,7 +9,7 @@ const adyenCompanyRegistrationNumberSchema = {
       .bail()
       .isLength({ min: 8, max: 8 })
       .withMessage('Company registration number must be 8 characters long')
-      .bail()
+      .bail(),
   },
 }
 
