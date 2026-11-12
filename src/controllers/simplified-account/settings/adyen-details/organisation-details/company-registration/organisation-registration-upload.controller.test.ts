@@ -20,7 +20,7 @@ const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registr
 
 const mockResponse = sinon.stub()
 
-const { res, call, nextRequest } = new ControllerTestBuilder(
+const { req, res, call, nextRequest } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/organisation-registration-upload.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
@@ -82,30 +82,194 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
   })
 
   describe('post', () => {
-    beforeEach(() => {
-      nextRequest({
-        body: { companyRegistrationNumber: '01234567' },
-        session: {
-          pageData: {
-            organisationDetails: {
-              organisationName: 'Test Organisation',
+    describe('when uploading a valid file', () => {
+      beforeEach(() => {
+        nextRequest({
+          file: {
+            size: 10 * 1024 * 1024,
+            mimetype: 'image/jpeg'
+          },
+          body: { companyRegistrationNumber: '01234567' },
+          session: {
+            pageData: {
+              organisationDetails: {
+                organisationName: 'Test Organisation',
+              },
             },
           },
-        },
+        })
+      })
+
+      it('should redirect to the task index page', async () => {
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
       })
     })
 
-    it('should redirect to the VAT registration number page', async () => {
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-        )
-      )
+
+    describe('when submitting invalid data', () => {
+      describe('file is too large', () => {
+        beforeEach(() => {
+          nextRequest({
+            file: {
+              size: 11 * 1024 * 1024,
+              mimetype: 'image/jpeg'
+            },
+            body: { companyRegistrationNumber: '01234567' },
+            session: {
+              pageData: {
+                organisationDetails: {
+                  organisationName: 'Test Organisation',
+                },
+              },
+            },
+          })
+        })
+
+        it('should not redirect', async () => {
+          await call('post')
+          sinon.assert.notCalled(res.redirect as sinon.SinonStub)
+        })
+
+        it('should re-render the upload page', async () => {
+          await call('post')
+          sinon.assert.calledOnce(mockResponse)
+          sinon.assert.calledWithMatch(mockResponse, req, res, TEMPLATE_PATH)
+        })
+
+        it('should show the summary error', async () => {
+          await call('post')
+          const context = mockResponse.firstCall.lastArg as {
+            errors: { summary: { text: string; href: string }[] }
+          }
+          sinon.assert.match(context.errors.summary, [
+            {
+              text: 'File size must be less than 10MB',
+              href: '#government-entity-document',
+            },
+          ])
+        })
+
+        it('should show the inline error', async () => {
+          await call('post')
+          const context = mockResponse.firstCall.lastArg as {
+            errors: { formErrors: Record<string, string> }
+          }
+          sinon.assert.match(context.errors.formErrors, {
+            governmentEntityDocument: 'File size must be less than 10MB',
+          })
+        })
+      })
+
+      describe('mimetype is incorrect', () => {
+        beforeEach(() => {
+          nextRequest({
+            file: {
+              size: 10 * 1024 * 1024,
+              mimetype: 'application/json'
+            },
+            body: { companyRegistrationNumber: '01234567' },
+            session: {
+              pageData: {
+                organisationDetails: {
+                  organisationName: 'Test Organisation',
+                },
+              },
+            },
+          })
+        })
+
+        it('should not redirect', async () => {
+          await call('post')
+          sinon.assert.notCalled(res.redirect as sinon.SinonStub)
+        })
+
+        it('should re-render the upload page', async () => {
+          await call('post')
+          sinon.assert.calledOnce(mockResponse)
+          sinon.assert.calledWithMatch(mockResponse, req, res, TEMPLATE_PATH)
+        })
+
+        it('should show the summary error', async () => {
+          await call('post')
+          const context = mockResponse.firstCall.lastArg as {
+            errors: { summary: { text: string; href: string }[] }
+          }
+          sinon.assert.match(context.errors.summary, [
+            {
+              text: 'File type must be PDF, JPG or PNG',
+              href: '#government-entity-document',
+            },
+          ])
+        })
+
+        it('should show the inline error', async () => {
+          await call('post')
+          const context = mockResponse.firstCall.lastArg as {
+            errors: { formErrors: Record<string, string> }
+          }
+          sinon.assert.match(context.errors.formErrors, {
+            governmentEntityDocument: 'File type must be PDF, JPG or PNG',
+          })
+        })
+      })
+
+      describe('file is missing', () => {
+        beforeEach(() => {
+          nextRequest({
+            body: { companyRegistrationNumber: '01234567' },
+            session: {
+              pageData: {
+                organisationDetails: {
+                  organisationName: 'Test Organisation',
+                },
+              },
+            },
+          })
+        })
+
+        it('should not redirect', async () => {
+          await call('post')
+          sinon.assert.notCalled(res.redirect as sinon.SinonStub)
+        })
+
+        it('should re-render the upload page', async () => {
+          await call('post')
+          sinon.assert.calledOnce(mockResponse)
+          sinon.assert.calledWithMatch(mockResponse, req, res, TEMPLATE_PATH)
+        })
+
+        it('should show the summary error', async () => {
+          await call('post')
+          const context = mockResponse.firstCall.lastArg as {
+            errors: { summary: { text: string; href: string }[] }
+          }
+          sinon.assert.match(context.errors.summary, [
+            {
+              text: 'Select a file to upload',
+              href: '#government-entity-document',
+            },
+          ])
+        })
+
+        it('should show the inline error', async () => {
+          await call('post')
+          const context = mockResponse.firstCall.lastArg as {
+            errors: { formErrors: Record<string, string> }
+          }
+          sinon.assert.match(context.errors.formErrors, {
+            governmentEntityDocument: 'Select a file to upload',
+          })
+        })
+      })
     })
   })
 })
