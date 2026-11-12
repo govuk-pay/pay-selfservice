@@ -120,7 +120,7 @@ const adyenOrganisationDetailsSchema = {
       .withMessage('Enter an email address')
       .bail()
       .isEmail()
-      .withMessage('Enter a real email address'),
+      .withMessage('Enter an email address in the correct format'),
   },
   hasCompanyRegistrationNumber: {
     validate: body('hasCompanyRegistrationNumber')

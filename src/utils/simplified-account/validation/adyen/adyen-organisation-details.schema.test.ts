@@ -482,7 +482,7 @@ describe('adyenOrganisationDetailsSchema', () => {
       expect(errors.array()).to.deep.include({
         type: 'field',
         value: 'no-email',
-        msg: 'Enter a real email address',
+        msg: 'Enter an email address in the correct format',
         path: 'email',
         location: 'body',
       })
