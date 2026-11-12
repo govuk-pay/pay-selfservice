@@ -21,6 +21,7 @@
           {
             value: "below-vat-threshold",
             text: "Turnover is below the VAT registration threshold",
+            checked: notRegisteredForVat === 'below-vat-threshold',
             attributes: {
               "data-cy": "below-vat-threshold"
             }
@@ -28,6 +29,7 @@
           {
             value: "exempt",
             text: "Organisation is exempt from VAT registration",
+            checked: notRegisteredForVat === 'exempt',
             attributes: {
               "data-cy": "exempt"
             }
