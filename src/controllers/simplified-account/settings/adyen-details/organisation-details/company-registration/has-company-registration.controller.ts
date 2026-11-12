@@ -22,8 +22,6 @@ function getBackLink(req: ServiceRequest<HasCompanyRegistrationBody>) {
 }
 
 function get(req: ServiceRequest, res: ServiceResponse) {
-  const { account } = req
-  const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
 
   if (currentSession.isEmpty()) {
@@ -62,17 +60,17 @@ async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servic
 
   const redirectPath = hasCompanyRegistrationNumber
     ? formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
     : formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
 
   const validations = [adyenDetailsSchema.hasCompanyRegistrationNumber.validate]
 
