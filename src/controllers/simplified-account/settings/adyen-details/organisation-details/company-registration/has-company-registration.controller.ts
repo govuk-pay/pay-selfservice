@@ -50,28 +50,6 @@ async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servic
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const existingSession = OrganisationDetailsSession.extract(req)
 
-  const updatedSession = {
-    hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
-  } as OrganisationDetailsSession
-
-  OrganisationDetailsSession.set(req, existingSession, updatedSession)
-
-  const hasCompanyRegistrationNumber = req.body.hasCompanyRegistrationNumber === 'true'
-
-  const redirectPath = hasCompanyRegistrationNumber
-    ? formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
-    : formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
-
   const validations = [adyenDetailsSchema.hasCompanyRegistrationNumber.validate]
 
   await Promise.all(validations.map((validation) => validation.run(req)))
@@ -93,6 +71,29 @@ async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servic
       }
     )
   }
+
+  const updatedSession = {
+    hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
+  } as OrganisationDetailsSession
+
+  OrganisationDetailsSession.set(req, existingSession, updatedSession)
+
+  const hasCompanyRegistrationNumber = req.body.hasCompanyRegistrationNumber === 'true'
+
+  const redirectPath = hasCompanyRegistrationNumber
+    ? formatServiceAndAccountPathsFor(
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
+    : formatServiceAndAccountPathsFor(
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
+
   return res.redirect(redirectPath)
 }
 
