@@ -5,7 +5,7 @@
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 
 {% block pageTitle %}
-  {% if errors %}Error:{% endif %}{{ settingsPageTitle }}
+  {{ "Error: " if errors }}{{ settingsPageTitle }}
   - Settings - {{ currentService.name }} - GOV.UK Pay
 {% endblock %}
 
