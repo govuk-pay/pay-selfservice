@@ -215,7 +215,7 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           backLink: string
         }
         sinon.assert.match(context, {
-          errors: { formErrors: { email: "'Enter an email address in the correct format" } },
+          errors: { formErrors: { email: "Enter an email address in the correct format" } },
           organisationDetails: {
             organisationName: 'Test Organisation',
             addressLine1: '1 Test Street',
