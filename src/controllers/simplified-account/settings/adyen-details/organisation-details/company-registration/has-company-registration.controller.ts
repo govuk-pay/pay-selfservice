@@ -60,17 +60,17 @@ async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servic
 
   const redirectPath = hasCompanyRegistrationNumber
     ? formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
     : formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+        req.service.externalId,
+        req.account.type,
+        switchingCredentialId
+      )
 
   const validations = [adyenDetailsSchema.hasCompanyRegistrationNumber.validate]
 
