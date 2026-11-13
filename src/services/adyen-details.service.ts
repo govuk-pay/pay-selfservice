@@ -27,6 +27,7 @@ import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatfor
 import { formatPhoneNumberWithCountryCode } from '@utils/telephone-number-utils'
 import { LegalEntityAssociation } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityAssociation'
 import { InvalidConfigurationError } from '@root/errors'
+import { FinanceOrgDetailsBody } from '@controllers/simplified-account/settings/adyen-details/finance-org-details.controller'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -652,6 +653,32 @@ function formatDateInputs(dobDay: string, dobMonth: string, dobYear: string): st
   return `${dobYear}-${dobMonth?.padStart(2, '0')}-${dobDay?.padStart(2, '0')}`
 }
 
+async function updateFinanceOrgDetails(session: FinanceOrgDetailsBody, organisationLegalEntityId: string) {
+  const legalEntity = await AdyenLEMClient.getLegalEntity(organisationLegalEntityId)
+
+  // legalName and organisation address are required fields for updating the organization, so we use existing values
+  // They should be set when the organisation is created in the previous task.
+  if (!legalEntity?.organization?.legalName || !legalEntity?.organization?.registeredAddress) {
+    throw new Error(`Organisation legal entity with ID ${organisationLegalEntityId} is missing required fields`)
+  }
+  const organizationUpdate = {
+    organization: {
+      legalName: legalEntity?.organization.legalName,
+      registeredAddress: legalEntity.organization.registeredAddress,
+      financialReports: [
+        {
+          annualTurnover: session.annualTurnover,
+          employeeCount: session.employeeCount,
+          currencyOfFinancialData: 'GBP',
+          dateOfFinancialData: formatDateInputs(session.financeDay, session.financeMonth, session.financeYear),
+        },
+      ],
+    },
+  }
+
+  await AdyenLEMClient.updateLegalEntity(organisationLegalEntityId, organizationUpdate)
+}
+
 export {
   setAdyenStoreId,
   createOrganisation,
@@ -664,4 +691,5 @@ export {
   getOrganisationDetailsSummary,
   getAccountHolder,
   isAccountHolderVerified,
+  updateFinanceOrgDetails,
 }
