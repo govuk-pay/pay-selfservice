@@ -7,7 +7,7 @@ import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 
-const SERVICE_EXTERNAL_ID = 'service123abc'
+const SERVICE_EXTERNAL_ID = 'service123'
 const SERVICE_TYPE = 'live'
 const serviceFixture = new ServiceFixture({
   externalId: SERVICE_EXTERNAL_ID,
@@ -82,30 +82,90 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
   })
 
   describe('post', () => {
-    beforeEach(() => {
-      nextRequest({
-        body: { companyRegistrationNumber: '01234567' },
-        session: {
-          pageData: {
-            organisationDetails: {
-              organisationName: 'Test Organisation',
-            },
-          },
+    const session = {
+      pageData: {
+        organisationDetails: {
+          organisationName: 'Test Organisation',
         },
+      },
+    }
+
+    describe('with a valid company registration number', () => {
+      beforeEach(async () => {
+        nextRequest({ body: { companyRegistrationNumber: '12345678' }, session })
+        await call('post')
+      })
+
+      it('should redirect to the VAT registration number page with a valid registration number', () => {
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
       })
     })
 
-    it('should redirect to the VAT registration number page', async () => {
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-        )
-      )
+    describe('with an empty company registration number', () => {
+      beforeEach(async () => {
+        nextRequest({ body: { companyRegistrationNumber: '' }, session })
+        await call('post')
+      })
+
+      it('should not redirect', () => {
+        sinon.assert.notCalled(res.redirect)
+      })
+
+      it('should show the error and backLink', () => {
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
+        const context = mockResponse.firstCall.lastArg as {
+          errors: { summary: { text: string; href: string }[]; formErrors: Record<string, string> }
+          companyRegistrationNumber: string
+          backLink: string
+        }
+        sinon.assert.match(context, {
+          errors: {
+            summary: [{ text: 'Enter a company registration number', href: '#company-registration-number' }],
+            formErrors: { companyRegistrationNumber: 'Enter a company registration number' },
+          },
+          companyRegistrationNumber: '',
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        })
+      })
+    })
+
+    describe('with a company registration number that is not 8 characters', () => {
+      beforeEach(async () => {
+        nextRequest({ body: { companyRegistrationNumber: '12345' }, session })
+        await call('post')
+      })
+
+      it('should not redirect', () => {
+        sinon.assert.notCalled(res.redirect)
+      })
+
+      it('should show the error and the submitted value', () => {
+        mockResponse.should.have.been.calledOnce
+        const context = mockResponse.firstCall.lastArg as {
+          errors: { formErrors: Record<string, string> }
+          companyRegistrationNumber: string
+        }
+        sinon.assert.match(context, {
+          errors: {
+            formErrors: { companyRegistrationNumber: 'Company registration number must be 8 characters long' },
+          },
+          companyRegistrationNumber: '12345',
+        })
+      })
     })
   })
 })
