@@ -165,7 +165,6 @@ describe('post', () => {
     const invalidBody = { vatRegistrationNumber: 'invalid-vat-number' }
     const organisationDetails = { organisationName: 'Test Organisation' }
 
-
     it('should show the error and the submitted value', async () => {
       nextRequest({ body: invalidBody, session: { pageData: { organisationDetails } } })
       await call('post')
@@ -190,7 +189,9 @@ describe('post', () => {
     it('should set the backLink to organisation details when there is no company registration number', async () => {
       nextRequest({
         body: invalidBody,
-        session: { pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'false' } } },
+        session: {
+          pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'false' } },
+        },
       })
       await call('post')
 
@@ -207,7 +208,9 @@ describe('post', () => {
     it('should set the backLink to company registration number when there is a company registration number', async () => {
       nextRequest({
         body: invalidBody,
-        session: { pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'true' } } },
+        session: {
+          pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'true' } },
+        },
       })
       await call('post')
 
