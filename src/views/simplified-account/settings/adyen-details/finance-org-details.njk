@@ -18,7 +18,7 @@
       {{
         govukRadios({
           idPrefix: 'what-is-your-operating-budget',
-          name: 'what-is-your-operating-budget',
+          name: 'annualTurnover',
           fieldset: {
             legend: {
               text: 'What is your operating budget?',
@@ -31,19 +31,19 @@
 
           items: [
             {
-              value: '0',
+              value: '500000',
               text: 'Up to £1 million'
             },
             {
-              value: '1',
+              value: '10000000',
               text: '£1 million to £20 million'
             },
             {
-              value: '20',
+              value: '250000000',
               text: '£20 million to £500 million'
             },
             {
-              value: '500',
+              value: '1000000000',
               text: 'Over £500 million'
             }
           ]
@@ -63,6 +63,18 @@
           },
           hint: {
             text: 'This is the date for the operating budget you selected above'
+          },
+          day: {
+            label: 'Day',
+            name: 'financeDay'
+          },
+          month: {
+              label: 'Month',
+              name: 'financeMonth'
+          },
+          year: {
+              label: 'Year',
+              name: 'financeYear'
           }
         })
       }}
@@ -72,7 +84,7 @@
       {{
         govukRadios({
           idPrefix: 'how-many-people-in-organisation',
-          name: 'how-many-people-in-organisation',
+          name: 'employeeCount',
           fieldset: {
             legend: {
               text: 'How many people worked for your organisation on the date above?',
@@ -84,19 +96,19 @@
           },
           items: [
             {
-              value: '1',
+              value: '125',
               text: 'Up to 249'
             },
             {
-              value: '250',
+              value: '500',
               text: '250 to 999'
             },
             {
-              value: '1000',
+              value: '5000',
               text: '1,000 to 9,999'
             },
             {
-              value: '10000',
+              value: '20000',
               text: '10,000+'
             }
           ]
