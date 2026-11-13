@@ -3,10 +3,25 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { HasCompanyRegistrationBody, OrganisationDetailsSession } from '../constants'
+import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
+import { validationResult } from 'express-validator/lib/validation-result'
+import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 
-export function get(req: ServiceRequest, res: ServiceResponse) {
-  const { account } = req
-  const switchingCredentialId = account.getSwitchingCredential().externalId
+function getBackLink(req: ServiceRequest<HasCompanyRegistrationBody>) {
+  const NOT_REGISTERED_PATH = paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat
+  const VAT_NUMBER_PATH = paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber
+
+  const backLinkPath = req.query.from === 'not-registered' ? NOT_REGISTERED_PATH : VAT_NUMBER_PATH
+
+  return formatServiceAndAccountPathsFor(
+    backLinkPath,
+    req.service.externalId,
+    req.account.type,
+    req.account.getSwitchingCredential().externalId
+  )
+}
+
+function get(req: ServiceRequest, res: ServiceResponse) {
   const currentSession = OrganisationDetailsSession.extract(req)
 
   if (currentSession.isEmpty()) {
@@ -19,31 +34,43 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  const NOT_REGISTERED_PATH = paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat
-  const VAT_NUMBER_PATH = paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber
-
-  const backLinkPath = req.query.from === 'not-registered' ? NOT_REGISTERED_PATH : VAT_NUMBER_PATH
-
   return response(
     req,
     res,
     'simplified-account/settings/adyen-details/company-registration/has-company-registration-number',
     {
       hasCompanyRegistrationNumber: currentSession.hasCompanyRegistrationNumber ?? '',
-      backLink: formatServiceAndAccountPathsFor(
-        backLinkPath,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      ),
+      backLink: getBackLink(req),
     }
   )
 }
 
-export function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const existingSession = OrganisationDetailsSession.extract(req)
+
+  const validations = [adyenDetailsSchema.hasCompanyRegistrationNumber.validate]
+
+  await Promise.all(validations.map((validation) => validation.run(req)))
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    const formattedErrors = formatValidationErrors(errors)
+
+    return response(
+      req,
+      res,
+      'simplified-account/settings/adyen-details/company-registration/has-company-registration-number',
+      {
+        errors: {
+          summary: formattedErrors.errorSummary,
+          formErrors: formattedErrors.formErrors,
+        },
+        backLink: getBackLink(req),
+      }
+    )
+  }
 
   const updatedSession = {
     hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
@@ -69,3 +96,5 @@ export function post(req: ServiceRequest<HasCompanyRegistrationBody>, res: Servi
 
   return res.redirect(redirectPath)
 }
+
+export { get, post }

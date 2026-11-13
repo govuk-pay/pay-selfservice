@@ -28,6 +28,9 @@ const adyenDetailsSchema = {
   notRegisteredForVat: {
     validate: body('notRegisteredForVat').notEmpty().withMessage('You must make a selection'),
   },
+  hasCompanyRegistrationNumber: {
+    validate: body('hasCompanyRegistrationNumber').notEmpty().withMessage('You must make a selection'),
+  },
 }
 
 export { adyenDetailsSchema }

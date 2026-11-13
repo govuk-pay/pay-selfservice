@@ -20,7 +20,7 @@ const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registr
 
 const mockResponse = sinon.stub()
 
-const { res, call, nextRequest } = new ControllerTestBuilder(
+const { req, res, call, nextRequest } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/has-company-registration.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
@@ -45,7 +45,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       })
     })
 
-    describe('with organisation details already in session', () => {
+    describe('with organisation details already in session and VAT registered ', () => {
       beforeEach(async () => {
         nextRequest({
           session: {
@@ -65,11 +65,45 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       })
 
       it('should call the response method with backLink', () => {
-        mockResponse.should.have.been.calledOnce
         const context = mockResponse.firstCall.lastArg as { backLink: string }
         sinon.assert.match(context, {
+          hasCompanyRegistrationNumber: '',
           backLink: formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        })
+      })
+    })
+
+    describe('with organisation details already in session and not VAT registered', () => {
+      beforeEach(async () => {
+        nextRequest({
+          query: { ['from']: 'not-registered' },
+          session: {
+            pageData: {
+              organisationDetails: {
+                organisationName: 'Test Organisation',
+              },
+            },
+          },
+        })
+        await call('get')
+      })
+
+      it('should call the response function with the template path', () => {
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
+      })
+
+      it('should call the response method with backLink', () => {
+        const context = mockResponse.firstCall.lastArg as { backLink: string }
+        sinon.assert.match(context, {
+          hasCompanyRegistrationNumber: '',
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
@@ -80,50 +114,90 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
   })
 
   describe('post', () => {
-    it('should redirect to the company registration number page when yes is selected', async () => {
-      nextRequest({
-        body: { hasCompanyRegistrationNumber: 'true' },
-        session: {
-          pageData: {
-            organisationDetails: {
-              organisationName: 'Test Organisation',
+    describe('when a true selection is made', () => {
+      it('should redirect to the company registration number', async () => {
+        nextRequest({
+          body: { hasCompanyRegistrationNumber: 'true' },
+          session: {
+            pageData: {
+              organisationDetails: {
+                organisationName: 'Test Organisation',
+              },
             },
           },
-        },
-      })
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+        })
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
         )
-      )
+      })
     })
 
-    it('should redirect to the company registration upload page when no is selected', async () => {
-      nextRequest({
-        body: { hasCompanyRegistrationNumber: 'false' },
-        session: {
-          pageData: {
+    describe('when a false selection is made', () => {
+      it('should redirect to the company registration upload page', async () => {
+        nextRequest({
+          body: { hasCompanyRegistrationNumber: 'false' },
+          session: {
+            pageData: {
+              organisationDetails: {
+                organisationName: 'Test Organisation',
+              },
+            },
+          },
+        })
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
+      })
+    })
+
+    describe('when no selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {},
+          session: {
             organisationDetails: {
               organisationName: 'Test Organisation',
             },
           },
-        },
+        })
       })
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-        )
-      )
+      it('should not redirect', async () => {
+        await call('post')
+        sinon.assert.notCalled(res.redirect)
+      })
+      it('should re-render the has company registration page with the backLink', async () => {
+        await call('post')
+        const expectedContext = {
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE_PATH, expectedContext)
+      })
+      it('should show the summary error', async () => {
+        await call('post')
+        const expectedContext = {
+          errors: { summary: [{ text: 'You must make a selection', href: '#has-company-registration-number' }] },
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE_PATH, expectedContext)
+      })
     })
   })
 })

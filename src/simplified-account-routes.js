@@ -1095,7 +1095,10 @@ simplifiedAccount.post(
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.upload.post
+  [
+    upload.single(GOV_ENTITY_DOC_FORM_FIELD_NAME),
+    serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.upload.post,
+  ]
 )
 
 simplifiedAccount.get(
