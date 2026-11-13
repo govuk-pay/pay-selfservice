@@ -160,4 +160,65 @@ describe('post', () => {
       )
     )
   })
+
+  describe('with an invalid VAT registration number', () => {
+    const invalidBody = { vatRegistrationNumber: 'invalid-vat-number' }
+    const organisationDetails = { organisationName: 'Test Organisation' }
+
+
+    it('should show the error and the submitted value', async () => {
+      nextRequest({ body: invalidBody, session: { pageData: { organisationDetails } } })
+      await call('post')
+
+      mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
+      sinon.assert.match(mockResponse.firstCall.lastArg, {
+        errors: {
+          summary: [
+            {
+              text: 'Enter a VAT registration number',
+              href: '#vat-registration-number',
+            },
+          ],
+          formErrors: {
+            vatRegistrationNumber: 'Enter a real VAT registration number',
+          },
+        },
+        vatRegistrationNumber: 'INVALID-VAT-NUMBER',
+      })
+    })
+
+    it('should set the backLink to organisation details when there is no company registration number', async () => {
+      nextRequest({
+        body: invalidBody,
+        session: { pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'false' } } },
+      })
+      await call('post')
+
+      sinon.assert.match(mockResponse.firstCall.lastArg, {
+        backLink: formatServiceAndAccountPathsFor(
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+        ),
+      })
+    })
+
+    it('should set the backLink to company registration number when there is a company registration number', async () => {
+      nextRequest({
+        body: invalidBody,
+        session: { pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'true' } } },
+      })
+      await call('post')
+
+      sinon.assert.match(mockResponse.firstCall.lastArg, {
+        backLink: formatServiceAndAccountPathsFor(
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+        ),
+      })
+    })
+  })
 })
