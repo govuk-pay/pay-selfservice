@@ -652,6 +652,37 @@ function formatDateInputs(dobDay: string, dobMonth: string, dobYear: string): st
   return `${dobYear}-${dobMonth?.padStart(2, '0')}-${dobDay?.padStart(2, '0')}`
 }
 
+interface FinanceDetails {
+  annualTurnover: string
+  employeeCount: string
+  financeDay: string
+  financeMonth: string
+  financeYear: string
+}
+
+async function createFinanceOrgDetails(session: FinanceDetails, organisationLegalEntityId: string) {
+  const legalEntity = await AdyenLEMClient.getLegalEntity(organisationLegalEntityId)
+
+  // legalName and organisation address are required fields for updating the organization, so we use exisiting values or defaults
+  // They should be set when the organisation is created in the previous task.
+  const organizationUpdate = {
+    organization: {
+      legalName: legalEntity?.organization?.legalName ?? '',
+      registeredAddress: legalEntity?.organization?.registeredAddress ?? { country: 'GB' },
+      financialReports: [
+        {
+          annualTurnover: session.annualTurnover,
+          employeeCount: session.employeeCount,
+          currencyOfFinancialData: 'GBP',
+          dateOfFinancialData: formatDateInputs(session.financeDay, session.financeMonth, session.financeYear),
+        },
+      ],
+    },
+  }
+
+  await AdyenLEMClient.updateLegalEntity(organisationLegalEntityId, organizationUpdate)
+}
+
 export {
   setAdyenStoreId,
   createOrganisation,
@@ -664,4 +695,5 @@ export {
   getOrganisationDetailsSummary,
   getAccountHolder,
   isAccountHolderVerified,
+  createFinanceOrgDetails,
 }

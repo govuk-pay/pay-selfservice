@@ -14,7 +14,7 @@ const SERVICE_EXTERNAL_ID = 'service456def'
 const LIVE_ACCOUNT_TYPE = 'live'
 const GATEWAY_ACCOUNT_ID = 12
 const ADYEN_CREDENTIAL_EXTERNAL_ID = 'adyen-credential-123-abc'
-const BALANCE_ACCOUNT_ID = 'BA-456'
+const ORGANISATION_LEGAL_ENTITY_ID = 'LE_ORG_123'
 
 const FINANCE_ORG_DETAILS_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/finance-org-details`
 const TASK_LIST_PATH = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/switch-psp/switch-to-adyen`
@@ -26,7 +26,7 @@ const gatewayAccountFixture = GatewayAccountFixture.forSwitchingPsp(
   [
     {
       externalId: ADYEN_CREDENTIAL_EXTERNAL_ID,
-      credentials: CredentialFixture.forAdyen({ balanceAccountId: BALANCE_ACCOUNT_ID }),
+      credentials: CredentialFixture.forAdyen({ legalEntityId: ORGANISATION_LEGAL_ENTITY_ID }),
     },
   ],
   {
@@ -58,19 +58,17 @@ const setStubs = (additionalStubs: object[] = []) => {
       ADYEN_CREDENTIAL_EXTERNAL_ID,
       adyenAccountSetup.toAdyenAccountSetupData().tasks
     ).success(),
-    GatewayAccountStubs.patchAdyenAccountTask(
-      SERVICE_EXTERNAL_ID,
-      LIVE_ACCOUNT_TYPE,
-      ADYEN_CREDENTIAL_EXTERNAL_ID,
-      'bank_details'
-    ).success(),
-    AdyenStubs.createTransferInstrument().success({ id: 'transfer-123' }),
-    AdyenStubs.createSweep(BALANCE_ACCOUNT_ID).success({ id: 'sweep-456' }),
+    // AdyenStubs.createLegalEntity().success({ id: 'LE_PERSON_456' }),
+    AdyenStubs.getLegalEntity(ORGANISATION_LEGAL_ENTITY_ID).success({
+      id: ORGANISATION_LEGAL_ENTITY_ID,
+      entityAssociations: [],
+    }),
+    AdyenStubs.updateLegalEntity(ORGANISATION_LEGAL_ENTITY_ID).success({ id: ORGANISATION_LEGAL_ENTITY_ID }),
     ...additionalStubs,
   ])
 }
 
-describe(`Organisation's bank details`, () => {
+describe(`Organisation's finance details`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
