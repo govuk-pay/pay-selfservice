@@ -175,15 +175,15 @@ describe('post', () => {
         errors: {
           summary: [
             {
-              text: 'Enter a VAT registration number',
+              text: 'Enter a valid VAT registration number',
               href: '#vat-registration-number',
             },
           ],
           formErrors: {
-            vatRegistrationNumber: 'Enter a real VAT registration number',
+            vatRegistrationNumber: 'Enter a valid VAT registration number',
           },
         },
-        vatRegistrationNumber: 'INVALID-VAT-NUMBER',
+        vatRegistrationNumber: 'invalid-vat-number',
       })
     })
 
