@@ -3,13 +3,21 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { OrganisationDetailsSession, VatRegistrationBody } from './constants'
-import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
+import { ADYEN_VAT_REGISTRATION_NUMBER_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-vat-registration-number.schema'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
 
+function getBackLink(req: ServiceRequest<unknown>, currentSession: OrganisationDetailsSession) {
+  const switchingCredentialId = req.account.getSwitchingCredential().externalId
+  const backPath =
+    currentSession.hasCompanyRegistrationNumber === 'true'
+      ? paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration
+      : paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index
+
+  return formatServiceAndAccountPathsFor(backPath, req.service.externalId, req.account.type, switchingCredentialId)
+}
+
 function get(req: ServiceRequest, res: ServiceResponse) {
-  const { account } = req
-  const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
 
   if (currentSession.isEmpty()) {
@@ -22,24 +30,9 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     )
   }
 
-  const backLink =
-    currentSession.hasCompanyRegistrationNumber === 'true'
-      ? formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-          req.service.externalId,
-          req.account.type,
-          switchingCredentialId
-        )
-      : formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
-          req.service.externalId,
-          req.account.type,
-          switchingCredentialId
-        )
-
   return response(req, res, 'simplified-account/settings/adyen-details/vat-registration-number', {
     vatRegistrationNumber: currentSession.vatRegistrationNumber ?? '',
-    backLink,
+    backLink: getBackLink(req, currentSession),
   })
 }
 
@@ -48,9 +41,9 @@ async function post(req: ServiceRequest<VatRegistrationBody>, res: ServiceRespon
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
 
-  const validations = [adyenDetailsSchema.vatRegistrationNumber.validate]
-
-  await Promise.all(validations.map((validation) => validation.run(req)))
+  for (const validation of ADYEN_VAT_REGISTRATION_NUMBER_VALIDATIONS) {
+    await validation.run(req)
+  }
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -62,12 +55,7 @@ async function post(req: ServiceRequest<VatRegistrationBody>, res: ServiceRespon
         formErrors: formattedErrors.formErrors,
       },
       vatRegistrationNumber: req.body.vatRegistrationNumber,
-      backLink: formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      ),
+      backLink: getBackLink(req, currentSession),
     })
   }
 
