@@ -6,7 +6,7 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import paths from '@root/paths'
 import { PaymentLinkCreationSession, FROM_REVIEW_QUERY_PARAM } from './constants'
 import { slugifyString } from '@utils/simplified-account/format/slugify-string'
-import { paymentLinkSchema } from '@utils/simplified-account/validation/payment-link.schema'
+import { paymentLinkSchema } from '@utils/simplified-account/validation/payments-links/payment-link.schema'
 import GatewayAccountType from '@models/gateway-account/gateway-account-type'
 import { getProductByServiceAndProductPath } from '@services/products.service'
 

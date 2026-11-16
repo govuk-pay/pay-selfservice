@@ -4,45 +4,50 @@ const paths = require('@root/paths')
 const _ = require('lodash')
 const { validationResult } = require('express-validator')
 const { response } = require('@utils/response')
-const { stripePersonSchema } = require('@utils/simplified-account/validation/stripe-person.schema')
-const { FORM_STATE_KEY } = require('@controllers/simplified-account/settings/stripe-details/responsible-person/constants')
+const { stripePersonSchema } = require('@utils/simplified-account/validation/stripe-details/stripe-person.schema')
+const {
+  FORM_STATE_KEY,
+} = require('@controllers/simplified-account/settings/stripe-details/responsible-person/constants')
 const StripeTaskIdentifiers = require('@models/task-workflows/task-identifiers/stripe-task-identifiers')
 
-async function get (req, res) {
+async function get(req, res) {
   const { name, dob } = _.get(req, FORM_STATE_KEY, {})
   return response(req, res, 'simplified-account/settings/stripe-details/responsible-person/index', {
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.index, req.service.externalId, req.account.type),
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.index,
+      req.service.externalId,
+      req.account.type
+    ),
     name,
-    dob
+    dob,
   })
 }
 
-async function post (req, res) {
+async function post(req, res) {
   const validations = [
     stripePersonSchema.name.firstName.validate,
     stripePersonSchema.name.lastName.validate,
     stripePersonSchema.dob.validate,
     stripePersonSchema.dob.dobDay.validate,
     stripePersonSchema.dob.dobMonth.validate,
-    stripePersonSchema.dob.dobYear.validate
+    stripePersonSchema.dob.dobYear.validate,
   ]
   for (const validation of validations) {
     await validation.run(req)
   }
-  const errors = validationResult(req)
-    .formatWith(({ msg, path, type }) => {
-      return {
-        msg,
-        path,
-        type,
-        ...(path === 'dob' ? { pathOverride: 'dobDay' } : {}) // ensure the error summary points at the first field in the dob component if the dob error is generic to all fields in said component
-      }
-    })
+  const errors = validationResult(req).formatWith(({ msg, path, type }) => {
+    return {
+      msg,
+      path,
+      type,
+      ...(path === 'dob' ? { pathOverride: 'dobDay' } : {}), // ensure the error summary points at the first field in the dob component if the dob error is generic to all fields in said component
+    }
+  })
   if (!errors.isEmpty()) {
     const formattedErrors = formatValidationErrors(errors)
     return postErrorResponse(req, res, {
       summary: formattedErrors.errorSummary,
-      formErrors: formattedErrors.formErrors
+      formErrors: formattedErrors.formErrors,
     })
   }
   const { firstName, lastName, dobDay, dobMonth, dobYear } = req.body
@@ -50,9 +55,15 @@ async function post (req, res) {
   _.set(req, FORM_STATE_KEY, {
     ...existingFormState,
     name: { firstName, lastName },
-    dob: { dobDay, dobMonth, dobYear }
+    dob: { dobDay, dobMonth, dobYear },
   })
-  res.redirect(formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.homeAddress, req.service.externalId, req.account.type))
+  res.redirect(
+    formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.homeAddress,
+      req.service.externalId,
+      req.account.type
+    )
+  )
 }
 
 const postErrorResponse = (req, res, errors) => {
@@ -62,7 +73,11 @@ const postErrorResponse = (req, res, errors) => {
     errors,
     name: { firstName, lastName },
     dob: { dobDay, dobMonth, dobYear },
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.index, req.service.externalId, req.account.type)
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.index,
+      req.service.externalId,
+      req.account.type
+    ),
   })
 }
 

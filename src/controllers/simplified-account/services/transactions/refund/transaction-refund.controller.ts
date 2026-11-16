@@ -5,7 +5,7 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import paths from '@root/paths'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
-import { transactionRefundSchema } from '@utils/simplified-account/validation/transaction-refund.schema'
+import { transactionRefundSchema } from '@utils/simplified-account/validation/transactions/transaction-refund.schema'
 import { submitRefund } from '@services/charge.service'
 import { ChargeRefundRequest } from '@models/charge/ChargeRefundRequest.class'
 import { safeConvertPoundsStringToPence } from '@utils/currency-formatter'

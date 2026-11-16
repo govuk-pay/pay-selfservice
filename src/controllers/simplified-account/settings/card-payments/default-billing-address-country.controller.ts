@@ -5,7 +5,7 @@ import { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import { updateDefaultBillingAddressCountry } from '@services/card-payments.service'
-import { cardPaymentsSchema } from '@utils/simplified-account/validation/card-payments.schema'
+import { cardPaymentsSchema } from '@utils/simplified-account/validation/settings/card-payments.schema'
 import { GB_COUNTRY_CODE } from '@controllers/simplified-account/settings/card-payments/constants'
 
 function get(req: ServiceRequest, res: ServiceResponse) {

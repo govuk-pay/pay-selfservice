@@ -4,7 +4,7 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
-import { cardPaymentsSchema } from '@utils/simplified-account/validation/card-payments.schema'
+import { cardPaymentsSchema } from '@utils/simplified-account/validation/settings/card-payments.schema'
 import { updateAllowGooglePay } from '@services/card-payments.service'
 import { WORLDPAY } from '@models/constants/payment-providers'
 import { updateGooglePayMerchantId } from '@services/worldpay-details.service'

@@ -4,7 +4,7 @@ import { getProductByGatewayAccountIdAndExternalId, updateProduct } from '@servi
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { ProductUpdateRequestBuilder } from '@models/products/ProductUpdateRequest.class'
-import { paymentLinkSchema } from '@utils/simplified-account/validation/payment-link.schema'
+import { paymentLinkSchema } from '@utils/simplified-account/validation/payments-links/payment-link.schema'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import { ServiceRequestParams } from '@utils/types/express/ServiceRequest'

@@ -8,7 +8,7 @@ import _ from 'lodash'
 import {
   ORGANISATION_DETAILS_VALIDATIONS,
   organisationDetailsSchema,
-} from '@utils/simplified-account/validation/organisation-details.schema'
+} from '@utils/simplified-account/validation/settings/organisation-details.schema'
 import { ServiceUpdateRequest } from '@models/service/ServiceUpdateRequest.class'
 import { updateService } from '@services/service.service'
 import { utils } from '@govuk-pay/pay-js-commons'

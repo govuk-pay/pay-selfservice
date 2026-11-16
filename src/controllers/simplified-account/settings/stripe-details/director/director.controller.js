@@ -1,36 +1,39 @@
 const { response } = require('@utils/response')
 const { formatSimplifiedAccountPathsFor, formatValidationErrors } = require('@utils/simplified-account/format')
-const { directorValidations } = require('@utils/simplified-account/validation/stripe-person.schema')
+const { directorValidations } = require('@utils/simplified-account/validation/stripe-details/stripe-person.schema')
 const { validationResult } = require('express-validator')
 const { updateStripeDetailsDirector } = require('@services/stripe-details.service')
 const { checkTaskCompletion } = require('@middleware/simplified-account')
 const paths = require('@root/paths')
 const StripeTaskIdentifiers = require('@models/task-workflows/task-identifiers/stripe-task-identifiers')
 
-async function get (req, res) {
+async function get(req, res) {
   return response(req, res, 'simplified-account/settings/stripe-details/director/index', {
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.index, req.service.externalId, req.account.type)
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.index,
+      req.service.externalId,
+      req.account.type
+    ),
   })
 }
 
-async function post (req, res, next) {
+async function post(req, res, next) {
   for (const validation of directorValidations) {
     await validation.run(req)
   }
-  const errors = validationResult(req)
-    .formatWith(({ msg, path, type }) => {
-      return {
-        msg,
-        path,
-        type,
-        ...(path === 'dob' ? { pathOverride: 'dobDay' } : {}) // ensure the error summary points at the first field in the dob component if the dob error is generic to all fields in said component
-      }
-    })
+  const errors = validationResult(req).formatWith(({ msg, path, type }) => {
+    return {
+      msg,
+      path,
+      type,
+      ...(path === 'dob' ? { pathOverride: 'dobDay' } : {}), // ensure the error summary points at the first field in the dob component if the dob error is generic to all fields in said component
+    }
+  })
   if (!errors.isEmpty()) {
     const formattedErrors = formatValidationErrors(errors)
     return postErrorResponse(req, res, {
       summary: formattedErrors.errorSummary,
-      formErrors: formattedErrors.formErrors
+      formErrors: formattedErrors.formErrors,
     })
   }
 
@@ -40,17 +43,27 @@ async function post (req, res, next) {
     dob_day: Number(req.body.dobDay),
     dob_month: Number(req.body.dobMonth),
     dob_year: Number(req.body.dobYear),
-    email: req.body.workEmail.trim()
+    email: req.body.workEmail.trim(),
   }
 
   updateStripeDetailsDirector(req.service, req.account, director)
     .then(() => {
-      res.redirect(formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.index, req.service.externalId, req.account.type))
+      res.redirect(
+        formatSimplifiedAccountPathsFor(
+          paths.simplifiedAccount.settings.stripeDetails.index,
+          req.service.externalId,
+          req.account.type
+        )
+      )
     })
     .catch((err) => {
       if (err.type === 'StripeInvalidRequestError') {
         return postErrorResponse(req, res, {
-          summary: [{ text: 'There is a problem with the information you’ve submitted. We’ve not been able to save your details. Email govuk-pay-support@digital.cabinet-office.gov.uk for help.' }]
+          summary: [
+            {
+              text: 'There is a problem with the information you’ve submitted. We’ve not been able to save your details. Email govuk-pay-support@digital.cabinet-office.gov.uk for help.',
+            },
+          ],
         })
       }
       next(err)
@@ -62,19 +75,23 @@ const postErrorResponse = (req, res, errors) => {
     errors,
     name: {
       firstName: req.body.firstName,
-      lastName: req.body.lastName
+      lastName: req.body.lastName,
     },
     dob: {
       dobDay: req.body.dobDay,
       dobMonth: req.body.dobMonth,
-      dobYear: req.body.dobYear
+      dobYear: req.body.dobYear,
     },
     workEmail: req.body.workEmail,
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.index, req.service.externalId, req.account.type)
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.index,
+      req.service.externalId,
+      req.account.type
+    ),
   })
 }
 
 module.exports = {
   get: [checkTaskCompletion(StripeTaskIdentifiers.DIRECTOR.connectorName), get],
-  post: [checkTaskCompletion(StripeTaskIdentifiers.DIRECTOR.connectorName), post]
+  post: [checkTaskCompletion(StripeTaskIdentifiers.DIRECTOR.connectorName), post],
 }

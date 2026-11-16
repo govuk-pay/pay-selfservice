@@ -5,7 +5,7 @@ import { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { setEmailCollectionModeByServiceIdAndAccountType } from '@services/email.service'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
-import { emailNotificationsSchema } from '@utils/simplified-account/validation/email-notifications.schema'
+import { emailNotificationsSchema } from '@utils/simplified-account/validation/settings/email-notifications.schema'
 
 const emailCollectionModes = {
   mandatory: 'MANDATORY',

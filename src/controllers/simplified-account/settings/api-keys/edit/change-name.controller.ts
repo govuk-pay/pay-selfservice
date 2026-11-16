@@ -5,7 +5,7 @@ import { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import { changeTokenName, getTokenByTokenLink } from '@services/tokens.service'
-import { apiKeySchema } from '@utils/simplified-account/validation/api-key.schema'
+import { apiKeySchema } from '@utils/simplified-account/validation/settings/api-key.schema'
 import { ServiceRequestParams } from '@utils/types/express/ServiceRequest'
 
 interface Params extends ServiceRequestParams {
