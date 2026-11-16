@@ -1,5 +1,5 @@
 import { body } from 'express-validator'
-import { demoPaymentSchema } from '@utils/simplified-account/validation/demo-payment.schema'
+import { demoPaymentSchema } from '@utils/simplified-account/validation/demo-payment/demo-payment.schema'
 import { getProductByServiceAndProductPath } from '@services/products.service'
 import { slugifyString } from '@utils/simplified-account/format/slugify-string'
 import { PaymentLinkCreationSession } from '@controllers/simplified-account/services/payment-links/create/constants'

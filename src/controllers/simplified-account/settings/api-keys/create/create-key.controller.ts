@@ -8,7 +8,7 @@ import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import _ from 'lodash'
 import { FORM_STATE_KEY } from '@controllers/simplified-account/settings/api-keys/create/constants'
-import { apiKeySchema } from '@utils/simplified-account/validation/api-key.schema'
+import { apiKeySchema } from '@utils/simplified-account/validation/settings/api-key.schema'
 import { CreateTokenRequest } from '@models/public-auth/CreateTokenRequest.class'
 import TokenUsageType from '@models/public-auth/token-usage-type'
 

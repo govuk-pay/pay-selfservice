@@ -6,7 +6,7 @@ import lodash from 'lodash'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import { PAYMENT_DEFAULTS, SESSION_KEY } from '@controllers/simplified-account/services/make-a-demo-payment/constants'
-import { demoPaymentSchema } from '@utils/simplified-account/validation/demo-payment.schema'
+import { demoPaymentSchema } from '@utils/simplified-account/validation/demo-payment/demo-payment.schema'
 import { penceToPounds, safeConvertPoundsStringToPence } from '@utils/currency-formatter'
 
 const DEMO_PAYMENT_INDEX = paths.simplifiedAccount.demoPayment.index

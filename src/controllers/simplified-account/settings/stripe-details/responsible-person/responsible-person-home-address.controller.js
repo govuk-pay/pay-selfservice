@@ -3,25 +3,31 @@ const { checkTaskCompletion } = require('@middleware/simplified-account')
 const paths = require('@root/paths')
 const _ = require('lodash')
 const { response } = require('@utils/response')
-const { stripePersonSchema } = require('@utils/simplified-account/validation/stripe-person.schema')
+const { stripePersonSchema } = require('@utils/simplified-account/validation/stripe-details/stripe-person.schema')
 const { validationResult } = require('express-validator')
-const { FORM_STATE_KEY } = require('@controllers/simplified-account/settings/stripe-details/responsible-person/constants')
+const {
+  FORM_STATE_KEY,
+} = require('@controllers/simplified-account/settings/stripe-details/responsible-person/constants')
 const StripeTaskIdentifiers = require('@models/task-workflows/task-identifiers/stripe-task-identifiers')
 
-async function get (req, res) {
+async function get(req, res) {
   const { address } = _.get(req, FORM_STATE_KEY, {})
   return response(req, res, 'simplified-account/settings/stripe-details/responsible-person/home-address', {
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.index, req.service.externalId, req.account.type),
-    address
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.index,
+      req.service.externalId,
+      req.account.type
+    ),
+    address,
   })
 }
 
-async function post (req, res) {
+async function post(req, res) {
   const validations = [
     stripePersonSchema.address.homeAddressLine1.validate,
     stripePersonSchema.address.homeAddressLine2.validate,
     stripePersonSchema.address.homeAddressCity.validate,
-    stripePersonSchema.address.homeAddressPostcode.validate
+    stripePersonSchema.address.homeAddressPostcode.validate,
   ]
   for (const validation of validations) {
     await validation.run(req)
@@ -31,7 +37,7 @@ async function post (req, res) {
     const formattedErrors = formatValidationErrors(errors)
     return postErrorResponse(req, res, {
       summary: formattedErrors.errorSummary,
-      formErrors: formattedErrors.formErrors
+      formErrors: formattedErrors.formErrors,
     })
   }
 
@@ -43,10 +49,16 @@ async function post (req, res) {
       homeAddressLine1,
       homeAddressLine2: homeAddressLine2.trim(),
       homeAddressCity,
-      homeAddressPostcode
-    }
+      homeAddressPostcode,
+    },
   })
-  res.redirect(formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.contactDetails, req.service.externalId, req.account.type))
+  res.redirect(
+    formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.contactDetails,
+      req.service.externalId,
+      req.account.type
+    )
+  )
 }
 
 const postErrorResponse = (req, res, errors) => {
@@ -58,13 +70,17 @@ const postErrorResponse = (req, res, errors) => {
       homeAddressLine1,
       homeAddressLine2,
       homeAddressCity,
-      homeAddressPostcode
+      homeAddressPostcode,
     },
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.index, req.service.externalId, req.account.type)
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.stripeDetails.responsiblePerson.index,
+      req.service.externalId,
+      req.account.type
+    ),
   })
 }
 
 module.exports = {
   get: [checkTaskCompletion(StripeTaskIdentifiers.RES_PERSON.connectorName), get],
-  post: [checkTaskCompletion(StripeTaskIdentifiers.RES_PERSON.connectorName), post]
+  post: [checkTaskCompletion(StripeTaskIdentifiers.RES_PERSON.connectorName), post],
 }

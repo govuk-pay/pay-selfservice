@@ -4,7 +4,7 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
-import { emailNotificationsSchema } from '@utils/simplified-account/validation/email-notifications.schema'
+import { emailNotificationsSchema } from '@utils/simplified-account/validation/settings/email-notifications.schema'
 import { setRefundEmailEnabledByServiceIdAndAccountType } from '@services/email.service'
 import logger from '@utils/logger'
 const LOGGER = logger(__filename)
