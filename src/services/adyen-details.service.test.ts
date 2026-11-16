@@ -1,7 +1,10 @@
 import sinon from 'sinon'
 import proxyquire from 'proxyquire'
 import { expect } from 'chai'
-import type { OrganisationDetailsSession } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
+import {
+  GovernmentActivity,
+  OrganisationDetailsSession,
+} from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
 import { ResponsiblePersonSession } from '@controllers/simplified-account/settings/adyen-details/responsible-person/constants'
 import { ServiceDirectorSession } from '@controllers/simplified-account/settings/adyen-details/service-director/constants'
 import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
@@ -66,7 +69,11 @@ describe('Adyen details service', () => {
       companyRegistrationNumber: '12345678',
       vatRegistrationNumber: 'GB123456789',
       email: 'test@gov.uk',
+      governmentActivity: 'general-local',
     } as OrganisationDetailsSession
+
+    const sessionWith = (overrides: Partial<OrganisationDetailsSession>) =>
+      new OrganisationDetailsSession({ ...fullOrganisationSession, ...overrides })
 
     const serviceFixture = new ServiceFixture({
       name: 'Test Service',
@@ -100,7 +107,6 @@ describe('Adyen details service', () => {
     it('should create Adyen legal entity for an organisation', async () => {
       const result = await service.createOrganisation(
         fullOrganisationSession,
-        'general-local',
         serviceFixture.toService(),
         'live',
         'credential_id',
@@ -137,7 +143,6 @@ describe('Adyen details service', () => {
     it('should create Adyen account holder for the organisation legal entity', async () => {
       const result = await service.createOrganisation(
         fullOrganisationSession,
-        'general-local',
         serviceFixture.toService(),
         'live',
         'credential_id',
@@ -156,7 +161,6 @@ describe('Adyen details service', () => {
     it('should create Adyen balance account for the organisation account holder', async () => {
       const result = await service.createOrganisation(
         fullOrganisationSession,
-        'general-local',
         serviceFixture.toService(),
         'live',
         'credential_id',
@@ -182,7 +186,6 @@ describe('Adyen details service', () => {
       await expect(
         service.createOrganisation(
           fullOrganisationSession,
-          'general-local',
           serviceFixture.toService(),
           'live',
           'credential_id',
@@ -199,7 +202,6 @@ describe('Adyen details service', () => {
       await expect(
         service.createOrganisation(
           fullOrganisationSession,
-          'general-local',
           serviceFixture.toService(),
           'live',
           'credential_id',
@@ -212,7 +214,6 @@ describe('Adyen details service', () => {
     it('should persist the legal entity id', async () => {
       await service.createOrganisation(
         fullOrganisationSession,
-        'general-local',
         serviceFixture.toService(),
         'live',
         'credential_id',
@@ -240,7 +241,6 @@ describe('Adyen details service', () => {
     it('should create Adyen business line for the organisation legal entity', async () => {
       await service.createOrganisation(
         fullOrganisationSession,
-        'general-local',
         serviceFixture.toService(),
         'live',
         'credential_id',
@@ -261,6 +261,25 @@ describe('Adyen details service', () => {
       )
     })
 
+    const CASES: [GovernmentActivity, string][] = [
+      ['general-local', '921'],
+      ['police-safety', '92219'],
+      ['everything-else', '92B'],
+    ]
+
+    CASES.forEach(([governmentActivity, industryCode]) => {
+      it(`should map ${governmentActivity} to industry code ${industryCode}`, async () => {
+        await service.createOrganisation(
+          sessionWith({ governmentActivity }),
+          serviceFixture.toService(),
+          'live',
+          'credential_id',
+          'user_id'
+        )
+        expect(legalEntityClientMock.createBusinessLine.firstCall.args[0].industryCode).to.equal(industryCode)
+      })
+    })
+
     it('should throw an error if the service does not have URL', async () => {
       const serviceFixtureWithoutUrl = new ServiceFixture({
         name: 'Test Service',
@@ -276,7 +295,6 @@ describe('Adyen details service', () => {
       try {
         await service.createOrganisation(
           fullOrganisationSession,
-          'general-local',
           serviceFixtureWithoutUrl.toService(),
           'live',
           'credential_id',
@@ -291,28 +309,25 @@ describe('Adyen details service', () => {
       })
     })
 
-    it('should map police-safety to industry code 92219', async () => {
-      await service.createOrganisation(
-        fullOrganisationSession,
-        'police-safety',
-        serviceFixture.toService(),
-        'live',
-        'credential_id',
-        'user_id'
-      )
-      expect(legalEntityClientMock.createBusinessLine.firstCall.args[0].industryCode).to.equal('92219')
-    })
+    it('should throw an error if the governmentActivity is missing', async () => {
+      const noGovernmentActivitySession = sessionWith({ governmentActivity: undefined })
 
-    it('should map everything-else to industry code 92B', async () => {
-      await service.createOrganisation(
-        fullOrganisationSession,
-        'everything-else',
-        serviceFixture.toService(),
-        'live',
-        'credential_id',
-        'user_id'
-      )
-      expect(legalEntityClientMock.createBusinessLine.firstCall.args[0].industryCode).to.equal('92B')
+      let error: unknown
+      try {
+        await service.createOrganisation(
+          noGovernmentActivitySession,
+          serviceFixture.toService(),
+          'live',
+          'credential_id',
+          'user_id'
+        )
+      } catch (err) {
+        error = err
+      }
+
+      sinon.assert.match(error, {
+        message: `No government activity set in session [service_external_id: service_id]`,
+      })
     })
   })
 
