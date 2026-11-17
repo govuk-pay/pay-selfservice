@@ -6,6 +6,7 @@ import { CompanyRegistrationBody, OrganisationDetailsSession } from '../constant
 import { check, validationResult } from 'express-validator'
 import { GOV_ENTITY_DOC_FORM_FIELD_NAME } from '@controllers/simplified-account/settings/stripe-details/government-entity-document/constants'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
+import { submitOrganisationDetails } from './utils'
 
 function get(req: ServiceRequest, res: ServiceResponse) {
   const { account } = req
@@ -92,6 +93,10 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
       }
     )
   }
+
+  await submitOrganisationDetails(req.service, req.account, req.user.externalId, completeSession, switchingCredentialId)
+
+  OrganisationDetailsSession.clear(req)
 
   return res.redirect(
     formatServiceAndAccountPathsFor(

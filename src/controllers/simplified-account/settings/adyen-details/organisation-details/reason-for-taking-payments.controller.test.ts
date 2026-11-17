@@ -125,12 +125,6 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
         },
       })
     })
-    // it('should not complete the task, create an organisation or redirect', async () => {
-    //   await call('post')
-    //   sinon.assert.notCalled(markTaskAsComplete)
-    //   sinon.assert.notCalled(createOrganisation)
-    //   sinon.assert.notCalled(res.redirect)
-    // })
     it('should re-render the taking payments for page with the backLink', async () => {
       await call('post')
       const expectedContext = { backLink: BACK_LINK }
@@ -143,10 +137,5 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
       }
       sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
     })
-
-    // it('should not clear the session organisation details', async () => {
-    //   const thisCall = await call('post')
-    //   expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
-    // })
   })
 })

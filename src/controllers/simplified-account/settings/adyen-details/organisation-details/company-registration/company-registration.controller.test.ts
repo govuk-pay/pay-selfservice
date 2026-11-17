@@ -12,6 +12,7 @@ import { OrganisationDetailsSession } from '../constants'
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
 const TELEPHONE_NUMBER = '01234 567890'
+
 const serviceFixture = new ServiceFixture({
   externalId: SERVICE_EXTERNAL_ID,
   merchantDetails: new MerchantDetailsFixture({
@@ -22,6 +23,7 @@ const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.ST
   type: 'live',
 }).toGatewayAccount()
 const USER = UserFixture.asServiceAdmin([serviceFixture], { externalId: 'user123abc' }).toUser()
+const CREDENTIAL_ID = GATEWAY_ACCOUNT.getSwitchingCredential().externalId
 
 const mockResponse = sinon.stub()
 
@@ -97,7 +99,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+            CREDENTIAL_ID
           ),
         })
       })
@@ -109,39 +111,40 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       ...VALID_SESSION,
       companyRegistrationNumber: '01234567',
     })
-    const CREDENTIAL_ID = GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-    beforeEach(() => {
-      nextRequest({
-        body: { companyRegistrationNumber: '01234567' },
-        session: {
-          otherSessionData: 'keep',
-          pageData: {
-            organisationDetails: VALID_SESSION,
+    describe('when a valid company registration number is provided', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: { companyRegistrationNumber: '01234567' },
+          session: {
+            otherSessionData: 'keep',
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
           },
-        },
+        })
       })
-    })
 
-    it('should submit organisation details and redirect to the task list page', async () => {
-      await call('post')
+      it('should submit organisation details and redirect to the task list page', async () => {
+        await call('post')
 
-      sinon.assert.calledOnceWithExactly(
-        submitOrganisationDetails,
-        serviceFixture.toService(),
-        GATEWAY_ACCOUNT,
-        USER.externalId,
-        UPDATED_SESSION,
-        CREDENTIAL_ID
-      )
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
+        sinon.assert.calledOnceWithExactly(
+          submitOrganisationDetails,
+          serviceFixture.toService(),
+          GATEWAY_ACCOUNT,
+          USER.externalId,
+          UPDATED_SESSION,
           CREDENTIAL_ID
         )
-      )
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            CREDENTIAL_ID
+          )
+        )
+      })
     })
   })
 })
