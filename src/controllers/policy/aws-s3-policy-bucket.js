@@ -10,10 +10,11 @@ const s3Client = new S3Client()
 const bucketName = process.env.AWS_S3_POLICY_DOCUMENTS_BUCKET_NAME
 const environmentVariablesSet =
   bucketName &&
-  (process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI || (process.env.AWS_ACCESS_KEY && process.env.AWS_SECRET_ACCESS_KEY))
+  (process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI ||
+    (process.env.AWS_ACCESS_KEY && process.env.AWS_SECRET_ACCESS_KEY))
 
 const s3BucketConfig = {
-  Bucket: bucketName
+  Bucket: bucketName,
 }
 
 if (!environmentVariablesSet) {
@@ -33,15 +34,14 @@ const generatePrivateLink = async function generatePrivateLink(documentConfig) {
     Key,
     ResponseContentDisposition,
     // signed URL expiration in seconds
-    Expires: 60 * 60
+    Expires: 60 * 60,
   }
   const command = new GetObjectCommand(params)
-  return getSignedUrl(s3Client, command, { expiresIn: 60 * 60 })
-    .catch(error => {
-      throw new Error(`Policy documents storage error: ${error.message}`)
-    })
+  return getSignedUrl(s3Client, command, { expiresIn: 60 * 60 }).catch((error) => {
+    throw new Error(`Policy documents storage error: ${error.message}`)
+  })
 }
 
 module.exports = {
-  generatePrivateLink
+  generatePrivateLink,
 }
