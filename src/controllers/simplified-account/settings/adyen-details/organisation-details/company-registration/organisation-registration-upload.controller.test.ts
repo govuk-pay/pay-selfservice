@@ -32,7 +32,6 @@ const mockBucketService = {
 }
 
 const { req, res, call, nextRequest } = new ControllerTestBuilder(
-
   '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/organisation-registration-upload.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)

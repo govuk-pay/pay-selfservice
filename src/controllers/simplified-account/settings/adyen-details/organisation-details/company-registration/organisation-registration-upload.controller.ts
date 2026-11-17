@@ -33,8 +33,6 @@ async function get(req: ServiceRequest, res: ServiceResponse, next: NextFunction
           req.account.type
         )
       )
-
-
     }
 
     return response(
