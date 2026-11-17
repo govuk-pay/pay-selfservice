@@ -16,7 +16,7 @@ export function getLegalEntity(legalEntityId: string) {
   const path = `/lem/v4/legalEntities/${legalEntityId}`
 
   return {
-    success: function (legalEntity: { id: string; entityAssociations?: object[] }) {
+    success: function (legalEntity: { id: string; entityAssociations?: object[]; organization?: object }) {
       return stubBuilder('GET', path, 200, {
         response: legalEntity,
       })
