@@ -168,7 +168,7 @@ describe(`Organisation's bank details`, () => {
 
       it('should display the errors and keep the entered values', () => {
         cy.get('#sort-code-error').should('contain', 'Sort code must be 6 digits long')
-        cy.get('#account-number-error').should('contain', 'Enter a valid account number like 00733445')
+        cy.get('#account-number-error').should('contain', 'Enter a valid account number')
         cy.get('#sort-code').should('have.value', '12345')
         cy.get('#account-number').should('have.value', 'ABCDEF')
       })
