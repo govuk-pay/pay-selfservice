@@ -120,6 +120,59 @@ describe(`Organisation's bank details`, () => {
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
+
+    describe('when the form is submitted empty', () => {
+      const expectedErrors = [
+        { field: '#sort-code', message: 'Enter a sort code' },
+        { field: '#account-number', message: 'Enter an account number' },
+      ]
+
+      beforeEach(() => {
+        setStubs()
+        cy.visit(BANK_DETAILS_PATH)
+        cy.get('#bank-details-submit').click()
+      })
+
+      it('should stay on the bank details page', () => {
+        cy.location('pathname').should('eq', BANK_DETAILS_PATH)
+        cy.a11yCheck()
+      })
+
+      it('should prefix the page title with "Error:"', () => {
+        cy.title().should('match', /^Error: Organisation’s bank details - Settings - /)
+      })
+
+      it('should display an error summary', () => {
+        cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
+        cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
+        expectedErrors.forEach(({ field, message }, index) => {
+          cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
+        })
+      })
+
+      it('should display an error for every field', () => {
+        expectedErrors.forEach(({ field, message }) => {
+          cy.get(`${field}-error`).should('be.visible').and('contain', message)
+        })
+      })
+    })
+
+    describe('when the form is submitted with invalid values', () => {
+      beforeEach(() => {
+        setStubs()
+        cy.visit(BANK_DETAILS_PATH)
+        cy.get('#sort-code').type('12345')
+        cy.get('#account-number').type('ABCDEF')
+        cy.get('#bank-details-submit').click()
+      })
+
+      it('should display the errors and keep the entered values', () => {
+        cy.get('#sort-code-error').should('contain', 'Sort code must be 6 digits long')
+        cy.get('#account-number-error').should('contain', 'Enter a valid account number like 00733445')
+        cy.get('#sort-code').should('have.value', '12345')
+        cy.get('#account-number').should('have.value', 'ABCDEF')
+      })
+    })
   })
 
   describe('for a service not migrating to Adyen', () => {
