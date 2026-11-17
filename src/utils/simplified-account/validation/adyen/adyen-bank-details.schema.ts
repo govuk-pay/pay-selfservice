@@ -30,7 +30,7 @@ const adyenBankDetailsSchema = {
       .withMessage(
         `Account number must be between ${ACCOUNT_NUMBER_MIN_LENGTH} and ${ACCOUNT_NUMBER_MAX_LENGTH} digits long`
       )
-      .bail()
+      .bail(),
   },
 }
 
