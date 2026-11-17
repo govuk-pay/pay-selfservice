@@ -4,9 +4,9 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import paths from '@root/paths'
 import { FROM_REVIEW_QUERY_PARAM, ResponsiblePersonSession } from './constants'
 import {
-  adyenResponsiblePersonSchema,
-  ResponsiblePersonDetailsBody,
-} from '@utils/simplified-account/validation/adyen/adyen-responsible-person.schema'
+  adyenResponsiblePersonPersonalDetailsSchema,
+  ResponsiblePersonPersonalDetailsBody,
+} from '@utils/simplified-account/validation/adyen/adyen-responsible-person-personal-details.schema'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '../../../../../utils/simplified-account/format/format-validation-errors'
 
@@ -49,15 +49,15 @@ function get(req: ServiceRequest, res: ServiceResponse) {
 }
 
 const validations = [
-  adyenResponsiblePersonSchema.details.firstName.validate,
-  adyenResponsiblePersonSchema.details.lastName.validate,
-  adyenResponsiblePersonSchema.details.dob.validate,
-  adyenResponsiblePersonSchema.details.dobDay.validate,
-  adyenResponsiblePersonSchema.details.dobMonth.validate,
-  adyenResponsiblePersonSchema.details.dobYear.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.details.firstName.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.details.lastName.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.details.dob.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.details.dobMonth.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.details.dobYear.validate,
 ]
 
-async function post(req: ServiceRequest<ResponsiblePersonDetailsBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<ResponsiblePersonPersonalDetailsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = ResponsiblePersonSession.extract(req)
