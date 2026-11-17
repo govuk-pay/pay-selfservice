@@ -24,16 +24,8 @@ const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.ST
 const USER = UserFixture.asServiceAdmin([serviceFixture], { externalId: 'user123abc' }).toUser()
 
 const mockResponse = sinon.stub()
-const createOrganisation = sinon.stub().resolves({
-  legalEntity: { id: 'LE123' },
-  businessLine: { id: 'BL123' },
-  accountHolder: { id: 'AH123' },
-  balanceAccount: { id: 'BA123' },
-})
-const createStore = sinon.stub().resolves({ id: 'ST123' })
-const getStripeStatementDescriptor = sinon.stub().resolves('TEST SERVICE')
-const markTaskAsComplete = sinon.stub().resolves()
-const setAdyenStoreId = sinon.stub().resolves()
+
+const submitOrganisationDetails = sinon.stub().resolves()
 
 const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration/company-registration-number'
 
@@ -46,9 +38,7 @@ const { res, call, nextRequest } = new ControllerTestBuilder(
   .withUser(USER)
   .withStubs({
     '@utils/response': { response: mockResponse },
-    '@services/adyen-details.service': { createOrganisation, createStore, setAdyenStoreId },
-    '@services/stripe-details.service': { getStripeStatementDescriptor },
-    '@services/adyen-setup.service': { markTaskAsComplete },
+    './utils': { submitOrganisationDetails },
   })
   .build()
 
@@ -119,6 +109,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       ...VALID_SESSION,
       companyRegistrationNumber: '01234567',
     })
+    const CREDENTIAL_ID = GATEWAY_ACCOUNT.getSwitchingCredential().externalId
     beforeEach(() => {
       nextRequest({
         body: { companyRegistrationNumber: '01234567' },
@@ -131,68 +122,26 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
       })
     })
 
-    it('should redirect to the task list page', async () => {
+    it('should submit organisation details and redirect to the task list page', async () => {
       await call('post')
+
+      sinon.assert.calledOnceWithExactly(
+        submitOrganisationDetails,
+        serviceFixture.toService(),
+        GATEWAY_ACCOUNT,
+        USER.externalId,
+        UPDATED_SESSION,
+        CREDENTIAL_ID
+      )
       sinon.assert.calledOnceWithExactly(
         res.redirect,
         formatServiceAndAccountPathsFor(
           paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
           SERVICE_EXTERNAL_ID,
           SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          CREDENTIAL_ID
         )
       )
-    })
-    it('should create Adyen legal entity and mark organisation details task as complete', async () => {
-      await call('post')
-
-      sinon.assert.calledOnceWithExactly(
-        createOrganisation,
-        UPDATED_SESSION,
-        serviceFixture.toService(),
-        GATEWAY_ACCOUNT.type,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        USER.externalId
-      )
-
-      sinon.assert.calledOnceWithExactly(
-        setAdyenStoreId,
-        SERVICE_EXTERNAL_ID,
-        SERVICE_TYPE,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        USER.externalId,
-        'ST123'
-      )
-
-      sinon.assert.calledOnceWithExactly(
-        markTaskAsComplete,
-        SERVICE_EXTERNAL_ID,
-        SERVICE_TYPE,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        'organisationDetails'
-      )
-
-      sinon.assert.callOrder(
-        getStripeStatementDescriptor,
-        createOrganisation,
-        createStore,
-        setAdyenStoreId,
-        markTaskAsComplete
-      )
-    })
-
-    it('should create a store for the business line using the Stripe statement descriptor', async () => {
-      await call('post')
-
-      sinon.assert.calledOnceWithExactly(getStripeStatementDescriptor, GATEWAY_ACCOUNT)
-      sinon.assert.calledOnceWithExactly(createStore, {
-        businessLineId: 'BL123',
-        balanceAccountId: 'BA123',
-        serviceName: serviceFixture.name,
-        statementDescriptor: 'TEST SERVICE',
-        telephoneNumber: TELEPHONE_NUMBER,
-        organisationDetails: UPDATED_SESSION,
-      })
     })
   })
 })

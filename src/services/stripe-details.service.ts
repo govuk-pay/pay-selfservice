@@ -258,6 +258,20 @@ function getStripeAccountIdForGatewayAccount(gatewayAccount: GatewayAccount) {
   }
 }
 
+async function getStoreDetailsForStripeMigration(service: Service, account: GatewayAccount) {
+  const telephoneNumber = service.merchantDetails?.telephoneNumber
+
+  if (!telephoneNumber) {
+    throw new InvalidConfigurationError(
+      `No telephone number set in merchant details [service_external_id: ${service.externalId}]`
+    )
+  }
+
+  const statementDescriptor = await getStripeStatementDescriptor(account)
+
+  return { telephoneNumber, statementDescriptor }
+}
+
 export {
   updateStripeDetailsBankDetails,
   updateStripeDetailsResponsiblePerson,
@@ -272,4 +286,5 @@ export {
   getStripeAccountIdForGatewayAccount,
   getStripeStatementDescriptor,
   getConnectorStripeAccountSetup,
+  getStoreDetailsForStripeMigration,
 }

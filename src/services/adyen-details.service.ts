@@ -1,7 +1,6 @@
 import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
 import ConnectorClient from '@services/clients/pay/ConnectorClient.class'
 import {
-  CompanyRegistrationBody,
   INDUSTRY_CODE_MAP,
   OrganisationDetailsSession,
 } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
@@ -27,8 +26,6 @@ import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatfor
 import { formatPhoneNumberWithCountryCode } from '@utils/telephone-number-utils'
 import { LegalEntityAssociation } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityAssociation'
 import { InvalidConfigurationError } from '@root/errors'
-import { ServiceRequest } from '@utils/types/express'
-import { getStripeStatementDescriptor } from './stripe-details.service'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -654,20 +651,6 @@ function formatDateInputs(dobDay: string, dobMonth: string, dobYear: string): st
   return `${dobYear}-${dobMonth?.padStart(2, '0')}-${dobDay?.padStart(2, '0')}`
 }
 
-async function getStoreDetailsForStripeMigration(req: ServiceRequest<CompanyRegistrationBody>) {
-  const telephoneNumber = req.service.merchantDetails?.telephoneNumber
-
-  if (!telephoneNumber) {
-    throw new InvalidConfigurationError(
-      `No telephone number set in merchant details [service_external_id: ${req.service.externalId}]`
-    )
-  }
-
-  const statementDescriptor = await getStripeStatementDescriptor(req.account)
-
-  return { telephoneNumber, statementDescriptor }
-}
-
 export {
   setAdyenStoreId,
   createOrganisation,
@@ -680,5 +663,4 @@ export {
   getOrganisationDetailsSummary,
   getAccountHolder,
   isAccountHolderVerified,
-  getStoreDetailsForStripeMigration,
 }

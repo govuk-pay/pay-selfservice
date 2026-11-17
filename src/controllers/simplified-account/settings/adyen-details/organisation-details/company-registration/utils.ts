@@ -1,42 +1,43 @@
 import { PaymentProvider } from '@models/constants/payment-provider'
-import {
-  createOrganisation,
-  createStore,
-  getStoreDetailsForStripeMigration,
-  setAdyenStoreId,
-} from '@services/adyen-details.service'
-import { ServiceRequest } from '@utils/types/express'
-import { CompanyRegistrationBody, OrganisationDetailsSession } from '../constants'
+import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
+import { OrganisationDetailsSession } from '../constants'
 import { markTaskAsComplete } from '@services/adyen-setup.service'
+import { getStoreDetailsForStripeMigration } from '@services/stripe-details.service'
+import Service from '@models/service/Service.class'
+import GatewayAccount from '@models/gateway-account/GatewayAccount.class'
 
 export const submitOrganisationDetails = async (
-  req: ServiceRequest<CompanyRegistrationBody>,
+  service: Service,
+  account: GatewayAccount,
+  userExternalId: string,
   session: OrganisationDetailsSession,
   switchingCredentialId: string
 ) => {
   const storeDetails =
-    req.account.paymentProvider === PaymentProvider.STRIPE ? await getStoreDetailsForStripeMigration(req) : undefined
+    account.paymentProvider === PaymentProvider.STRIPE
+      ? await getStoreDetailsForStripeMigration(service, account)
+      : undefined
 
   if (!storeDetails) {
-    throw new Error(`Merchant details not returned from Stripe for [service_external_id: ${req.service.externalId}]`)
+    throw new Error(`Merchant details not returned from Stripe for [service_external_id: ${service.externalId}]`)
   }
 
   const { businessLine, balanceAccount } = await createOrganisation(
     session,
-    req.service,
-    req.account.type,
+    service,
+    account.type,
     switchingCredentialId,
-    req.user.externalId
+    userExternalId
   )
 
   const store = await createStore({
     ...storeDetails,
     businessLineId: businessLine.id,
     balanceAccountId: balanceAccount.id,
-    serviceName: req.service.name,
+    serviceName: service.name,
     organisationDetails: session,
   })
 
-  await setAdyenStoreId(req.service.externalId, req.account.type, switchingCredentialId, req.user.externalId, store.id!)
-  await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'organisationDetails')
+  await setAdyenStoreId(service.externalId, account.type, switchingCredentialId, userExternalId, store.id!)
+  await markTaskAsComplete(service.externalId, account.type, switchingCredentialId, 'organisationDetails')
 }
