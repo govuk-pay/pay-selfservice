@@ -1,9 +1,10 @@
 import { body } from 'express-validator'
-import { demoPaymentSchema } from '@utils/simplified-account/validation/demo-payment/demo-payment.schema'
 import { getProductByServiceAndProductPath } from '@services/products.service'
 import { slugifyString } from '@utils/simplified-account/format/slugify-string'
 import { PaymentLinkCreationSession } from '@controllers/simplified-account/services/payment-links/create/constants'
 import { ServiceRequest } from '@utils/types/express'
+
+const VALID_PAYMENT_AMOUNT_ERR_MSG = 'Enter a valid payment amount between £0.30 and £100000'
 
 const paymentLinkSchema = {
   info: {
@@ -109,7 +110,22 @@ const paymentLinkSchema = {
         .bail(),
     },
     price: {
-      validate: demoPaymentSchema.paymentAmount.validate,
+      validate: body('paymentAmount')
+        .trim()
+        .notEmpty()
+        .withMessage('Enter a payment amount')
+        .bail()
+        .isNumeric()
+        .withMessage('Enter a valid payment amount')
+        .bail()
+        .isFloat({ min: 0.3, max: 100000 })
+        .withMessage(VALID_PAYMENT_AMOUNT_ERR_MSG)
+        .bail()
+        .custom((value: string) => {
+          // two decimal places
+          return /^\d+(\.\d{2})?$/.test(value)
+        })
+        .withMessage(VALID_PAYMENT_AMOUNT_ERR_MSG),
     },
     hint: {
       validate: body('amountHint')

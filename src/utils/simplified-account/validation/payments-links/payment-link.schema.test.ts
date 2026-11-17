@@ -13,6 +13,7 @@ describe('Payment Link Schema Validation', () => {
         referenceTypeGroup: 'custom',
         referenceLabel: 'Order Number',
         referenceHint: 'Enter your order number',
+        paymentAmount: '1000',
       },
     }
   })
@@ -420,6 +421,46 @@ describe('Payment Link Schema Validation', () => {
       }
       await paymentLinkSchema.amount.type.validate.run(validReq)
       expect(validationResult(validReq).isEmpty()).to.be.true
+    })
+  })
+
+  describe('Payment price validation', () => {
+    it('should pass with valid price', async () => {
+      const validReq = {
+        body: { ...BASE_REQ.body, paymentAmount: '1000' },
+      }
+      await paymentLinkSchema.amount.price.validate.run(validReq)
+      expect(validationResult(validReq).isEmpty()).to.be.true
+    })
+
+    it('should fail with empty price', async () => {
+      const invalidReq = {
+        body: { ...BASE_REQ.body, paymentAmount: '' },
+      }
+      await paymentLinkSchema.amount.price.validate.run(invalidReq)
+
+      const errors = validationResult(invalidReq)
+      expect(errors.array()[0].msg).to.equal('Enter a payment amount')
+    })
+
+    it('should fail when the price is too low', async () => {
+      const invalidReq = {
+        body: { ...BASE_REQ.body, paymentAmount: '.02' },
+      }
+      await paymentLinkSchema.amount.price.validate.run(invalidReq)
+
+      const errors = validationResult(invalidReq)
+      expect(errors.array()[0].msg).to.equal('Enter a valid payment amount between £0.30 and £100000')
+    })
+
+    it('should fail when the price is too high', async () => {
+      const invalidReq = {
+        body: { ...BASE_REQ.body, paymentAmount: '100001' },
+      }
+      await paymentLinkSchema.amount.price.validate.run(invalidReq)
+
+      const errors = validationResult(invalidReq)
+      expect(errors.array()[0].msg).to.equal('Enter a valid payment amount between £0.30 and £100000')
     })
   })
 
