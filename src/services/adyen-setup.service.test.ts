@@ -58,6 +58,7 @@ describe('Adyen setup service', function () {
         ['bankDetails', 'bank_details'],
         ['responsiblePerson', 'responsible_person'],
         ['director', 'director'],
+        ['sizeOfOrganisation', 'size_of_organisation'],
       ]
 
       for (const [taskName, expectedPath] of cases) {

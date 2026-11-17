@@ -15,23 +15,27 @@ export class AdyenAccountSetupUpdateRequest {
 
   replace(): Record<AdyenAccountSetupTaskName, (value: AdyenAccountSetupTaskStatus) => this> {
     return {
-      organisationDetails: (value: AdyenAccountSetupTaskStatus) => {
+      organisationDetails: (value) => {
         return this.#op('replace', 'organisation_details', value)
       },
 
-      legalTerms: (value: AdyenAccountSetupTaskStatus) => {
+      legalTerms: (value) => {
         return this.#op('replace', 'legal_terms', value)
       },
 
-      bankDetails: (value: AdyenAccountSetupTaskStatus) => {
+      sizeOfOrganisation: (value) => {
+        return this.#op('replace', 'size_of_organisation', value)
+      },
+
+      bankDetails: (value) => {
         return this.#op('replace', 'bank_details', value)
       },
 
-      responsiblePerson: (value: AdyenAccountSetupTaskStatus) => {
+      responsiblePerson: (value) => {
         return this.#op('replace', 'responsible_person', value)
       },
 
-      director: (value: AdyenAccountSetupTaskStatus) => {
+      director: (value) => {
         return this.#op('replace', 'director', value)
       },
     }
