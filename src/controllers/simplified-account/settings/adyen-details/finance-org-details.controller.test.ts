@@ -16,8 +16,13 @@ const serviceFixture = new ServiceFixture({
 })
 const ORGANISATION_LEGAL_ENTITY_ID = 'LE_ORG_123'
 
+const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.STRIPE, PaymentProvider.ADYEN, [], [], {
+  type: 'live',
+}).toGatewayAccount()
+
 const mockResponse = sinon.stub()
 const updateFinanceOrgDetails = sinon.stub().resolves()
+const markTaskAsComplete = sinon.stub().resolves()
 
 describe('Controller: settings/adyen-details/finance-org-details', () => {
   const { req, res, call, nextRequest } = new ControllerTestBuilder(
@@ -39,6 +44,7 @@ describe('Controller: settings/adyen-details/finance-org-details', () => {
     .withStubs({
       '@utils/response': { response: mockResponse },
       '@services/adyen-details.service': { updateFinanceOrgDetails },
+      '@services/adyen-setup.service': { markTaskAsComplete },
     })
     .build()
 
@@ -127,6 +133,18 @@ describe('Controller: settings/adyen-details/finance-org-details', () => {
             financeYear: '2012',
           },
           ORGANISATION_LEGAL_ENTITY_ID
+        )
+      })
+
+      it('should mark the sizeOfOrganisation task as complete', async () => {
+        await call('post')
+
+        sinon.assert.calledOnceWithExactly(
+          markTaskAsComplete,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          'sizeOfOrganisation'
         )
       })
 
