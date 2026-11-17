@@ -331,6 +331,7 @@ module.exports = {
           reasonForTakingPayments:
             '/settings/adyen-details/:credentialId/organisation-details/reason-for-taking-payments',
           registeredForVat: '/settings/adyen-details/:credentialId/organisation-details/registered-for-vat',
+          notRegisteredForVat: '/settings/adyen-details/:credentialId/organisation-details/not-registered-for-vat',
         },
         statementDescriptors: {
           user: '/settings/adyen-details/:credentialId/statement-descriptors/user',

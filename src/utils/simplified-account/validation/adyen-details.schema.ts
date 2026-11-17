@@ -22,6 +22,15 @@ const adyenDetailsSchema = {
         return true
       }),
   },
+  registeredForVat: {
+    validate: body('registeredForVat').notEmpty().withMessage('You must make a selection'),
+  },
+  notRegisteredForVat: {
+    validate: body('notRegisteredForVat').notEmpty().withMessage('You must make a selection'),
+  },
+  hasCompanyRegistrationNumber: {
+    validate: body('hasCompanyRegistrationNumber').notEmpty().withMessage('You must make a selection'),
+  },
 }
 
 export { adyenDetailsSchema }

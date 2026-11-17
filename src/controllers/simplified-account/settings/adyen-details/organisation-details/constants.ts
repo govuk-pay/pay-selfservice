@@ -15,6 +15,18 @@ export interface VatRegistrationBody {
   vatRegistrationNumber: string
 }
 
+export interface RegisteredForVatBody {
+  registeredForVat: string
+}
+
+export interface NotRegisteredForVatBody {
+  notRegisteredForVat: string
+}
+
+export interface GovernmentActivityBody {
+  governmentActivity: GovernmentActivity
+}
+
 export interface OrganisationDetailsBody {
   organisationName: string
   addressLine1: string
@@ -36,6 +48,9 @@ export class OrganisationDetailsSession {
   companyRegistrationNumber?: string
   vatRegistrationNumber?: string
   email?: string
+  governmentActivity?: GovernmentActivity
+  registeredForVat?: string
+  notRegisteredForVat?: string
 
   constructor(data: Partial<OrganisationDetailsSession>) {
     Object.assign(this, data)

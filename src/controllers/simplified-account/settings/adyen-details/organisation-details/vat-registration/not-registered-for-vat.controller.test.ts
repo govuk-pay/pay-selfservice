@@ -7,7 +7,7 @@ import { MerchantDetailsFixture } from '@test/fixtures/service/merchant-details.
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
-import { OrganisationDetailsSession } from './constants'
+import { OrganisationDetailsSession } from '../constants'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -36,16 +36,16 @@ const getStripeStatementDescriptor = sinon.stub().resolves('TEST SERVICE')
 const markTaskAsComplete = sinon.stub().resolves()
 const setAdyenStoreId = sinon.stub().resolves()
 
-const TEMPLATE = 'simplified-account/settings/adyen-details/registered-for-vat'
+const TEMPLATE = 'simplified-account/settings/adyen-details/not-registered-for-vat'
 const BACK_LINK = formatServiceAndAccountPathsFor(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
   SERVICE_EXTERNAL_ID,
   SERVICE_TYPE,
   GATEWAY_ACCOUNT.getSwitchingCredential().externalId
 )
 
 const { req, res, call, nextRequest } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/organisation-details/registered-for-vat.controller.ts'
+  '@controllers/simplified-account/settings/adyen-details/organisation-details/vat-registration/not-registered-for-vat.controller.ts'
 )
   .withService(serviceFixture.toService())
   .withAccount(GATEWAY_ACCOUNT)
@@ -67,7 +67,7 @@ const VALID_SESSION: Partial<OrganisationDetailsSession> = {
   hasCompanyRegistrationNumber: 'true',
 }
 
-describe('Controller: settings/adyen-details/registered-for-vat', () => {
+describe('Controller: settings/adyen-details/not-registered-for-vat', () => {
   describe('get', () => {
     describe('with no organisation details in session', () => {
       beforeEach(async () => {
@@ -109,7 +109,7 @@ describe('Controller: settings/adyen-details/registered-for-vat', () => {
       beforeEach(() => {
         nextRequest({
           body: {
-            registeredForVat: true,
+            notRegisteredForVat: 'exempt',
           },
           session: {
             otherSessionData: 'keep',
@@ -119,17 +119,44 @@ describe('Controller: settings/adyen-details/registered-for-vat', () => {
           },
         })
       })
-      it('should redirect to the enter your vat registration page', async () => {
-        await call('post')
-        sinon.assert.calledOnceWithExactly(
-          res.redirect,
-          formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-          )
+      it('should redirect to the company registration page', async () => {
+        const nextPagePath = formatServiceAndAccountPathsFor(
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
         )
+
+        await call('post')
+        sinon.assert.calledOnceWithExactly(res.redirect, `${nextPagePath}?from=not-registered`)
+      })
+    })
+    describe('when no selection is made', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: {},
+          session: {
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
+          },
+        })
+      })
+      it('should not redirect', async () => {
+        await call('post')
+        sinon.assert.notCalled(res.redirect)
+      })
+      it('should re-render the not registered for vat page with the backLink', async () => {
+        await call('post')
+        const expectedContext = { backLink: BACK_LINK }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
+      })
+      it('should show the summary error', async () => {
+        await call('post')
+        const expectedContext = {
+          errors: { summary: [{ text: 'You must make a selection', href: '#not-registered-for-vat' }] },
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, req, res, TEMPLATE, expectedContext)
       })
     })
   })

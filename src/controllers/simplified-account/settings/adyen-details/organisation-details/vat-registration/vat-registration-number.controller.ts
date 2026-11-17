@@ -2,7 +2,7 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
-import { OrganisationDetailsSession, VatRegistrationBody } from './constants'
+import { OrganisationDetailsSession, VatRegistrationBody } from '../constants'
 import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
@@ -65,14 +65,14 @@ async function post(req: ServiceRequest<VatRegistrationBody>, res: ServiceRespon
     vatRegistrationNumber: req.body.vatRegistrationNumber,
   } as OrganisationDetailsSession)
 
-  return res.redirect(
-    formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
-      req.service.externalId,
-      req.account.type,
-      switchingCredentialId
-    )
+  const nextPagePath = formatServiceAndAccountPathsFor(
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+    req.service.externalId,
+    req.account.type,
+    switchingCredentialId
   )
+
+  return res.redirect(`${nextPagePath}?from=vat-number`)
 }
 
 export { get, post }
