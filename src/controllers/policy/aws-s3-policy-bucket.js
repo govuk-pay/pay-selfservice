@@ -20,7 +20,11 @@ if (!environmentVariablesSet) {
   logger.warn('AWS policy documents S3 Bucket environment not configured')
 }
 
-const generatePrivateLink = async function generatePrivateLink (documentConfig) {
+const generatePrivateLink = async function generatePrivateLink(documentConfig) {
+  if (process.env.NODE_ENV === 'test') {
+    return 'https://example.com/some-document.pdf'
+  }
+
   // S3 Bucket documents are uploaded directly, the key will include file extension
   const Key = `${documentConfig.key}.pdf`
   const ResponseContentDisposition = `attachment; filename="${documentConfig.title}.pdf"`

@@ -127,7 +127,6 @@ describe(`Organisation details`, () => {
   })
 
   describe('for a service that is migrating to adyen', () => {
-    // skipped as sequence has changed - will be address in subsequent PR
     it('should walk through flow in sequence if registered for VAT and has organisation number are true', () => {
       setStubs()
 
