@@ -3,8 +3,9 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { CompanyRegistrationBody, OrganisationDetailsSession } from '../constants'
+import { submitOrganisationDetails } from './utils'
 
-export function get(req: ServiceRequest, res: ServiceResponse) {
+function get(req: ServiceRequest, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
@@ -35,14 +36,21 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
   )
 }
 
-export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
-  const currentSession = OrganisationDetailsSession.extract(req)
+  const existingSession = OrganisationDetailsSession.extract(req)
 
-  OrganisationDetailsSession.set(req, currentSession, {
+  const completeSession = new OrganisationDetailsSession({
+    ...existingSession,
     companyRegistrationNumber: req.body.companyRegistrationNumber,
-  } as OrganisationDetailsSession)
+  })
+
+  OrganisationDetailsSession.set(req, completeSession)
+
+  await submitOrganisationDetails(req.service, req.account, req.user.externalId, completeSession, switchingCredentialId)
+
+  OrganisationDetailsSession.clear(req)
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
@@ -53,3 +61,5 @@ export function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceR
     )
   )
 }
+
+export { get, post }

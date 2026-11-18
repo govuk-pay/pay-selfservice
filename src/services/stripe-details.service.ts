@@ -234,6 +234,7 @@ const getStripeStatementDescriptor = async (gatewayAccount: GatewayAccount) => {
   const stripeAccountId = getStripeAccountIdForGatewayAccount(gatewayAccount)
   const stripeAccount = await stripeClient.retrieveAccountDetails(stripeAccountId)
   const statementDescriptor = stripeAccount.settings?.payments.statement_descriptor
+
   if (!statementDescriptor) {
     throw new InvalidConfigurationError(
       `No statement descriptor set on Stripe account [stripe_account_id: ${stripeAccountId}]`

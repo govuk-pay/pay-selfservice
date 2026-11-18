@@ -1,7 +1,6 @@
 import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
 import ConnectorClient from '@services/clients/pay/ConnectorClient.class'
 import {
-  GovernmentActivity,
   INDUSTRY_CODE_MAP,
   OrganisationDetailsSession,
 } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
@@ -114,7 +113,6 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
 
 const createOrganisation = async (
   session: OrganisationDetailsSession,
-  governmentActivity: GovernmentActivity,
   service: Service,
   accountType: string,
   switchingCredentialId: string,
@@ -123,12 +121,17 @@ const createOrganisation = async (
   if (!service.merchantDetails?.url) {
     throw new InvalidConfigurationError(`No URL set in merchant details [service_external_id: ${service.externalId}]`)
   }
+  if (!session.governmentActivity) {
+    throw new InvalidConfigurationError(
+      `No government activity set in session [service_external_id: ${service.externalId}]`
+    )
+  }
 
   const legalEntity = await createOrganisationLegalEntity(session, service)
 
   const businessLine = await AdyenLEMClient.createBusinessLine({
     service: BusinessLineInfo.ServiceEnum.PaymentProcessing,
-    industryCode: INDUSTRY_CODE_MAP[governmentActivity],
+    industryCode: INDUSTRY_CODE_MAP[session.governmentActivity],
     legalEntityId: legalEntity.id,
     salesChannels: ['eCommerce'],
     webData: [{ webAddress: service.merchantDetails.url }],
