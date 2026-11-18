@@ -167,7 +167,7 @@ describe(`Responsible person - contact details`, () => {
       describe('when the form is submitted with invalid values', () => {
         beforeEach(() => {
           cy.get('#telephone-number').type('abc')
-          cy.get('#email').type('not-an-email')
+          cy.get('#email').type('invalid-email')
           cy.get('#responsible-person-contact-details-submit').click()
         })
 
@@ -178,7 +178,7 @@ describe(`Responsible person - contact details`, () => {
           )
           cy.get('#email-error').should('contain', 'Enter a real email address')
           cy.get('#telephone-number').should('have.value', 'abc')
-          cy.get('#email').should('have.value', 'not-an-email')
+          cy.get('#email').should('have.value', 'invalid-email')
         })
       })
     })
