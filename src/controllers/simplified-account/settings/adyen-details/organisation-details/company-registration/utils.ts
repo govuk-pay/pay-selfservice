@@ -2,9 +2,9 @@ import { PaymentProvider } from '@models/constants/payment-provider'
 import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
 import { OrganisationDetailsSession } from '../constants'
 import { markTaskAsComplete } from '@services/adyen-setup.service'
-import { getStoreDetailsForStripeMigration } from '@services/stripe-details.service'
 import Service from '@models/service/Service.class'
 import GatewayAccount from '@models/gateway-account/GatewayAccount.class'
+import { getStripeStatementDescriptor } from '@services/stripe-details.service'
 
 export const submitOrganisationDetails = async (
   service: Service,
@@ -13,9 +13,14 @@ export const submitOrganisationDetails = async (
   session: OrganisationDetailsSession,
   switchingCredentialId: string
 ) => {
+  const telephoneNumber = service.merchantDetails?.telephoneNumber
+
   const storeDetails =
-    account.paymentProvider === PaymentProvider.STRIPE
-      ? await getStoreDetailsForStripeMigration(service, account)
+    account.paymentProvider === PaymentProvider.STRIPE && telephoneNumber
+      ? {
+          statementDescriptor: await getStripeStatementDescriptor(account),
+          telephoneNumber,
+        }
       : undefined
 
   if (!storeDetails) {

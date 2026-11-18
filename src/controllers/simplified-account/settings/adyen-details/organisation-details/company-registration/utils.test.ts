@@ -33,13 +33,11 @@ const createOrganisation = sinon.stub().resolves({
 const createStore = sinon.stub().resolves({ id: 'ST123' })
 const markTaskAsComplete = sinon.stub().resolves()
 const setAdyenStoreId = sinon.stub().resolves()
-const getStoreDetailsForStripeMigration = sinon
-  .stub()
-  .resolves({ telephoneNumber: TELEPHONE_NUMBER, statementDescriptor: 'TEST SERVICE' })
+const getStripeStatementDescriptor = sinon.stub().resolves('TEST SERVICE')
 
 const { submitOrganisationDetails } = proxyquire('./utils', {
   '@services/adyen-details.service': { createOrganisation, createStore, setAdyenStoreId },
-  '@services/stripe-details.service': { getStoreDetailsForStripeMigration },
+  '@services/stripe-details.service': { getStripeStatementDescriptor },
   '@services/adyen-setup.service': { markTaskAsComplete },
 }) as typeof import('./utils')
 
@@ -77,7 +75,7 @@ describe('submitOrganisationDetails', () => {
     )
 
     sinon.assert.callOrder(
-      getStoreDetailsForStripeMigration,
+      getStripeStatementDescriptor,
       createOrganisation,
       createStore,
       setAdyenStoreId,
@@ -88,7 +86,7 @@ describe('submitOrganisationDetails', () => {
   it('should create a store for the business line using the Stripe statement descriptor', async () => {
     await submitOrganisationDetails(SERVICE, GATEWAY_ACCOUNT, USER_EXTERNAL_ID, SESSION, CREDENTIAL_ID)
 
-    sinon.assert.calledOnceWithExactly(getStoreDetailsForStripeMigration, SERVICE, GATEWAY_ACCOUNT)
+    sinon.assert.calledOnceWithExactly(getStripeStatementDescriptor, GATEWAY_ACCOUNT)
     sinon.assert.calledOnceWithExactly(createStore, {
       businessLineId: 'BL123',
       balanceAccountId: 'BA123',
