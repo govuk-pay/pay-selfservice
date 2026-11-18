@@ -10,6 +10,7 @@ import supportedPolicyDocuments from '@controllers/policy/supported-policy-docum
 import { check, validationResult } from 'express-validator'
 import { GOV_ENTITY_DOC_FORM_FIELD_NAME } from '@controllers/simplified-account/settings/stripe-details/government-entity-document/constants'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
+import { submitOrganisationDetails } from './utils'
 
 const logger = createLogger(__filename)
 
@@ -59,6 +60,14 @@ async function get(req: ServiceRequest, res: ServiceResponse, next: NextFunction
 async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceResponse) {
   const { account, file } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
+  const existingSession = OrganisationDetailsSession.extract(req)
+
+  const completeSession = new OrganisationDetailsSession({
+    ...existingSession,
+    companyRegistrationNumber: req.body.companyRegistrationNumber,
+  })
+
+  OrganisationDetailsSession.set(req, completeSession)
 
   const validations = [
     check(GOV_ENTITY_DOC_FORM_FIELD_NAME).custom(() => {
@@ -101,6 +110,10 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
       }
     )
   }
+
+  await submitOrganisationDetails(req.service, req.account, req.user.externalId, completeSession, switchingCredentialId)
+
+  OrganisationDetailsSession.clear(req)
 
   return res.redirect(
     formatServiceAndAccountPathsFor(

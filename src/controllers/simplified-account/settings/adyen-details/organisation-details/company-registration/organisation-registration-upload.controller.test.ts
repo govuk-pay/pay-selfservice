@@ -6,6 +6,8 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
+import { OrganisationDetailsSession } from '../constants'
+import { expect } from 'chai'
 import { lookup } from '@controllers/policy/supported-policy-documents'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
@@ -16,10 +18,13 @@ const serviceFixture = new ServiceFixture({
 const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.STRIPE, PaymentProvider.ADYEN, [], [], {
   type: 'live',
 }).toGatewayAccount()
+const USER = UserFixture.asServiceAdmin([serviceFixture], { externalId: 'user123abc' }).toUser()
+const CREDENTIAL_ID = GATEWAY_ACCOUNT.getSwitchingCredential().externalId
 
 const TEMPLATE_PATH = 'simplified-account/settings/adyen-details/company-registration/organisation-registration-upload'
 
 const mockResponse = sinon.stub()
+const submitOrganisationDetails = sinon.stub().resolves()
 
 const mockBucketGetLinkToPdf = sinon.spy(() => {
   return new Promise((resolve) => {
@@ -34,14 +39,27 @@ const mockBucketService = {
 const { req, res, call, nextRequest } = new ControllerTestBuilder(
   '@controllers/simplified-account/settings/adyen-details/organisation-details/company-registration/organisation-registration-upload.controller'
 )
+  .withService(serviceFixture.toService())
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
   .withAccount(GATEWAY_ACCOUNT)
-  .withUser(UserFixture.asServiceAdmin([serviceFixture]).toUser())
+  .withUser(USER)
   .withStubs({
     '@utils/response': { response: mockResponse },
+    './utils': { submitOrganisationDetails },
     '@controllers/policy/aws-s3-policy-bucket': mockBucketService,
   })
   .build()
+
+const VALID_SESSION: Partial<OrganisationDetailsSession> = {
+  organisationName: 'Test Organisation',
+  addressLine1: '1 Test Street',
+  addressCity: 'swansea',
+  addressPostcode: 'T3 5TT',
+  addressCountry: 'GB',
+  vatRegistrationNumber: 'GB123456789',
+  hasCompanyRegistrationNumber: 'true',
+  governmentActivity: 'general-local',
+}
 
 describe('Controller: settings/adyen-details/organisation-details/company-registration/organisation-registration-upload', () => {
   describe('get', () => {
@@ -93,7 +111,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+            CREDENTIAL_ID
           ),
           downloadLink: 'html-url-link',
         })
@@ -102,6 +120,10 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
   })
 
   describe('post', () => {
+    const UPDATED_SESSION = new OrganisationDetailsSession({
+      ...VALID_SESSION,
+      companyRegistrationNumber: '01234567',
+    })
     describe('when uploading a valid file', () => {
       beforeEach(() => {
         nextRequest({
@@ -113,23 +135,31 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           body: { companyRegistrationNumber: '01234567' },
           session: {
             pageData: {
-              organisationDetails: {
-                organisationName: 'Test Organisation',
-              },
+              organisationDetails: UPDATED_SESSION,
             },
           },
         })
       })
 
-      it('should redirect to the task index page', async () => {
+      it('should submit organisation details and redirect to the task index page', async () => {
         await call('post')
+
+        sinon.assert.calledOnceWithExactly(
+          submitOrganisationDetails,
+          serviceFixture.toService(),
+          GATEWAY_ACCOUNT,
+          USER.externalId,
+          UPDATED_SESSION,
+          CREDENTIAL_ID
+        )
+
         sinon.assert.calledOnceWithExactly(
           res.redirect,
           formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+            CREDENTIAL_ID
           )
         )
       })
@@ -146,9 +176,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             body: { companyRegistrationNumber: '01234567' },
             session: {
               pageData: {
-                organisationDetails: {
-                  organisationName: 'Test Organisation',
-                },
+                organisationDetails: UPDATED_SESSION,
               },
             },
           })
@@ -187,6 +215,14 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             governmentEntityDocument: 'File size must be less than 10MB',
           })
         })
+        it('should not call submitOrganisationDetails', async () => {
+          await call('post')
+          sinon.assert.notCalled(submitOrganisationDetails)
+        })
+        it('should not clear the session organisation details', async () => {
+          const thisCall = await call('post')
+          expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: UPDATED_SESSION } })
+        })
       })
 
       describe('mimetype is incorrect', () => {
@@ -199,9 +235,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             body: { companyRegistrationNumber: '01234567' },
             session: {
               pageData: {
-                organisationDetails: {
-                  organisationName: 'Test Organisation',
-                },
+                organisationDetails: UPDATED_SESSION,
               },
             },
           })
@@ -240,6 +274,15 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             governmentEntityDocument: 'File type must be PDF, JPG or PNG',
           })
         })
+
+        it('should not call submitOrganisationDetails', async () => {
+          await call('post')
+          sinon.assert.notCalled(submitOrganisationDetails)
+        })
+        it('should not clear the session organisation details', async () => {
+          const thisCall = await call('post')
+          expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: UPDATED_SESSION } })
+        })
       })
 
       describe('file is missing', () => {
@@ -248,9 +291,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             body: { companyRegistrationNumber: '01234567' },
             session: {
               pageData: {
-                organisationDetails: {
-                  organisationName: 'Test Organisation',
-                },
+                organisationDetails: UPDATED_SESSION,
               },
             },
           })
@@ -288,6 +329,15 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           sinon.assert.match(context.errors.formErrors, {
             governmentEntityDocument: 'Select a file to upload',
           })
+        })
+
+        it('should not call submitOrganisationDetails', async () => {
+          await call('post')
+          sinon.assert.notCalled(submitOrganisationDetails)
+        })
+        it('should not clear the session organisation details', async () => {
+          const thisCall = await call('post')
+          expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: UPDATED_SESSION } })
         })
       })
     })
