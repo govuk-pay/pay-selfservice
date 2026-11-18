@@ -571,20 +571,20 @@ const createStore = async ({
   return store
 }
 
-const uploadRegistrationDocument = async (legalEntityId: string, organisationName: string, base64String: string) => {
+const uploadRegistrationDocument = async (legalEntityId: string, serviceName: string, encodedDocument: string) => {
   const ownerEntity: Types.legalEntityManagement.OwnerEntity = {
     id: legalEntityId,
     type: 'legalEntity'
   };
 
   const attachment = {
-    content: base64String
+    content: encodedDocument
   } as Types.legalEntityManagement.Attachment;
 
   const document: Types.legalEntityManagement.Document = {
     owner: ownerEntity,
     attachments: [attachment],
-    description: `Registration document for service ${organisationName}`,
+    description: `Registration document for service ${serviceName}`,
     type: Types.legalEntityManagement.Document.TypeEnum.RegistrationDocument
   };
 
@@ -685,5 +685,5 @@ export {
   getOrganisationDetailsSummary,
   getAccountHolder,
   isAccountHolderVerified,
-  uploadRegistrationDocument as createDocument
+  uploadRegistrationDocument
 }
