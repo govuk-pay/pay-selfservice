@@ -20,7 +20,7 @@ const GATEWAY_ACCOUNT = GatewayAccountFixture.forSwitchingPsp(PaymentProvider.ST
 const mockResponse = sinon.stub()
 
 const { nextRequest, res, call } = new ControllerTestBuilder(
-  '@controllers/simplified-account/settings/adyen-details/responsible-person/responsible-person.controller'
+  '@controllers/simplified-account/settings/adyen-details/responsible-person/responsible-person-personal-details.controller'
 )
   .withServiceExternalId(SERVICE_EXTERNAL_ID)
   .withAccount(GATEWAY_ACCOUNT)

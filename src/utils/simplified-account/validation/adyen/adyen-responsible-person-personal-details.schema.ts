@@ -1,6 +1,6 @@
 import { body, Meta } from 'express-validator'
 
-export interface ResponsiblePersonDetailsBody {
+export interface ResponsiblePersonPersonalDetailsBody {
   firstName: string
   lastName: string
   dobDay: string
@@ -9,11 +9,11 @@ export interface ResponsiblePersonDetailsBody {
 }
 
 function isDobEntered(_: unknown, meta: Meta): boolean {
-  const { dobDay, dobMonth, dobYear } = meta.req.body as ResponsiblePersonDetailsBody
+  const { dobDay, dobMonth, dobYear } = meta.req.body as ResponsiblePersonPersonalDetailsBody
   return Boolean(dobDay) || Boolean(dobMonth) || Boolean(dobYear)
 }
 
-const adyenResponsiblePersonSchema = {
+const adyenResponsiblePersonPersonalDetailsSchema = {
   details: {
     firstName: {
       validate: body('firstName')
@@ -71,4 +71,4 @@ const adyenResponsiblePersonSchema = {
   },
 }
 
-export { adyenResponsiblePersonSchema }
+export { adyenResponsiblePersonPersonalDetailsSchema }
