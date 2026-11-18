@@ -10,7 +10,6 @@ import { markTaskAsComplete } from '@services/adyen-setup.service'
 import Service from '@models/service/Service.class'
 import GatewayAccount from '@models/gateway-account/GatewayAccount.class'
 import { getStripeStatementDescriptor } from '@services/stripe-details.service'
-import { nonEmpty } from '@utils/types/non-empty-string'
 
 export const submitOrganisationDetails = async (
   service: Service,
