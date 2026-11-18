@@ -31,7 +31,7 @@ describe('adyenResponsiblePersonContactDetailsSchema', () => {
   })
 
   describe('telephoneNumber', () => {
-    const validTelephoneNumbers = ['0113 123 0000', '01200 123900', '+44 0101 123 0123', '0113-123-0000']
+    const validTelephoneNumbers = ['0113 123 0000', '01200 123900', '+44 0121 123 0123', '0113-123-0000']
     validTelephoneNumbers.forEach((telephoneNumber) => {
       it(`should pass validation when telephoneNumber is: ${telephoneNumber}`, async () => {
         const req = { body: { telephoneNumber } }
