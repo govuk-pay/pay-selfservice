@@ -180,8 +180,6 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
     })
 
     describe('with empty contact details', () => {
-      let req: { session: { pageData: { responsiblePerson: Partial<ResponsiblePersonSession> } } }
-
       beforeEach(async () => {
         nextRequest({
           session: {
@@ -195,7 +193,7 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
           },
         })
 
-        ;({ req } = (await call('post')) as { req: typeof req })
+        await call('post')
       })
 
       it('should show the page with an error for every field', () => {
