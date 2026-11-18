@@ -133,3 +133,17 @@ export async function acceptTermsOfService(
     )
   )
 }
+
+export async function uploadDocument(
+  document: Types.legalEntityManagement.Document,
+) {
+  return new AdyenRequest(
+    AdyenAPI.LEGAL_ENTITY_MANAGEMENT,
+    'upload document',
+    Metadata.Post({ legal_entity_id: document.owner!.id, document_description: document.description })
+  ).execute(() =>
+    legalEntityManagementAPI.DocumentsApi.uploadDocumentForVerificationChecks(
+      document
+    )
+  )
+}
