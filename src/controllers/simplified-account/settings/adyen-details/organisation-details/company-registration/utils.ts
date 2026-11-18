@@ -37,6 +37,10 @@ export const submitOrganisationDetails = async (
     userExternalId
   )
 
+  if (typeof encodedDocument !== 'undefined') {
+    await uploadRegistrationDocument(legalEntity.id, service.name, encodedDocument)
+  }
+
   const store = await createStore({
     ...storeDetails,
     businessLineId: businessLine.id,
@@ -45,9 +49,6 @@ export const submitOrganisationDetails = async (
     organisationDetails: session,
   })
 
-  if (nonEmpty(encodedDocument)) {
-    await uploadRegistrationDocument(legalEntity.id, service.name, encodedDocument!)
-  }
 
   await setAdyenStoreId(service.externalId, account.type, switchingCredentialId, userExternalId, store.id!)
   await markTaskAsComplete(service.externalId, account.type, switchingCredentialId, 'organisationDetails')
