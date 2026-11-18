@@ -31,6 +31,9 @@ const adyenDetailsSchema = {
   hasCompanyRegistrationNumber: {
     validate: body('hasCompanyRegistrationNumber').notEmpty().withMessage('You must make a selection'),
   },
+  companyRegistrationNumber: {
+    validate: body('companyRegistrationNumber').notEmpty().withMessage('You must enter a company registration number'),
+  },
 }
 
 export { adyenDetailsSchema }
