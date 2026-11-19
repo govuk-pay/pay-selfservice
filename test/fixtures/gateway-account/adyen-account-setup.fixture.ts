@@ -19,6 +19,7 @@ export class AdyenAccountSetupFixture {
       bankDetails: AdyenAccountSetupTaskFixture.NotStarted(),
       responsiblePerson: AdyenAccountSetupTaskFixture.NotStarted(),
       director: AdyenAccountSetupTaskFixture.NotStarted(),
+      sizeOfOrganisation: AdyenAccountSetupTaskFixture.NotStarted(),
     }
 
     overrides.forEach((override) => {
@@ -39,6 +40,7 @@ export class AdyenAccountSetupFixture {
           bankDetails: AdyenAccountSetupTaskFixture.Completed(),
           responsiblePerson: AdyenAccountSetupTaskFixture.Completed(),
           director: AdyenAccountSetupTaskFixture.Completed(),
+          sizeOfOrganisation: AdyenAccountSetupTaskFixture.Completed(),
         },
       },
       ...overrides
@@ -55,6 +57,7 @@ export class AdyenAccountSetupFixture {
         bank_details: this.tasks.bankDetails.toTaskData(),
         responsible_person: this.tasks.responsiblePerson.toTaskData(),
         director: this.tasks.director.toTaskData(),
+        size_of_organisation: this.tasks.sizeOfOrganisation.toTaskData(),
       },
     }
   }

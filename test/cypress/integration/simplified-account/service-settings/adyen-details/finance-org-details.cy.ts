@@ -58,6 +58,12 @@ const setStubs = (additionalStubs: object[] = []) => {
       ADYEN_CREDENTIAL_EXTERNAL_ID,
       adyenAccountSetup.toAdyenAccountSetupData().tasks
     ).success(),
+    GatewayAccountStubs.patchAdyenAccountTask(
+      SERVICE_EXTERNAL_ID,
+      LIVE_ACCOUNT_TYPE,
+      ADYEN_CREDENTIAL_EXTERNAL_ID,
+      'size_of_organisation'
+    ).success(),
     AdyenStubs.getLegalEntity(ORGANISATION_LEGAL_ENTITY_ID).success({
       id: ORGANISATION_LEGAL_ENTITY_ID,
       organization: {

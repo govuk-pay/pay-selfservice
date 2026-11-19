@@ -1,6 +1,7 @@
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
+import { markTaskAsComplete } from '@services/adyen-setup.service'
 import paths from '@root/paths'
 import { updateFinanceOrgDetails } from '@services/adyen-details.service'
 
@@ -40,6 +41,13 @@ async function post(req: ServiceRequest<FinanceOrgDetailsBody>, res: ServiceResp
       financeYear: req.body.financeYear,
     },
     organisationLegalEntityId
+  )
+
+  await markTaskAsComplete(
+    req.service.externalId,
+    req.account.type,
+    switchingCredential.externalId,
+    'sizeOfOrganisation'
   )
 
   return res.redirect(
