@@ -3,6 +3,7 @@ import ConnectorClient from '@services/clients/pay/ConnectorClient.class'
 import {
   INDUSTRY_CODE_MAP,
   OrganisationDetailsSession,
+  VAT_ABSENCE_MAP,
 } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
 import { Types } from '@adyen/api-library'
 import { CreateBankDetailsBody } from '@controllers/simplified-account/settings/adyen-details/bank-details.controller'
@@ -101,7 +102,11 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
     phone: {
       number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
     },
+    ...(session.notRegisteredForVat && {
+      vatAbsenceReason: VAT_ABSENCE_MAP[session.notRegisteredForVat]
+    })
   }
+
 
   const legalEntityInfo: LegalEntityInfoRequiredType = {
     type: Types.legalEntityManagement.LegalEntityInfoRequiredType.TypeEnum.Organization,
