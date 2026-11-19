@@ -571,6 +571,28 @@ const createStore = async ({
   return store
 }
 
+const uploadRegistrationDocument = async (legalEntityId: string, serviceName: string, encodedDocument: string) => {
+  const ownerEntity: Types.legalEntityManagement.OwnerEntity = {
+    id: legalEntityId,
+    type: 'legalEntity',
+  }
+
+  const attachment = {
+    content: encodedDocument,
+  } as Types.legalEntityManagement.Attachment
+
+  const document: Types.legalEntityManagement.Document = {
+    owner: ownerEntity,
+    attachments: [attachment],
+    description: `Registration document for service ${serviceName}`,
+    type: Types.legalEntityManagement.Document.TypeEnum.RegistrationDocument,
+  }
+
+  const documentId = (await AdyenLEMClient.uploadDocument(document)).id
+
+  logger.info(`Successfully uploaded a document: ${documentId}`)
+}
+
 interface OrganisationDetailsSummary {
   bankDetails: BankDetailsSummary
   responsiblePerson: { name: string }
@@ -663,4 +685,5 @@ export {
   getOrganisationDetailsSummary,
   getAccountHolder,
   isAccountHolderVerified,
+  uploadRegistrationDocument,
 }

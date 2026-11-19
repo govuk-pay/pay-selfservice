@@ -1,5 +1,10 @@
 import { PaymentProvider } from '@models/constants/payment-provider'
-import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
+import {
+  createOrganisation,
+  createStore,
+  setAdyenStoreId,
+  uploadRegistrationDocument,
+} from '@services/adyen-details.service'
 import { OrganisationDetailsSession } from '../constants'
 import { markTaskAsComplete } from '@services/adyen-setup.service'
 import Service from '@models/service/Service.class'
@@ -11,7 +16,8 @@ export const submitOrganisationDetails = async (
   account: GatewayAccount,
   userExternalId: string,
   session: OrganisationDetailsSession,
-  switchingCredentialId: string
+  switchingCredentialId: string,
+  encodedDocument?: string
 ) => {
   const telephoneNumber = service.merchantDetails?.telephoneNumber
 
@@ -27,13 +33,17 @@ export const submitOrganisationDetails = async (
     throw new Error(`Merchant details not returned from Stripe for [service_external_id: ${service.externalId}]`)
   }
 
-  const { businessLine, balanceAccount } = await createOrganisation(
+  const { businessLine, balanceAccount, legalEntity } = await createOrganisation(
     session,
     service,
     account.type,
     switchingCredentialId,
     userExternalId
   )
+
+  if (typeof encodedDocument !== 'undefined') {
+    await uploadRegistrationDocument(legalEntity.id, service.name, encodedDocument)
+  }
 
   const store = await createStore({
     ...storeDetails,
