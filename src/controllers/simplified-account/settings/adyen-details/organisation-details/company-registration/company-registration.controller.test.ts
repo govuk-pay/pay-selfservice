@@ -8,6 +8,7 @@ import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { OrganisationDetailsSession } from '../constants'
+import { expect } from 'chai'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -144,6 +145,46 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
             CREDENTIAL_ID
           )
         )
+      })
+    })
+    describe('when the field is empty', () => {
+      beforeEach(() => {
+        nextRequest({
+          body: { companyRegistrationNumber: '' },
+          session: {
+            otherSessionData: 'keep',
+            pageData: {
+              organisationDetails: VALID_SESSION,
+            },
+          },
+        })
+      })
+      it('should not redirect', async () => {
+        await call('post')
+        sinon.assert.notCalled(res.redirect)
+      })
+      it('should re-render the company registration page with the backLink', async () => {
+        await call('post')
+        const expectedContext = {
+          errors: {
+            formErrors: { companyRegistrationNumber: 'You must enter a company registration number' },
+          },
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        }
+        sinon.assert.calledOnceWithMatch(mockResponse, sinon.match.any, res, TEMPLATE_PATH, expectedContext)
+      })
+      it('should not call submitOrganisationDetails', async () => {
+        await call('post')
+        sinon.assert.notCalled(submitOrganisationDetails)
+      })
+      it('should not clear the session organisation details', async () => {
+        const thisCall = await call('post')
+        expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
       })
     })
   })
