@@ -22,7 +22,7 @@ if (!environmentVariablesSet) {
 }
 
 const generatePrivateLink = async function generatePrivateLink(documentConfig) {
-  if (process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test' || !bucketName) {
     return 'https://example.com/some-document.pdf'
   }
 

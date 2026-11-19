@@ -111,7 +111,16 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
     )
   }
 
-  await submitOrganisationDetails(req.service, req.account, req.user.externalId, completeSession, switchingCredentialId)
+  const encodedDocument = file!.buffer.toString('base64')
+
+  await submitOrganisationDetails(
+    req.service,
+    req.account,
+    req.user.externalId,
+    completeSession,
+    switchingCredentialId,
+    encodedDocument
+  )
 
   OrganisationDetailsSession.clear(req)
 

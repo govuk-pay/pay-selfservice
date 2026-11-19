@@ -150,7 +150,8 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           GATEWAY_ACCOUNT,
           USER.externalId,
           UPDATED_SESSION,
-          CREDENTIAL_ID
+          CREDENTIAL_ID,
+          'completed form'
         )
 
         sinon.assert.calledOnceWithExactly(
