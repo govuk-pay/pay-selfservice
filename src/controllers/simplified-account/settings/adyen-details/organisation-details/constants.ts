@@ -81,8 +81,8 @@ export type GovernmentActivity = 'general-local' | 'police-safety' | 'everything
 export type VatAbsenceReason = 'exempt' | 'below-vat-threshold'
 
 export const VAT_ABSENCE_MAP: Record<VatAbsenceReason, VatAbsenceReasonEnum> = {
-  'exempt': Types.legalEntityManagement.Organization.VatAbsenceReasonEnum.IndustryExemption,
-  'below-vat-threshold': Types.legalEntityManagement.Organization.VatAbsenceReasonEnum.BelowTaxThreshold
+  exempt: Types.legalEntityManagement.Organization.VatAbsenceReasonEnum.IndustryExemption,
+  'below-vat-threshold': Types.legalEntityManagement.Organization.VatAbsenceReasonEnum.BelowTaxThreshold,
 }
 
 export const INDUSTRY_CODE_MAP: Record<GovernmentActivity, string> = {

@@ -103,10 +103,9 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
       number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
     },
     ...(session.notRegisteredForVat && {
-      vatAbsenceReason: VAT_ABSENCE_MAP[session.notRegisteredForVat]
-    })
+      vatAbsenceReason: VAT_ABSENCE_MAP[session.notRegisteredForVat],
+    }),
   }
-
 
   const legalEntityInfo: LegalEntityInfoRequiredType = {
     type: Types.legalEntityManagement.LegalEntityInfoRequiredType.TypeEnum.Organization,
