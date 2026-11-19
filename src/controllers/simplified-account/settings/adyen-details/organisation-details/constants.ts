@@ -20,7 +20,7 @@ export interface RegisteredForVatBody {
 }
 
 export interface NotRegisteredForVatBody {
-  notRegisteredForVat: string
+  notRegisteredForVat: VatAbsenceReason
 }
 
 export interface GovernmentActivityBody {
@@ -50,7 +50,7 @@ export class OrganisationDetailsSession {
   email?: string
   governmentActivity?: GovernmentActivity
   registeredForVat?: string
-  notRegisteredForVat?: string
+  notRegisteredForVat?: VatAbsenceReason
 
   constructor(data: Partial<OrganisationDetailsSession>) {
     Object.assign(this, data)
@@ -74,6 +74,13 @@ export class OrganisationDetailsSession {
 }
 
 export type GovernmentActivity = 'general-local' | 'police-safety' | 'everything-else'
+
+export type VatAbsenceReason = 'exempt' | 'below-vat-threshold'
+
+export const VAT_ABSENCE_MAP: Record<VatAbsenceReason, string> = {
+  'exempt': 'industryExemption',
+  'below-vat-threshold': 'belowTaxThreshold'
+}
 
 export const INDUSTRY_CODE_MAP: Record<GovernmentActivity, string> = {
   'general-local': '921',
