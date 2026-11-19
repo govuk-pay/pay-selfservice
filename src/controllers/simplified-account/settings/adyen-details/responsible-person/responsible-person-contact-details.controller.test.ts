@@ -144,34 +144,129 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
   })
 
   describe('post', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       res.redirect.resetHistory()
-
-      nextRequest({
-        session: {
-          pageData: {
-            responsiblePerson: {},
-          },
-        },
-        body: {
-          telephoneNumber: '07700 700900',
-          email: 'sam@example.com',
-        },
-      })
-
-      await call('post')
+      mockResponse.resetHistory()
     })
 
-    it('should redirect to the check your answers page', () => {
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.checkYourAnswers,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+    describe('with valid contact details', () => {
+      beforeEach(async () => {
+        nextRequest({
+          session: {
+            pageData: {
+              responsiblePerson: {},
+            },
+          },
+          body: {
+            telephoneNumber: '01234 567890',
+            email: 'test@example.com',
+          },
+        })
+
+        await call('post')
+      })
+
+      it('should redirect to the check your answers page', () => {
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.checkYourAnswers,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
         )
-      )
+      })
+    })
+
+    describe('with empty contact details', () => {
+      beforeEach(async () => {
+        nextRequest({
+          session: {
+            pageData: {
+              responsiblePerson: { firstName: 'Dan' },
+            },
+          },
+          body: {
+            telephoneNumber: '',
+            email: '',
+          },
+        })
+
+        await call('post')
+      })
+
+      it('should show the page with an error for every field', () => {
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(
+          sinon.match.any,
+          sinon.match.any,
+          'simplified-account/settings/adyen-details/responsible-person/contact-details'
+        )
+        sinon.assert.match(mockResponse.firstCall.lastArg, {
+          errors: {
+            summary: [
+              { text: 'Enter a telephone number', href: '#telephone-number' },
+              { text: 'Enter a work email address', href: '#email' },
+            ],
+            formErrors: {
+              telephoneNumber: 'Enter a telephone number',
+              email: 'Enter a work email address',
+            },
+          },
+          contact: {
+            telephoneNumber: '',
+            email: '',
+          },
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.address,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        })
+      })
+    })
+
+    describe('with invalid contact details when coming from check your answers page', () => {
+      beforeEach(async () => {
+        nextRequest({
+          query: { [FROM_REVIEW_QUERY_PARAM]: 'true' },
+          session: {
+            pageData: {
+              responsiblePerson: { firstName: 'Dan' },
+            },
+          },
+          body: {
+            telephoneNumber: 'abc',
+            email: 'invalid-email',
+          },
+        })
+
+        await call('post')
+      })
+
+      it('should show the page with the errors, the submitted values and the backLink', () => {
+        sinon.assert.notCalled(res.redirect)
+        sinon.assert.match(mockResponse.firstCall.lastArg, {
+          errors: {
+            formErrors: {
+              telephoneNumber: 'Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192',
+              email: 'Enter a real email address',
+            },
+          },
+          contact: {
+            telephoneNumber: 'abc',
+            email: 'invalid-email',
+          },
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.checkYourAnswers,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        })
+      })
     })
   })
 })
