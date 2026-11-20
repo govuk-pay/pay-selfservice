@@ -11,6 +11,7 @@ import { check, validationResult } from 'express-validator'
 import { GOV_ENTITY_DOC_FORM_FIELD_NAME } from '@controllers/simplified-account/settings/stripe-details/government-entity-document/constants'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import { submitOrganisationDetails } from './utils'
+import { Message } from '@utils/types/express/Message'
 
 const logger = createLogger(__filename)
 
@@ -107,6 +108,7 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
           req.account.type,
           switchingCredentialId
         ),
+        uploadField: GOV_ENTITY_DOC_FORM_FIELD_NAME,
       }
     )
   }
@@ -120,7 +122,15 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
     completeSession,
     switchingCredentialId,
     encodedDocument
-  )
+  ).then(() => {
+    req.flash(
+      'messages',
+      Message.Success(
+        'Information sent to Adyen',
+        'Adyen is checking your information. We will contact you if there is a problem.'
+      )
+    )
+  })
 
   OrganisationDetailsSession.clear(req)
 
