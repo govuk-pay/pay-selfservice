@@ -234,12 +234,18 @@ describe(`Organisation details`, () => {
         .and('contain', 'Select a file to upload')
       cy.get('#government-entity-document-error').should('be.visible').and('contain', 'Select a file to upload')
 
-
       //// happy path
       cy.get(`#government-entity-document`).selectFile('test/test-helpers/companydetails.png')
       cy.get(`#company-registration-document-submit`).click()
 
       cy.location('pathname').should('eq', TASK_LIST_PATH)
+      cy.get('.govuk-notification-banner')
+        .should('have.class', 'govuk-notification-banner--success')
+        .should('have.class', 'system-messages')
+        .contains('Information sent to Adyen')
+        .parent()
+        .parent()
+        .contains('Adyen is checking your information. We will contact you if there is a problem.')
     })
   })
 
