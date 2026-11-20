@@ -180,7 +180,7 @@ describe(`Organisation details`, () => {
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
 
-    it('should walk through flow in sequence if registered for VAT and has organisation number are false', () => {
+    it('should walk through flow in sequence if not registered for VAT and has organisation number are false', () => {
       setStubs()
 
       // organisation details
@@ -226,6 +226,16 @@ describe(`Organisation details`, () => {
       cy.get('h1').should('contain.text', `Upload a document showing your organisation's registration`)
       cy.get('.govuk-back-link').should('have.attr', 'href', HAS_COMPANY_REGISTRATION_PATH)
 
+      //// sad path
+      cy.get('#company-registration-document-submit').click()
+      cy.get('.govuk-error-summary')
+        .should('be.visible')
+        .and('contain', 'There is a problem')
+        .and('contain', 'Select a file to upload')
+      cy.get('#government-entity-document-error').should('be.visible').and('contain', 'Select a file to upload')
+
+
+      //// happy path
       cy.get(`#government-entity-document`).selectFile('test/test-helpers/companydetails.png')
       cy.get(`#company-registration-document-submit`).click()
 
