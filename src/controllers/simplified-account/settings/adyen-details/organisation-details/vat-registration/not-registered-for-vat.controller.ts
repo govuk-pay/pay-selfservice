@@ -57,9 +57,9 @@ async function post(req: ServiceRequest<NotRegisteredForVatBody>, res: ServiceRe
     })
   }
 
-  OrganisationDetailsSession.set(req, existingSession, {
+  const updatedSession = {
     notRegisteredForVat: req.body.notRegisteredForVat,
-  } as OrganisationDetailsSession)
+  } as OrganisationDetailsSession
 
   const nextPagePath = formatServiceAndAccountPathsFor(
     paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
@@ -67,6 +67,8 @@ async function post(req: ServiceRequest<NotRegisteredForVatBody>, res: ServiceRe
     req.account.type,
     switchingCredentialId
   )
+
+  OrganisationDetailsSession.set(req, existingSession, updatedSession)
 
   return res.redirect(`${nextPagePath}?from=not-registered`)
 }
