@@ -130,7 +130,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           file: {
             size: 10 * 1024 * 1024,
             mimetype: 'image/jpeg',
-            buffer: 'completed form'
+            buffer: 'completed form',
           },
           body: { companyRegistrationNumber: '01234567' },
           session: {
