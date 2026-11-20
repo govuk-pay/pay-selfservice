@@ -108,7 +108,7 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
           req.account.type,
           switchingCredentialId
         ),
-        uploadField: GOV_ENTITY_DOC_FORM_FIELD_NAME
+        uploadField: GOV_ENTITY_DOC_FORM_FIELD_NAME,
       }
     )
   }
@@ -123,7 +123,13 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
     switchingCredentialId,
     encodedDocument
   ).then(() => {
-    req.flash('messages', Message.Success('Information sent to Adyen', 'Adyen is checking your information. We will contact you if there is a problem.'))
+    req.flash(
+      'messages',
+      Message.Success(
+        'Information sent to Adyen',
+        'Adyen is checking your information. We will contact you if there is a problem.'
+      )
+    )
   })
 
   OrganisationDetailsSession.clear(req)
