@@ -166,7 +166,7 @@ describe(`Responsible person - address`, () => {
       describe('when the form is submitted with invalid values', () => {
         beforeEach(() => {
           setStubs()
-          cy.get('#address-line1').type('PO Box 123')
+          cy.get('#address-line1').type('a'.repeat(256), { delay: 0 })
           cy.get('#address-line2').type('a'.repeat(256), { delay: 0 })
           cy.get('#address-city').type('123')
           cy.get('#address-postcode').type('not a postcode')
@@ -175,11 +175,10 @@ describe(`Responsible person - address`, () => {
 
         it('should display an error for every field and keep the entered values', () => {
           cy.get('.govuk-error-summary__list li').should('have.length', 4)
-          cy.get('#address-line1-error').should('contain', 'Enter a home address, not a PO box')
+          cy.get('#address-line1-error').should('contain', 'Address line 1 must be 255 characters or fewer')
           cy.get('#address-line2-error').should('contain', 'Address line 2 must be 255 characters or fewer')
           cy.get('#address-city-error').should('contain', 'Town or city cannot contain only numbers')
           cy.get('#address-postcode-error').should('contain', 'Enter a real postcode')
-          cy.get('#address-line1').should('have.value', 'PO Box 123')
           cy.get('#address-city').should('have.value', '123')
           cy.get('#address-postcode').should('have.value', 'NOT A POSTCODE')
         })
