@@ -174,7 +174,7 @@ describe(`Responsible person - address`, () => {
         })
 
         it('should display an error for every field and keep the entered values', () => {
-          cy.get('.govuk-error-summary__list li').should('have.length', 3)
+          cy.get('.govuk-error-summary__list li').should('have.length', 4)
           cy.get('#address-line1-error').should('contain', 'Address line 1 must be 255 characters or fewer')
           cy.get('#address-line2-error').should('contain', 'Address line 2 must be 255 characters or fewer')
           cy.get('#address-city-error').should('contain', 'Town or city must be 255 characters or fewer')
