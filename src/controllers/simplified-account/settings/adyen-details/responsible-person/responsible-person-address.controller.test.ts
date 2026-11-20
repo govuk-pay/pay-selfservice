@@ -142,37 +142,98 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
       })
     })
   })
-})
 
-describe('post', () => {
-  beforeEach(async () => {
-    res.redirect.resetHistory()
-
-    nextRequest({
-      session: {
-        pageData: {
-          responsiblePerson: {},
-        },
-      },
-      body: {
-        addressLine1: '29 Acacia Road',
-        addressCity: 'London',
-        addressPostcode: 'W1 2AB',
-      },
+  describe('post', () => {
+    beforeEach(() => {
+      res.redirect.resetHistory()
+      mockResponse.resetHistory()
     })
 
-    await call('post')
-  })
+    describe('with a valid address', () => {
+      beforeEach(async () => {
+        nextRequest({
+          session: {
+            pageData: {
+              responsiblePerson: {},
+            },
+          },
+          body: {
+            addressLine1: '1 Test Street',
+            addressCity: 'Swansea',
+            addressPostcode: 'T3 5TT',
+          },
+        })
 
-  it('should redirect to the responsible person contact details page', () => {
-    sinon.assert.calledOnceWithExactly(
-      res.redirect,
-      formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.contactDetails,
-        SERVICE_EXTERNAL_ID,
-        SERVICE_TYPE,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-      )
-    )
+        await call('post')
+      })
+
+      it('should redirect to the responsible person contact details page', () => {
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.contactDetails,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
+      })
+    })
+
+    describe('with an empty address', () => {
+      beforeEach(async () => {
+        nextRequest({
+          session: {
+            pageData: {
+              responsiblePerson: { firstName: 'Dan' },
+            },
+          },
+          body: {
+            addressLine1: '',
+            addressLine2: '',
+            addressCity: '',
+            addressPostcode: '',
+          },
+        })
+
+        await call('post')
+      })
+
+      it('should show the page with an error for every required field', () => {
+        sinon.assert.notCalled(res.redirect)
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(
+          sinon.match.any,
+          sinon.match.any,
+          'simplified-account/settings/adyen-details/responsible-person/address'
+        )
+        sinon.assert.match(mockResponse.firstCall.lastArg, {
+          errors: {
+            summary: [
+              { text: 'Enter address line 1', href: '#address-line1' },
+              { text: 'Enter a town or city', href: '#address-city' },
+              { text: 'Enter a postcode', href: '#address-postcode' },
+            ],
+            formErrors: {
+              addressLine1: 'Enter address line 1',
+              addressCity: 'Enter a town or city',
+              addressPostcode: 'Enter a postcode',
+            },
+          },
+          address: {
+            addressLine1: '',
+            addressLine2: '',
+            addressCity: '',
+            addressPostcode: '',
+          },
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.responsiblePerson.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        })
+      })
+    })
   })
 })
