@@ -128,7 +128,7 @@ describe(`Organisation details`, () => {
   })
 
   describe('for a service that is migrating to adyen', () => {
-    it('should walk through flow in sequence if registered for VAT and has organisation number are true', () => {
+    it('should walk through flow in sequence if registered for VAT and has an organisation number', () => {
       setStubs()
 
       // organisation details
@@ -180,7 +180,7 @@ describe(`Organisation details`, () => {
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
 
-    it('should walk through flow in sequence if not registered for VAT and has organisation number are false', () => {
+    it('should walk through flow in sequence if not registered for VAT and does not have an organisation number', () => {
       setStubs()
 
       // organisation details

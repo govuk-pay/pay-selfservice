@@ -62,12 +62,12 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const existingSession = OrganisationDetailsSession.extract(req)
 
-  // const completeSession = new OrganisationDetailsSession({
-  //   ...existingSession,
-  //   companyRegistrationNumber: req.body.companyRegistrationNumber,
-  // })
+  const completeSession = new OrganisationDetailsSession({
+    ...existingSession,
+    companyRegistrationNumber: req.body.companyRegistrationNumber,
+  })
 
-  // OrganisationDetailsSession.set(req, completeSession)
+  OrganisationDetailsSession.set(req, completeSession)
 
   const validations = [
     check(GOV_ENTITY_DOC_FORM_FIELD_NAME).custom(() => {
