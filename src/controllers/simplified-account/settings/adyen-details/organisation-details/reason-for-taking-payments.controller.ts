@@ -34,7 +34,7 @@ async function getStoreDetailsForStripeMigration(req: ServiceRequest<ReasonForTa
     )
   }
 
-  const statementDescriptor = 'ADYEN'
+  const statementDescriptor = await getStripeStatementDescriptor(req.account)
 
   return { telephoneNumber, statementDescriptor }
 }
