@@ -3,21 +3,22 @@
 {% set settingsPageTitle = "Organisation details" %}
 
 {% block settingsContent %}
-<h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
+  <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
 
-<form id="organisation-details-form" method="post">
-  <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+  <form id="organisation-details-form" method="post">
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
 
-  {% set organisationNameHint %}
-  <div>
-    <p>Enter the main name of your organisation, not your local office or individual department.<br />
-      <br />
-      Write the organisation name in full. Only use acronyms that are widely understood (for example, NHS).
-    </p>
-  </div>
-  {% endset %}
+    {% set organisationNameHint %}
+      <div>
+        <p
+          >Enter the main name of your organisation, not your local office or individual department.<br />
+          <br />
+          Write the organisation name in full. Only use acronyms that are widely understood (for example, NHS).
+        </p>
+      </div>
+    {% endset %}
 
-  {{
+    {{
       govukInput({
         label: {
           text: "Organisation name",
@@ -35,7 +36,7 @@
       })
     }}
 
-  {%
+    {%
       call govukFieldset({
         legend: {
           text: "Organisation address",
@@ -44,7 +45,7 @@
         }
       })
     %}
-  {{
+      {{
         govukInput({
           label: {
             html: 'Address line 1 <span class="govuk-visually-hidden">line 1 of 2</span>'
@@ -61,7 +62,7 @@
         })
       }}
 
-  {{
+      {{
         govukInput({
           label: {
             html: 'Address line 2 (optional)<span class="govuk-visually-hidden">Building and street line 2 of 2</span>'
@@ -75,7 +76,7 @@
         })
       }}
 
-  {{
+      {{
         govukInput({
           label: {
             text: "Town or city"
@@ -89,7 +90,7 @@
         })
       }}
 
-  {{
+      {{
         govukSelect({
           id: "address-country",
           classes: "govuk-!-width-two-thirds",
@@ -102,7 +103,7 @@
         })
       }}
 
-  {{
+      {{
         govukInput({
           label: {
             text: "Postcode"
@@ -115,9 +116,59 @@
           value: organisationDetails.addressPostcode
         })
       }}
-  {% endcall %}
+    {% endcall %}
 
-  {%
+    {%
+      call govukFieldset({
+        legend: {
+          text: "Telephone number",
+          classes: "govuk-fieldset__legend--m",
+          isPageHeading: false
+        }
+      })
+    %}
+      {{
+        govukInput({
+          label: {
+            html: 'Include the country code for international numbers'
+          },
+          classes: "govuk-!-width-three-quarters",
+          id: "telephone-number",
+          name: "telephone-number",
+          value: organisationDetails.telephoneNumber,
+          type: "tel",
+          autocomplete: "tel",
+          errorMessage: { text: errors.formErrors['telephoneNumber'] } if errors.formErrors['telephoneNumber'] else false
+        })
+      }}
+    {% endcall %}
+
+    {%
+      call govukFieldset({
+        legend: {
+          text: "Organisation website address",
+          classes: "govuk-fieldset__legend--m",
+          isPageHeading: false
+        }
+      })
+    %}
+      {{
+        govukInput({
+          label: {
+            html: 'Enter the address in full like https://www.example.com'
+          },
+          classes: "govuk-!-width-three-quarters",
+          id: "website",
+          name: "organisationUrl",
+          type: "url",
+          autocomplete: "url",
+          spellcheck: false,
+          value: organisationDetails.organisationUrl
+        })
+      }}
+    {% endcall %}
+
+    {%
       call govukFieldset({
         legend: {
           text: "Organisation contact details",
@@ -126,7 +177,7 @@
         }
       })
     %}
-  {{
+      {{
         govukInput({
           label: {
             html: 'Email address'
@@ -140,9 +191,9 @@
           value: organisationDetails.email
         })
       }}
-  {% endcall %}
+    {% endcall %}
 
-  {{
+    {{
       govukButton({
         text: "Continue",
         attributes: {
@@ -151,5 +202,5 @@
         preventDoubleClick: true
       })
     }}
-</form>
+  </form>
 {% endblock %}
