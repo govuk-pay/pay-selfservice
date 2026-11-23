@@ -1,5 +1,8 @@
 import { body, Meta } from 'express-validator'
 
+const HAS_NUMBER_OR_SPECIAL_CHARACTER_REGEX = /^[^0-9<>@#$%^&*_=+{}\[\]\\|/]+$/
+
+
 export interface ResponsiblePersonPersonalDetailsBody {
   firstName: string
   lastName: string
@@ -21,7 +24,10 @@ const adyenResponsiblePersonPersonalDetailsSchema = {
         .withMessage('Enter the first name')
         .bail()
         .isLength({ max: 100 })
-        .withMessage('First name must be 100 characters or fewer'),
+        .withMessage('First name must be 100 characters or fewer')
+        .bail()
+        .matches(HAS_NUMBER_OR_SPECIAL_CHARACTER_REGEX)
+        .withMessage('First name must not contain numbers or special characters'),
     },
     lastName: {
       validate: body('lastName')
@@ -29,7 +35,10 @@ const adyenResponsiblePersonPersonalDetailsSchema = {
         .withMessage('Enter the last name')
         .bail()
         .isLength({ max: 100 })
-        .withMessage('Last name must be 100 characters or fewer'),
+        .withMessage('Last name must be 100 characters or fewer')
+        .bail()
+        .matches(HAS_NUMBER_OR_SPECIAL_CHARACTER_REGEX)
+        .withMessage('Last name must not contain numbers or special characters'),
     },
     dob: {
       // error should appear on dobDay field
