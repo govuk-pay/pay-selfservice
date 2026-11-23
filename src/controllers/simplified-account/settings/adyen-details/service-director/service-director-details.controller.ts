@@ -3,11 +3,23 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { FROM_REVIEW_QUERY_PARAM, ServiceDirectorSession } from './constants'
+import { validationResult } from 'express-validator'
+import { formatValidationErrors } from '@utils/simplified-account/format'
+import { transformDateOfBirthErrors } from '@utils/simplified-account/format/transform-date-of-birth-errors'
+import { ADYEN_SERVICE_DIRECTOR_DETAILS_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-service-director-details.schema'
+
+function getBackLink(req: ServiceRequest<unknown>) {
+  const switchingCredentialId = req.account.getSwitchingCredential().externalId
+  const backPath =
+    req.query[FROM_REVIEW_QUERY_PARAM] === 'true'
+      ? paths.simplifiedAccount.settings.adyenDetails.serviceDirector.checkYourAnswers
+      : paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index
+
+  return formatServiceAndAccountPathsFor(backPath, req.service.externalId, req.account.type, switchingCredentialId)
+}
 
 function get(req: ServiceRequest, res: ServiceResponse) {
   const currentSession = ServiceDirectorSession.extract(req)
-  const { account } = req
-  const switchingCredentialId = account.getSwitchingCredential().externalId
 
   const name = {
     firstName: currentSession.firstName ?? '',
@@ -20,20 +32,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     dobYear: currentSession.dobYear ?? '',
   }
 
-  const switchToAdyenLink = formatServiceAndAccountPathsFor(
-    paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
-    req.service.externalId,
-    req.account.type
-  )
-
-  const reviewLink = formatServiceAndAccountPathsFor(
-    paths.simplifiedAccount.settings.adyenDetails.serviceDirector.checkYourAnswers,
-    req.service.externalId,
-    req.account.type,
-    switchingCredentialId
-  )
-
-  const backLink = req.query[FROM_REVIEW_QUERY_PARAM] === 'true' ? reviewLink : switchToAdyenLink
+  const backLink = getBackLink(req)
 
   return response(req, res, 'simplified-account/settings/adyen-details/service-director/details', {
     backLink,
@@ -52,10 +51,38 @@ interface ServiceDirectorDetailsBody {
   email: string
 }
 
-function post(req: ServiceRequest<ServiceDirectorDetailsBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<ServiceDirectorDetailsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = ServiceDirectorSession.extract(req)
+
+  for (const validation of ADYEN_SERVICE_DIRECTOR_DETAILS_VALIDATIONS) {
+    await validation.run(req)
+  }
+  const errors = validationResult(req).formatWith(transformDateOfBirthErrors)
+
+  if (!errors.isEmpty()) {
+    const formattedErrors = formatValidationErrors(errors)
+    const backLink = getBackLink(req)
+
+    return response(req, res, 'simplified-account/settings/adyen-details/service-director/details', {
+      errors: {
+        summary: formattedErrors.errorSummary,
+        formErrors: formattedErrors.formErrors,
+      },
+      backLink,
+      name: {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+      },
+      dob: {
+        dobDay: req.body.dobDay,
+        dobMonth: req.body.dobMonth,
+        dobYear: req.body.dobYear,
+      },
+      email: req.body.email,
+    })
+  }
 
   ServiceDirectorSession.set(req, currentSession, {
     firstName: req.body.firstName,
