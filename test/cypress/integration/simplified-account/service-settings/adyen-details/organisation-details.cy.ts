@@ -337,12 +337,16 @@ const organisationDetailsFormFill = () => {
   cy.get('#address-city').should('exist')
   cy.get('#address-country').should('exist')
   cy.get('#address-postcode').should('exist')
+  cy.get('#telephone-number').should('exist')
+  cy.get('#website').should('exist')
   cy.get('#email').should('exist')
 
   cy.get('#organisation-name').type('Test Organisation')
   cy.get('#address-line1').type('1 Test Street')
   cy.get('#address-city').type('Testville')
   cy.get('#address-postcode').type('T3 5TT')
+  cy.get('#telephone-number').type('07700 700900')
+  cy.get('#website').type('https://payments.example.com')
   cy.get('#email').type('some-tax@example.com')
   cy.get('#organisation-details-submit').click()
 }
