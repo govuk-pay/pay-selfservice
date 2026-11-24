@@ -8,11 +8,7 @@ import { formatValidationErrors } from '@utils/simplified-account/format'
 import formatPathFor from '@utils/replace-params-in-path'
 import {
   ADYEN_LEGAL_TERMS_VALIDATIONS,
-  adyenLegalTermsSchema,
 } from '@utils/simplified-account/validation/adyen/adyen-accept-legal-terms.schema'
-import {
-  ADYEN_COMPANY_REGISTRATION_NUMBER_VALIDATIONS
-} from '@utils/simplified-account/validation/adyen/adyen-organisation-company-number.schema'
 
 function getBackLink(req: ServiceRequest) {
   return formatServiceAndAccountPathsFor(
