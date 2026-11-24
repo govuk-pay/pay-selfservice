@@ -19,12 +19,11 @@ export const submitOrganisationDetails = async (
   switchingCredentialId: string,
   encodedDocument?: string
 ) => {
-
   const storeDetails =
     account.paymentProvider === PaymentProvider.STRIPE
       ? {
-        statementDescriptor: await getStripeStatementDescriptor(account),
-      }
+          statementDescriptor: await getStripeStatementDescriptor(account),
+        }
       : undefined
 
   if (!storeDetails) {
