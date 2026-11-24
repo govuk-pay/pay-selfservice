@@ -10,7 +10,6 @@ import { ServiceDirectorSession } from '@controllers/simplified-account/settings
 import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
 import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import { MerchantDetailsFixture } from '@test/fixtures/service/merchant-details.fixture'
-import { email } from '@pact-foundation/pact/src/dsl/matchers'
 
 type AdyenDetailsService = typeof import('./adyen-details.service')
 
