@@ -8,8 +8,6 @@ const adyenLegalTermsSchema = {
   },
 }
 
-const ADYEN_LEGAL_TERMS_VALIDATIONS: ValidationChain[] = [
-  adyenLegalTermsSchema.acceptTerms.validate,
-]
+const ADYEN_LEGAL_TERMS_VALIDATIONS: ValidationChain[] = [adyenLegalTermsSchema.acceptTerms.validate]
 
 export { adyenLegalTermsSchema, ADYEN_LEGAL_TERMS_VALIDATIONS }

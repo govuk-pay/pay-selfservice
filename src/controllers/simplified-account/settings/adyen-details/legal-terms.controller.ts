@@ -6,9 +6,7 @@ import { markTaskAsComplete } from '@services/adyen-setup.service'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
 import formatPathFor from '@utils/replace-params-in-path'
-import {
-  ADYEN_LEGAL_TERMS_VALIDATIONS,
-} from '@utils/simplified-account/validation/adyen/adyen-accept-legal-terms.schema'
+import { ADYEN_LEGAL_TERMS_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-accept-legal-terms.schema'
 
 function getBackLink(req: ServiceRequest) {
   return formatServiceAndAccountPathsFor(
@@ -28,7 +26,6 @@ function get(req: ServiceRequest, res: ServiceResponse) {
 
 async function post(req: ServiceRequest, res: ServiceResponse) {
   const { account } = req
-
 
   for (const validation of ADYEN_LEGAL_TERMS_VALIDATIONS) {
     await validation.run(req)
