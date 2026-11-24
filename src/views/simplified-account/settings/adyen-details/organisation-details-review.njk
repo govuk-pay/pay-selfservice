@@ -3,10 +3,11 @@
 
 {% set settingsPageTitle = "Check your answers" %}
 
+
 {% set addressHtml %}
-    {%- for line in fullAddress -%}
-        {{line}}{% if not loop.last %}<br>{% endif %}
-    {%- endfor -%}
+  {%- for line in fullAddress -%}
+    {{ line }}{% if not loop.last %}<br />{% endif %}
+  {%- endfor -%}
 {% endset %}
 
 {% block settingsContent %}
@@ -74,10 +75,12 @@
     })
   }}
 
-  {{ govukWarningText({
-  text: "These details will be sent to Adyen to verify your organisation. Make sure they match your organisation's offical records.",
-  iconFallbackText: "Warning"
-}) }}
+  {{
+    govukWarningText({
+      text: "These details will be sent to Adyen to verify your organisation. Make sure they match your organisation's offical records.",
+      iconFallbackText: "Warning"
+    })
+  }}
 
   <form id="organisation-details-review-form" method="post" class="govuk-!-margin-top-4" novalidate>
     <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />

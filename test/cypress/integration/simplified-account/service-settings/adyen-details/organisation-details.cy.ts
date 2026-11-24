@@ -367,7 +367,7 @@ const reasonForTakingPaymentsFormFill = () => {
   cy.a11yCheck()
 
   cy.get('h1').should('contain.text', 'What will your service be taking payments for?')
-  cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
+  cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_REVIEW_PATH)
 
   cy.get('[data-cy="radio-general-local"]').should('exist')
   cy.get('[data-cy="radio-police-safety"]').should('exist')
