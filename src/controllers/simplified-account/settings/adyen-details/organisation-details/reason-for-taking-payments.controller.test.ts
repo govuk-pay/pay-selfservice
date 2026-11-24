@@ -22,7 +22,7 @@ const mockResponse = sinon.stub()
 
 const TEMPLATE = 'simplified-account/settings/adyen-details/reason-for-taking-payments'
 const BACK_LINK = formatServiceAndAccountPathsFor(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
   SERVICE_EXTERNAL_ID,
   SERVICE_TYPE,
   GATEWAY_ACCOUNT.getSwitchingCredential().externalId
