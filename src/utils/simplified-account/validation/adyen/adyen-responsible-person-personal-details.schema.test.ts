@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { adyenResponsiblePersonPersonalDetailsSchema } from './adyen-responsible-person-personal-details.schema'
 import { validationResult } from 'express-validator'
-import { first } from 'node_modules/cheerio/lib/api/traversing'
 
 describe('Adyen responsible persion - personal detail - Schema Validation', () => {
   describe('First name validation', () => {
@@ -150,205 +149,134 @@ describe('Adyen responsible persion - personal detail - Schema Validation', () =
     })
   })
 
-  describe('DOB day validation', () => {
-    it('should pass with a valid DOB day', async () => {
-      const req = {
-        body: {
-          dobDay: '10',
-        },
-      }
+  describe.only('dob', () => {
+    context('when given blank day, month and year', () => {
+      ;[
+        { dobDay: '', dobMonth: '', dobYear: '' },
+        { dobDay: '    ', dobMonth: ' ', dobYear: '' },
+      ].forEach((dob) => {
+        it(`should return invalid when whole date is missig: "${dob.dobDay}" "${dob.dobMonth}" "${dob.dobYear}"`, async () => {
+          const req = { body: { ...dob } }
 
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate.run(req)
+          await adyenResponsiblePersonPersonalDetailsSchema.dob.validate.run(req)
+          const errors = validationResult(req)
 
-      const errors = validationResult(req)
+          expect(errors.isEmpty()).to.be.false
+          expect(errors.array()[0]).to.deep.equal({
+            type: 'field',
+            msg: 'Enter the date of birth',
+            path: 'dob',
+            location: 'body',
+            value: undefined,
+          })
+        })
+      })
+    })
 
-      expect(errors.isEmpty()).to.be.true
+    context('when given invalid day, month or year', () => {
+      ;[
+        { dobDay: '23', dobMonth: 'aa', dobYear: '19' },
+        { dobDay: '    ', dobMonth: 'x', dobYear: '' },
+      ].forEach((dob) => {
+        it(`should pass validation when dob is: "${dob.dobDay}" "${dob.dobMonth}" "${dob.dobYear}"`, async () => {
+          const req = { body: { ...dob } }
+
+          await adyenResponsiblePersonPersonalDetailsSchema.dob.validate.run(req)
+          const errors = validationResult(req)
+
+          expect(errors.isEmpty()).to.be.true
+        })
+      })
+    })
+
+    context('when given valid day, month and year', () => {
+      ;[
+        { dobDay: '12', dobMonth: '02', dobYear: '1999' },
+        { dobDay: '29', dobMonth: '02', dobYear: '2024' },
+      ].forEach((dob) => {
+        it(`should pass validation when dob is: ${dob.dobDay} ${dob.dobMonth} ${dob.dobYear}`, async () => {
+          const req = { body: { ...dob } }
+
+          await adyenResponsiblePersonPersonalDetailsSchema.dob.validate.run(req)
+          const errors = validationResult(req)
+
+          expect(errors.isEmpty()).to.be.true
+        })
+      })
+      ;[
+        { dobDay: '31', dobMonth: '04', dobYear: '1999' },
+        { dobDay: '29', dobMonth: '02', dobYear: '2023' },
+      ].forEach((dob) => {
+        it(`should fail validation when dob is: ${dob.dobDay} ${dob.dobMonth} ${dob.dobYear}`, async () => {
+          const req = { body: { ...dob } }
+
+          await adyenResponsiblePersonPersonalDetailsSchema.dob.validate.run(req)
+          const errors = validationResult(req)
+
+          expect(errors.isEmpty()).to.be.false
+          expect(errors.array()[0]).to.deep.equal({
+            type: 'field',
+            msg: 'Date of birth must be a real date',
+            path: 'dob',
+            location: 'body',
+            value: undefined,
+          })
+        })
+      })
     })
   })
 
-  describe('DOB day validation', () => {
-    it('should pass with a valid DOB day', async () => {
-      const req = {
-        body: {
-          dobDay: '10',
-        },
-      }
+  describe.only('dobDay', () => {
+    it('should return not return an error when all values are empty', async () => {
+      const req = { body: { dobDay: '', dobMonth: '', dobYear: '' } }
 
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate.run(req)
-
+      await adyenResponsiblePersonPersonalDetailsSchema.dob.dobDay.validate.run(req)
       const errors = validationResult(req)
 
       expect(errors.isEmpty()).to.be.true
     })
 
-    it('should fail with an empty DOB day', async () => {
-      const req = {
-        body: {
-          dobDay: '',
-        },
-      }
+    it('should return the correct error message when day is empty but month and year are filled', async () => {
+      const req = { body: { dobDay: '', dobMonth: '02', dobYear: '1999' } }
 
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate.run(req)
-
+      await adyenResponsiblePersonPersonalDetailsSchema.dob.dobDay.validate.run(req)
       const errors = validationResult(req)
 
       expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Date of birth must include a day')
-    })
-
-    it('should fail with a DOB day < 1', async () => {
-      const req = {
-        body: {
-          dobDay: '0',
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Day of birth must be a number between 1 and 31')
-    })
-
-    it('should fail with a DOB day > 31', async () => {
-      const req = {
-        body: {
-          dobDay: '32',
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Day of birth must be a number between 1 and 31')
+      expect(errors.array()[0]).to.deep.equal({
+        type: 'field',
+        msg: 'Date of birth must include a day',
+        path: 'dobDay',
+        location: 'body',
+        value: '',
+      })
     })
   })
 
-  describe('DOB month validation', () => {
-    it('should pass with a valid DOB month', async () => {
-      const req = {
-        body: {
-          dobMonth: '10',
-        },
-      }
+  describe('dobMonth', () => {
+    it('should return not return an error when all values are empty', async () => {
+      const req = { body: { dobDay: '', dobMonth: '', dobYear: '' } }
 
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobMonth.validate.run(req)
-
+      await adyenResponsiblePersonPersonalDetailsSchema.dob.dobMonth.validate.run(req)
       const errors = validationResult(req)
 
       expect(errors.isEmpty()).to.be.true
     })
 
-    it('should fail with an empty DOB month', async () => {
-      const req = {
-        body: {
-          dobMonth: '',
-        },
-      }
+    it('should return the correct error message when month is empty but day and year are filled', async () => {
+      const req = { body: { dobDay: '12', dobMonth: '', dobYear: '1999' } }
 
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobMonth.validate.run(req)
-
+      await adyenResponsiblePersonPersonalDetailsSchema.dob.dobMonth.validate.run(req)
       const errors = validationResult(req)
 
       expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Date of birth must include a month')
-    })
-
-    it('should fail with a DOB month < 1', async () => {
-      const req = {
-        body: {
-          dobMonth: '0',
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobMonth.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Month of birth must be a number between 1 and 12')
-    })
-
-    it('should fail with a DOB month > 12', async () => {
-      const req = {
-        body: {
-          dobMonth: '13',
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobMonth.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Month of birth must be a number between 1 and 12')
-    })
-  })
-
-  describe('DOB year validation', () => {
-    it('should pass with a valid DOB year', async () => {
-      const req = {
-        body: {
-          dobYear: '2025',
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobYear.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.true
-    })
-
-    it('should fail with an empty DOB year', async () => {
-      const req = {
-        body: {
-          dobYear: '',
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobYear.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Date of birth must include a year')
-    })
-
-    it('should fail with a DOB year < 1900', async () => {
-      const req = {
-        body: {
-          dobYear: '1899',
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobYear.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Enter a valid year of birth')
-    })
-
-    it('should fail with a DOB year > current year', async () => {
-      const CURRENT_YEAR = new Date().getFullYear()
-      const NEXT_YEAR = CURRENT_YEAR + 1
-
-      const req = {
-        body: {
-          dobYear: NEXT_YEAR,
-        },
-      }
-
-      await adyenResponsiblePersonPersonalDetailsSchema.details.dobYear.validate.run(req)
-
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()[0].msg).to.equal('Enter a valid year of birth')
+      expect(errors.array()[0]).to.deep.equal({
+        type: 'field',
+        msg: 'Date of birth must include a month',
+        path: 'dobMonth',
+        location: 'body',
+        value: '',
+      })
     })
   })
 })
