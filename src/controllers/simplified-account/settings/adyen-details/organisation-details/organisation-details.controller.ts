@@ -47,7 +47,7 @@ export function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceR
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.reasonForTakingPayments,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
       req.service.externalId,
       req.account.type,
       switchingCredentialId
