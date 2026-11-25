@@ -19,13 +19,10 @@ export const submitOrganisationDetails = async (
   switchingCredentialId: string,
   encodedDocument?: string
 ) => {
-  const telephoneNumber = service.merchantDetails?.telephoneNumber
-
   const storeDetails =
-    account.paymentProvider === PaymentProvider.STRIPE && telephoneNumber
+    account.paymentProvider === PaymentProvider.STRIPE
       ? {
           statementDescriptor: await getStripeStatementDescriptor(account),
-          telephoneNumber,
         }
       : undefined
 

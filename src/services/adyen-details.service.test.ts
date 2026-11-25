@@ -70,6 +70,8 @@ describe('Adyen details service', () => {
       vatRegistrationNumber: 'GB123456789',
       email: 'test@gov.uk',
       governmentActivity: 'general-local',
+      telephoneNumber: '07700700900',
+      website: 'https://service.gov.uk',
     } as OrganisationDetailsSession
 
     const sessionWith = (overrides: Partial<OrganisationDetailsSession>) =>
@@ -127,13 +129,14 @@ describe('Adyen details service', () => {
             postalCode: 'SW1A 1AA',
             country: 'GB',
           },
+          email: 'test@gov.uk',
           registrationNumber: '12345678',
           vatNumber: 'GB123456789',
           support: {
             email: 'test@gov.uk',
-            phone: { number: '+44 1234 567890' },
+            phone: { number: '+44 7700 700900' },
           },
-          phone: { number: '+44 1234 567890' },
+          phone: { number: '+44 7700 700900' },
         },
       })
 
@@ -626,6 +629,7 @@ describe('Adyen details service', () => {
       addressCity: 'London',
       addressPostcode: 'N1 1NN',
       addressCountry: 'GB',
+      telephoneNumber: '07700 700900',
     } as OrganisationDetailsSession
 
     const storeParams = {
@@ -633,7 +637,6 @@ describe('Adyen details service', () => {
       balanceAccountId: 'BA123',
       serviceName: 'Test Service',
       statementDescriptor: 'TEST SERVICE',
-      telephoneNumber: '01234 567890',
       organisationDetails,
     }
 
@@ -662,7 +665,7 @@ describe('Adyen details service', () => {
         merchantId: 'MERCHANT123',
         description: 'Test Service',
         shopperStatement: 'TEST SERVICE',
-        phoneNumber: '+441234567890',
+        phoneNumber: '+447700700900',
         address: {
           line1: '1 Test St',
           line2: undefined,

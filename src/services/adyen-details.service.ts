@@ -39,7 +39,6 @@ export interface CreateStoreParams {
   balanceAccountId: string
   serviceName: string
   statementDescriptor: string
-  telephoneNumber: string
   organisationDetails: OrganisationDetailsSession
 }
 type AccountHolderInfo = Types.balancePlatform.AccountHolderInfo
@@ -89,6 +88,7 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
       postalCode: session.addressPostcode,
       country: session.addressCountry ?? '',
     },
+    email: session.email,
     registrationNumber: session.companyRegistrationNumber,
     vatNumber: ensureVatRegistrationPrefix(session.vatRegistrationNumber),
     doingBusinessAs: service.name,
@@ -96,11 +96,11 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
     support: {
       email: session.email,
       phone: {
-        number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
+        number: formatPhoneNumberWithCountryCode(session.telephoneNumber!),
       },
     },
     phone: {
-      number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
+      number: formatPhoneNumberWithCountryCode(session.telephoneNumber!),
     },
     ...(session.notRegisteredForVat && {
       vatAbsenceReason: VAT_ABSENCE_MAP[session.notRegisteredForVat],
@@ -138,7 +138,7 @@ const createOrganisation = async (
     industryCode: INDUSTRY_CODE_MAP[session.governmentActivity],
     legalEntityId: legalEntity.id,
     salesChannels: ['eCommerce'],
-    webData: [{ webAddress: service.merchantDetails.url }],
+    webData: [{ webAddress: session.website }],
   })
   const accountHolder = await createAccountHolder(legalEntity.id, service.name)
   const balanceAccount = await createBalanceAccount(accountHolder.id, service.name)
@@ -537,7 +537,6 @@ const createStore = async ({
   balanceAccountId,
   serviceName,
   statementDescriptor,
-  telephoneNumber,
   organisationDetails,
 }: CreateStoreParams) => {
   const merchantId = process.env.ADYEN_LIVE_MERCHANT_ACCOUNT_ID
@@ -554,7 +553,7 @@ const createStore = async ({
     merchantId,
     description: serviceName,
     shopperStatement: statementDescriptor,
-    phoneNumber: toUkInternationalNumber(telephoneNumber),
+    phoneNumber: toUkInternationalNumber(organisationDetails.telephoneNumber!),
     address: {
       line1: organisationDetails.addressLine1,
       line2: organisationDetails.addressLine2,
