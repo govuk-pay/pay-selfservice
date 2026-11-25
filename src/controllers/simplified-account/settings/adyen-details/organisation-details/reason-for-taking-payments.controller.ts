@@ -6,7 +6,7 @@ import { markTaskAsComplete } from '@services/adyen-setup.service'
 import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
-import { OrganisationDetailsSession, GovernmentActivity } from './constants'
+import { OrganisationDetailsSession, GovernmentActivity, GOVERNMENT_ACTIVITY_OPTIONS } from './constants'
 import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
 import { PaymentProvider } from '@models/constants/payment-provider'
 import { InvalidConfigurationError } from '@root/errors'
@@ -54,6 +54,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
 
   return response(req, res, 'simplified-account/settings/adyen-details/reason-for-taking-payments', {
     backLink: getBackLink(req),
+    governmentActivityOptions: GOVERNMENT_ACTIVITY_OPTIONS,
   })
 }
 
@@ -76,6 +77,7 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
         formErrors: formattedErrors.formErrors,
       },
       backLink: getBackLink(req),
+      governmentActivityOptions: GOVERNMENT_ACTIVITY_OPTIONS,
     })
   }
 

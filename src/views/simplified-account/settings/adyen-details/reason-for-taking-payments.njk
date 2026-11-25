@@ -2,6 +2,19 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
 {% set settingsPageTitle = 'What will your service be taking payments for?' %}
+{% set governmentActivityItems = [] %}
+
+{% for key, text in governmentActivityOptions %}
+  {%
+    set governmentActivityItems = governmentActivityItems.concat([{
+       value: key,
+       text: text,
+       attributes: {
+         "data-cy": "radio-" + key
+     }
+    }])
+  %}
+{% endfor %}
 
 {% block settingsContent %}
   <form id="reason-for-taking-payments-form" autocomplete="off" method="post" class="govuk-!-margin-top-3">
@@ -22,29 +35,7 @@
         errorMessage: {
           text: errors.formErrors['governmentActivity']
           } if errors.formErrors['governmentActivity'],
-        items: [
-          {
-            value: "general-local",
-            text: "General local government activities",
-            attributes: {
-              "data-cy": "radio-general-local"
-            }
-          },
-          {
-            value: "police-safety",
-            text: "Police and public safety",
-            attributes: {
-              "data-cy": "radio-police-safety"
-            }
-          },
-          {
-            value: "everything-else",
-            text: "Armed forces, cadets, colleges and everything else",
-            attributes: {
-              "data-cy": "radio-everything-else"
-            }
-          }
-        ]
+        items: governmentActivityItems
       })
     }}
 

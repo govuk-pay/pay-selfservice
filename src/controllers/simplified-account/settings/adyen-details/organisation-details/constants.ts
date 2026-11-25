@@ -62,3 +62,9 @@ export const INDUSTRY_CODE_MAP: Record<GovernmentActivity, string> = {
   'police-safety': '92219',
   'everything-else': '92B',
 }
+
+export const GOVERNMENT_ACTIVITY_OPTIONS: Record<GovernmentActivity, string> = {
+  'general-local': 'General local government activities',
+  'police-safety': 'Police and public safety',
+  'everything-else': 'Armed forces, cadets, colleges and everything else',
+}
