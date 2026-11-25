@@ -75,7 +75,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-d
       })
     })
     describe('post', () => {
-      beforeEach(async () => {
+      it('when called with valid data should redirect to the service director address', async () => {
         res.redirect.resetHistory()
 
         nextRequest({
@@ -95,9 +95,7 @@ describe('Controller: settings/adyen-details/service-director/service-director-d
         })
 
         await call('post')
-      })
 
-      it('should redirect to the service director address', () => {
         sinon.assert.calledOnceWithExactly(
           res.redirect,
           formatServiceAndAccountPathsFor(
@@ -106,6 +104,54 @@ describe('Controller: settings/adyen-details/service-director/service-director-d
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
           )
+        )
+      })
+
+      it('when called with invalid data should call the response function with the template path', async () => {
+        res.redirect.resetHistory()
+
+        nextRequest({
+          session: {
+            pageData: {
+              serviceDirector: {},
+            },
+          },
+          body: {
+            firstName: '',
+            lastName: '',
+            dobDay: '31',
+            dobMonth: '04',
+            dobYear: '2002',
+            email: 'invalid_email_address',
+          },
+        })
+
+        await call('post')
+
+        mockResponse.should.have.been.calledWith(
+          sinon.match.any,
+          sinon.match.any,
+          'simplified-account/settings/adyen-details/service-director/details',
+          sinon.match({
+            errors: {
+              summary: [
+                { href: '#first-name', text: 'Enter the service director’s first name' },
+                { href: '#last-name', text: 'Enter the service director’s last name' },
+                { href: '#dob-day', text: 'Date of birth must be a real date' },
+                { href: '#email', text: 'Enter a valid email address' },
+              ],
+              formErrors: {
+                firstName: 'Enter the service director’s first name',
+                lastName: 'Enter the service director’s last name',
+                dob: 'Date of birth must be a real date',
+                email: 'Enter a valid email address',
+              },
+            },
+            backLink: '/service/service123abc/account/live/settings/switch-psp/switch-to-adyen',
+            name: { firstName: '', lastName: '' },
+            dob: { dobDay: '31', dobMonth: '04', dobYear: '2002' },
+            email: 'invalid_email_address',
+          })
         )
       })
     })
