@@ -20,6 +20,7 @@ const ADYEN_LEGAL_ENTITY_ID = 'LE123'
 const ADYEN_DETAILS_BASE_URL = `/service/${SERVICE_EXTERNAL_ID}/account/${LIVE_ACCOUNT_TYPE}/settings/adyen-details/${ADYEN_CREDENTIAL_EXTERNAL_ID}/organisation-details`
 
 const ORGANISATION_DETAILS_PATH = `${ADYEN_DETAILS_BASE_URL}/details`
+const ORGANISATION_DETAILS_REVIEW_PATH = `${ADYEN_DETAILS_BASE_URL}/review`
 const TAKING_PAYMENTS_PATH = `${ADYEN_DETAILS_BASE_URL}/reason-for-taking-payments`
 const REGISTERED_FOR_VAT_PATH = `${ADYEN_DETAILS_BASE_URL}/registered-for-vat`
 const NOT_REGISTERED_FOR_VAT_PATH = `${ADYEN_DETAILS_BASE_URL}/not-registered-for-vat`
@@ -138,6 +139,13 @@ describe(`Organisation details`, () => {
       checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
       organisationDetailsFormFill()
 
+      // org details review
+      cy.location('pathname').should('eq', ORGANISATION_DETAILS_REVIEW_PATH)
+      cy.a11yCheck()
+      cy.get('h1').should('contain.text', 'Check your answers')
+      cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
+      cy.get('#organisation-details-review-confirm').click()
+
       // reason for taking payments
       reasonForTakingPaymentsFormFill()
 
@@ -189,6 +197,13 @@ describe(`Organisation details`, () => {
 
       checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
       organisationDetailsFormFill()
+
+      // org details review
+      cy.location('pathname').should('eq', ORGANISATION_DETAILS_REVIEW_PATH)
+      cy.a11yCheck()
+      cy.get('h1').should('contain.text', 'Check your answers')
+      cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
+      cy.get('#organisation-details-review-confirm').click()
 
       // reason for taking payments
       reasonForTakingPaymentsFormFill()
@@ -368,7 +383,7 @@ const reasonForTakingPaymentsFormFill = () => {
   cy.a11yCheck()
 
   cy.get('h1').should('contain.text', 'What will your service be taking payments for?')
-  cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
+  cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_REVIEW_PATH)
 
   cy.get('[data-cy="radio-general-local"]').should('exist')
   cy.get('[data-cy="radio-police-safety"]').should('exist')

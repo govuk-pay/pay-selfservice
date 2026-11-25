@@ -9,7 +9,7 @@ import { OrganisationDetailsSession, GovernmentActivityBody } from './constants'
 
 function getBackLink(req: ServiceRequest<GovernmentActivityBody>) {
   return formatServiceAndAccountPathsFor(
-    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
     req.service.externalId,
     req.account.type,
     req.account.getSwitchingCredential().externalId
