@@ -1051,6 +1051,22 @@ simplifiedAccount.post(
 )
 
 simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.review.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.review.post
+)
+
+simplifiedAccount.get(
   paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
