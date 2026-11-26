@@ -37,6 +37,7 @@ export interface OrganisationDetailsBody {
   addressCity: string
   addressPostcode: string
   addressCountry: string
+  hasCompanyRegistrationNumber: string
   website: string
   telephoneNumber: string
   email: string
