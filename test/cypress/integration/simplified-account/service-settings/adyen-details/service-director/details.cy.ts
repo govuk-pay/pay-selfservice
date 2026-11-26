@@ -110,6 +110,34 @@ describe(`Service director - details`, () => {
 
       cy.location('pathname').should('eq', SERVICE_DIRECTOR_ADDRESS_PATH)
     })
+
+    it('should show an error summary when continue is pressed without filling in values', () => {
+      const expectedErrors = [
+        { field: '#first-name', message: 'Enter the service director’s first name' },
+        { field: '#last-name', message: 'Enter the service director’s last name' },
+        { field: '#dob-day', message: 'Enter the date of birth' },
+        { field: '#email', message: 'Enter a work email address' },
+      ]
+
+      setStubs()
+
+      cy.visit(SERVICE_DIRECTOR_DETAILS_PATH)
+      cy.get('#service-director-details-submit').click()
+
+      cy.log('the page title has error prefix')
+      cy.title().should('match', /^Error: Service director details - /)
+
+      cy.log('the error summary is present')
+      cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
+
+      cy.log('the correct errors are shown')
+      cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
+      expectedErrors.forEach(({ field, message }, index) => {
+        cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
+      })
+
+      cy.location('pathname').should('eq', SERVICE_DIRECTOR_DETAILS_PATH)
+    })
   })
 
   describe('for a service not migrating to Adyen', () => {

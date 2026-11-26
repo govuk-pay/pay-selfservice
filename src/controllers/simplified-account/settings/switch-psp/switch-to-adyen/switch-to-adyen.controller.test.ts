@@ -23,6 +23,9 @@ const accountSetup = new AdyenAccountSetup({
     bank_details: {
       status: 'NOT_STARTED',
     },
+    size_of_organisation: {
+      status: 'NOT_STARTED',
+    },
     director: {
       status: 'NOT_STARTED',
     },
@@ -80,10 +83,10 @@ describe('Switch to Adyen controller tests', () => {
     }
 
     context.currentPsp.should.eq(PaymentProvider.STRIPE)
-    context.adyenTasks.tasks.should.have.length(7)
+    context.adyenTasks.tasks.should.have.length(8)
     context.adyenTasks.confirmOrganisationTasks.should.have.length(1)
     context.adyenTasks.acceptLegalTermsTasks.should.have.length(1)
-    context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(3)
+    context.adyenTasks.completeOrganisationDetailsTasks.should.have.length(4)
     context.adyenTasks.completeFinalTasks.should.have.length(2)
 
     context.adyenTasks.confirmOrganisationTasks[0].id.should.eq(AdyenTaskIdentifier.ORG_DETAILS)
@@ -95,11 +98,14 @@ describe('Switch to Adyen controller tests', () => {
     context.adyenTasks.completeOrganisationDetailsTasks[0].id.should.eq(AdyenTaskIdentifier.BANK_DETAILS)
     context.adyenTasks.completeOrganisationDetailsTasks[0].status.should.eq(TaskStatus.NOT_STARTED)
 
-    context.adyenTasks.completeOrganisationDetailsTasks[1].id.should.eq(AdyenTaskIdentifier.RESPONSIBLE_PERSON)
-    context.adyenTasks.completeOrganisationDetailsTasks[1].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
+    context.adyenTasks.completeOrganisationDetailsTasks[1].id.should.eq(AdyenTaskIdentifier.SIZE_OF_ORG)
+    context.adyenTasks.completeOrganisationDetailsTasks[1].status.should.eq(TaskStatus.NOT_STARTED)
 
-    context.adyenTasks.completeOrganisationDetailsTasks[2].id.should.eq(AdyenTaskIdentifier.SERVICE_DIRECTOR)
-    context.adyenTasks.completeOrganisationDetailsTasks[2].status.should.eq(TaskStatus.NOT_STARTED)
+    context.adyenTasks.completeOrganisationDetailsTasks[2].id.should.eq(AdyenTaskIdentifier.RESPONSIBLE_PERSON)
+    context.adyenTasks.completeOrganisationDetailsTasks[2].status.should.eq(TaskStatus.COMPLETED_CANNOT_START)
+
+    context.adyenTasks.completeOrganisationDetailsTasks[3].id.should.eq(AdyenTaskIdentifier.SERVICE_DIRECTOR)
+    context.adyenTasks.completeOrganisationDetailsTasks[3].status.should.eq(TaskStatus.NOT_STARTED)
 
     context.adyenTasks.completeFinalTasks[0].id.should.eq(AdyenTaskIdentifier.PAYMENT)
     context.adyenTasks.completeFinalTasks[0].status.should.eq(TaskStatus.CANNOT_START)

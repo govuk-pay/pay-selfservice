@@ -4,7 +4,7 @@ import paths from '@root/paths'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
-import { paymentLinkSchema } from '@utils/simplified-account/validation/payment-link.schema'
+import { paymentLinkSchema } from '@utils/simplified-account/validation/payments-links/payment-link.schema'
 import { PaymentLinkCreationSession } from '@controllers/simplified-account/services/payment-links/create/constants'
 import { slugifyString } from '@utils/simplified-account/format/slugify-string'
 const FRIENDLY_URL = String(process.env.PRODUCTS_FRIENDLY_BASE_URI)

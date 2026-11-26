@@ -5,7 +5,7 @@ import { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import { updateAllowApplePay } from '@services/card-payments.service'
-import { cardPaymentsSchema } from '@utils/simplified-account/validation/card-payments.schema'
+import { cardPaymentsSchema } from '@utils/simplified-account/validation/settings/card-payments.schema'
 
 function get(req: ServiceRequest, res: ServiceResponse) {
   return response(req, res, 'simplified-account/settings/card-payments/apple-pay', {

@@ -41,6 +41,9 @@ const tasksWithStatus: Record<AdyenAccountSetupTaskNameData, AdyenAccountSetupTa
   bank_details: {
     status: 'NOT_STARTED',
   },
+  size_of_organisation: {
+    status: 'NOT_STARTED',
+  },
   director: {
     status: 'NOT_STARTED',
   },
@@ -139,7 +142,7 @@ describe('switch to adyen task list', () => {
         .contains('3. Complete your organisation’s details')
         .next('.govuk-task-list')
         .within(() => {
-          cy.get('.govuk-task-list__item').should('have.length', 3)
+          cy.get('.govuk-task-list__item').should('have.length', 4)
 
           cy.get('.govuk-task-list__item')
             .eq(0)
@@ -157,12 +160,19 @@ describe('switch to adyen task list', () => {
           cy.get('.govuk-task-list__item')
             .eq(1)
             .within(() => {
+              cy.get('.govuk-task-list__name-and-hint').should('contain.text', 'Size of your organisation')
+              cy.get('.govuk-task-list__status').should('contain.text', 'Not yet started')
+            })
+
+          cy.get('.govuk-task-list__item')
+            .eq(2)
+            .within(() => {
               cy.get('.govuk-task-list__name-and-hint').should('contain.text', 'Responsible person')
               cy.get('.govuk-task-list__status').should('contain.text', 'Completed')
             })
 
           cy.get('.govuk-task-list__item')
-            .eq(2)
+            .eq(3)
             .within(() => {
               cy.get('.govuk-task-list__link')
                 .should('contain.text', 'Service director')

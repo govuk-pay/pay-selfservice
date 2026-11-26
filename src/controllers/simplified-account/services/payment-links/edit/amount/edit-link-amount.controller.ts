@@ -5,7 +5,7 @@ import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/fo
 import paths from '@root/paths'
 import { penceToPounds, safeConvertPoundsStringToPence } from '@utils/currency-formatter'
 import { ProductUpdateRequestBuilder } from '@models/products/ProductUpdateRequest.class'
-import { paymentLinkSchema } from '@utils/simplified-account/validation/payment-link.schema'
+import { paymentLinkSchema } from '@utils/simplified-account/validation/payments-links/payment-link.schema'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 import { ServiceRequestParams } from '@utils/types/express/ServiceRequest'

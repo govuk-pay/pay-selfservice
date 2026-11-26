@@ -29,6 +29,8 @@ describe('connector client - patch adyen account setup', () => {
       .legalTerms('COMPLETED')
       .replace()
       .organisationDetails('COMPLETED')
+      .replace()
+      .sizeOfOrganisation('COMPLETED')
 
     await provider
       .addInteraction()
@@ -52,6 +54,11 @@ describe('connector client - patch adyen account setup', () => {
             {
               op: 'replace',
               path: 'organisation_details',
+              value: 'COMPLETED',
+            },
+            {
+              op: 'replace',
+              path: 'size_of_organisation',
               value: 'COMPLETED',
             },
           ])

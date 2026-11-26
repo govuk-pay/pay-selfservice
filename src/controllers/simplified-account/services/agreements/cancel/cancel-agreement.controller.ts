@@ -1,6 +1,6 @@
 import { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { response } from '@utils/response'
-import { validateYesNoAnswer } from '@utils/simplified-account/validation/yes-no-answer.schema'
+import { validateYesNoAnswer } from '@utils/simplified-account/validation/agreements/yes-no-answer.schema'
 import { getAgreement, cancelAgreement } from '@services/agreements.service'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'

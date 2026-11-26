@@ -2,7 +2,10 @@ const paths = require('@root/paths')
 const { response } = require('@utils/response')
 const { constants } = require('@govuk-pay/pay-js-commons')
 const { validationResult } = require('express-validator')
-const { webhookErrorIdentifiers, CREATE_AND_UPDATE_WEBHOOK_VALIDATIONS } = require('@utils/simplified-account/validation/webhook.schema')
+const {
+  webhookErrorIdentifiers,
+  CREATE_AND_UPDATE_WEBHOOK_VALIDATIONS,
+} = require('@utils/simplified-account/validation/settings/webhook.schema')
 const formatSimplifiedAccountPathsFor = require('@utils/simplified-account/format/format-simplified-account-paths-for')
 const formatValidationErrors = require('@utils/simplified-account/format/format-validation-errors')
 const webhooksService = require('@services/webhooks.service')
@@ -11,10 +14,14 @@ const webhooksService = require('@services/webhooks.service')
  * @param {import('@utils/types/settings/settings-request').SettingsRequest} req
  * @param {import('express').Response} res
  */
-async function get (req, res) {
+async function get(req, res) {
   response(req, res, 'simplified-account/settings/webhooks/edit', {
     eventTypes: constants.webhooks.humanReadableSubscriptions,
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.webhooks.index, req.service.externalId, req.account.type)
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.webhooks.index,
+      req.service.externalId,
+      req.account.type
+    ),
   })
 }
 
@@ -23,7 +30,7 @@ async function get (req, res) {
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
  */
-async function post (req, res, next) {
+async function post(req, res, next) {
   const accountIsLive = req.account.type === 'live'
   for (const validation of CREATE_AND_UPDATE_WEBHOOK_VALIDATIONS) {
     await validation.run(req)
@@ -35,13 +42,19 @@ async function post (req, res, next) {
   }
   try {
     await webhooksService.createWebhook(req.service.externalId, req.account.id, accountIsLive, req.body)
-    res.redirect(formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.webhooks.index, req.service.externalId, req.account.type))
+    res.redirect(
+      formatSimplifiedAccountPathsFor(
+        paths.simplifiedAccount.settings.webhooks.index,
+        req.service.externalId,
+        req.account.type
+      )
+    )
   } catch (createWebhookError) {
     if (createWebhookError.errorIdentifier in webhookErrorIdentifiers) {
       const callbackErrorMessage = webhookErrorIdentifiers[createWebhookError.errorIdentifier]
       const callbackUrlError = {
         errorSummary: [{ text: callbackErrorMessage, href: '#callback-url' }],
-        formErrors: { callbackUrl: callbackErrorMessage }
+        formErrors: { callbackUrl: callbackErrorMessage },
       }
       return responseWithErrors(req, res, callbackUrlError)
     } else {
@@ -56,15 +69,19 @@ const responseWithErrors = (req, res, errors) => {
     form: { callbackUrl: req.body.callbackUrl, description: req.body.description, subscriptions },
     errors: {
       summary: errors.errorSummary,
-      formErrors: errors.formErrors
+      formErrors: errors.formErrors,
     },
     eventTypes: constants.webhooks.humanReadableSubscriptions,
-    backLink: formatSimplifiedAccountPathsFor(paths.simplifiedAccount.settings.webhooks.index, req.service.externalId, req.account.type)
+    backLink: formatSimplifiedAccountPathsFor(
+      paths.simplifiedAccount.settings.webhooks.index,
+      req.service.externalId,
+      req.account.type
+    ),
   })
 }
 
 module.exports = {
   get,
   post,
-  responseWithErrors
+  responseWithErrors,
 }

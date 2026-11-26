@@ -128,6 +128,59 @@ describe(`Responsible person - contact details`, () => {
 
         cy.location('pathname').should('eq', RESPONSIBLE_PERSON_REVIEW_PATH)
       })
+
+      describe('when the form is submitted empty', () => {
+        const expectedErrors = [
+          { field: '#telephone-number', message: 'Enter a telephone number' },
+          { field: '#email', message: 'Enter a work email address' },
+        ]
+
+        beforeEach(() => {
+          cy.get('#responsible-person-contact-details-submit').click()
+        })
+
+        it('should stay on the contact details page', () => {
+          cy.location('pathname').should('eq', RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH)
+          cy.get('.govuk-back-link').should('have.attr', 'href', RESPONSIBLE_PERSON_ADDRESS_PATH)
+          cy.a11yCheck()
+        })
+
+        it('should prefix the page title with "Error:"', () => {
+          cy.title().should('match', /^Error: Responsible person’s contact details - Settings - /)
+        })
+
+        it('should display an error summary', () => {
+          cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
+          cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
+          expectedErrors.forEach(({ field, message }, index) => {
+            cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
+          })
+        })
+
+        it('should display an error for every field', () => {
+          expectedErrors.forEach(({ field, message }) => {
+            cy.get(`${field}-error`).should('be.visible').and('contain', message)
+          })
+        })
+      })
+
+      describe('when the form is submitted with invalid values', () => {
+        beforeEach(() => {
+          cy.get('#telephone-number').type('abc')
+          cy.get('#email').type('invalid-email')
+          cy.get('#responsible-person-contact-details-submit').click()
+        })
+
+        it('should display the errors and keep the entered values', () => {
+          cy.get('#telephone-number-error').should(
+            'contain',
+            'Enter a telephone number, like 01632 960 001, 07700 900 982 or +44 0808 157 0192'
+          )
+          cy.get('#email-error').should('contain', 'Enter a real email address')
+          cy.get('#telephone-number').should('have.value', 'abc')
+          cy.get('#email').should('have.value', 'invalid-email')
+        })
+      })
     })
   })
 

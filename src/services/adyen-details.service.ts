@@ -27,6 +27,7 @@ import { AccountHolder } from '@adyen/api-library/lib/src/typings/balancePlatfor
 import { formatPhoneNumberWithCountryCode } from '@utils/telephone-number-utils'
 import { LegalEntityAssociation } from '@adyen/api-library/lib/src/typings/legalEntityManagement/legalEntityAssociation'
 import { InvalidConfigurationError } from '@root/errors'
+import { FinanceOrgDetailsBody } from '@controllers/simplified-account/settings/adyen-details/finance-org-details.controller'
 
 type LegalEntityInfoRequiredType = Types.legalEntityManagement.LegalEntityInfoRequiredType
 type Organization = Types.legalEntityManagement.Organization
@@ -164,8 +165,11 @@ const createOrganisation = async (
 
 const addPaymentMethodsToStore = async (storeId: string, businessLineId: string, merchantId: string) => {
   await addCardPaymentMethods(storeId, businessLineId, merchantId)
-  await addGooglePayPaymentMethods(storeId, businessLineId, merchantId)
+  await addGooglePayPaymentMethod(storeId, businessLineId, merchantId)
+  /*
+  Temporarily removing this function call as it causes issues with Adyen, will be added back in when resolved
   await addPayByBankPaymentMethod(storeId, businessLineId, merchantId)
+  */
 
   logger.info(`Required payment methods added to store`, {
     store_id: storeId,
@@ -201,7 +205,7 @@ async function addCardPaymentMethods(storeId: string, businessLineId: string, me
   }
 }
 
-async function addGooglePayPaymentMethods(storeId: string, businessLineId: string, merchantId: string) {
+async function addGooglePayPaymentMethod(storeId: string, businessLineId: string, merchantId: string) {
   const googlePayPaymentType = PaymentMethodSetupInfo.TypeEnum.Googlepay
 
   const googlePayPaySetupInfo: PaymentMethodSetupInfo = {
@@ -224,6 +228,7 @@ async function addGooglePayPaymentMethods(storeId: string, businessLineId: strin
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function addPayByBankPaymentMethod(storeId: string, businessLineId: string, merchantId: string) {
   const payByBankPaymentType = PaymentMethodSetupInfo.TypeEnum.Paybybank
   const payByBankSetupInfo: PaymentMethodSetupInfo = {
@@ -676,6 +681,32 @@ function formatDateInputs(dobDay: string, dobMonth: string, dobYear: string): st
   return `${dobYear}-${dobMonth?.padStart(2, '0')}-${dobDay?.padStart(2, '0')}`
 }
 
+async function updateFinanceOrgDetails(session: FinanceOrgDetailsBody, organisationLegalEntityId: string) {
+  const legalEntity = await AdyenLEMClient.getLegalEntity(organisationLegalEntityId)
+
+  // legalName and organisation address are required fields for updating the organization, so we use existing values
+  // They should be set when the organisation is created in the previous task.
+  if (!legalEntity?.organization?.legalName || !legalEntity?.organization?.registeredAddress) {
+    throw new Error(`Organisation legal entity with ID ${organisationLegalEntityId} is missing required fields`)
+  }
+  const organizationUpdate = {
+    organization: {
+      legalName: legalEntity?.organization.legalName,
+      registeredAddress: legalEntity.organization.registeredAddress,
+      financialReports: [
+        {
+          annualTurnover: session.annualTurnover,
+          employeeCount: session.employeeCount,
+          currencyOfFinancialData: 'GBP',
+          dateOfFinancialData: formatDateInputs(session.financeDay, session.financeMonth, session.financeYear),
+        },
+      ],
+    },
+  }
+
+  await AdyenLEMClient.updateLegalEntity(organisationLegalEntityId, organizationUpdate)
+}
+
 export {
   setAdyenStoreId,
   createOrganisation,
@@ -689,4 +720,5 @@ export {
   getAccountHolder,
   isAccountHolderVerified,
   uploadRegistrationDocument,
+  updateFinanceOrgDetails,
 }

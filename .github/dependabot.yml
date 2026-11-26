@@ -38,7 +38,7 @@ updates:
   ignore:
   - dependency-name: node
     versions:
-    - ">= 23"
+    - ">= 25"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

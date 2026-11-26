@@ -124,6 +124,64 @@ describe(`Responsible person - address`, () => {
 
         cy.location('pathname').should('eq', RESPONSIBLE_PERSON_CONTACT_DETAILS_PATH)
       })
+
+      describe('when the form is submitted empty', () => {
+        const expectedErrors = [
+          { field: '#address-line1', message: 'Enter address line 1' },
+          { field: '#address-city', message: 'Enter a town or city' },
+          { field: '#address-postcode', message: 'Enter a postcode' },
+        ]
+
+        beforeEach(() => {
+          setStubs()
+          cy.get('#responsible-person-address-submit').click()
+        })
+
+        it('should stay on the address page', () => {
+          cy.location('pathname').should('eq', RESPONSIBLE_PERSON_ADDRESS_PATH)
+          cy.get('.govuk-back-link').should('have.attr', 'href', RESPONSIBLE_PERSON_DETAILS_PATH)
+          cy.a11yCheck()
+        })
+
+        it('should prefix the page title with "Error:"', () => {
+          cy.title().should('match', /^Error: Responsible person’s address - Settings - /)
+        })
+
+        it('should display an error summary', () => {
+          cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
+          cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
+          expectedErrors.forEach(({ field, message }, index) => {
+            cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
+          })
+        })
+
+        it('should display an error for every required field', () => {
+          expectedErrors.forEach(({ field, message }) => {
+            cy.get(`${field}-error`).should('be.visible').and('contain', message)
+          })
+          cy.get('#address-line2-error').should('not.exist')
+        })
+      })
+
+      describe('when the form is submitted with invalid values', () => {
+        beforeEach(() => {
+          setStubs()
+          cy.get('#address-line1').type('a'.repeat(256), { delay: 0 })
+          cy.get('#address-line2').type('a'.repeat(256), { delay: 0 })
+          cy.get('#address-city').type('a'.repeat(256), { delay: 0 })
+          cy.get('#address-postcode').type('invalid postcode')
+          cy.get('#responsible-person-address-submit').click()
+        })
+
+        it('should display an error for every field and keep the entered values', () => {
+          cy.get('.govuk-error-summary__list li').should('have.length', 4)
+          cy.get('#address-line1-error').should('contain', 'Address line 1 must be 255 characters or fewer')
+          cy.get('#address-line2-error').should('contain', 'Address line 2 must be 255 characters or fewer')
+          cy.get('#address-city-error').should('contain', 'Town or city must be 255 characters or fewer')
+          cy.get('#address-postcode-error').should('contain', 'Enter a real postcode')
+          cy.get('#address-postcode').should('have.value', 'INVALID POSTCODE')
+        })
+      })
     })
   })
 

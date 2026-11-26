@@ -66,6 +66,27 @@ class AdyenTask extends Task {
     ).setStatus(status)
   }
 
+  static sizeOfOrganisationTask(
+    service: Service,
+    gatewayAccount: GatewayAccount,
+    accountSetup: AdyenAccountSetup,
+    switchingCredentialId: string
+  ) {
+    const canStart = accountSetup.tasks.legalTerms.status === 'COMPLETED'
+    const status = AdyenTask.checkStatus(accountSetup.tasks.sizeOfOrganisation.status === 'COMPLETED', canStart)
+
+    return new AdyenTask(
+      'Size of your organisation',
+      AdyenTaskIdentifier.SIZE_OF_ORG,
+      formatServiceAndAccountPathsFor(
+        paths.simplifiedAccount.settings.adyenDetails.financeOrgDetails,
+        service.externalId,
+        gatewayAccount.type,
+        switchingCredentialId
+      )
+    ).setStatus(status)
+  }
+
   static bankDetailsTask(
     service: Service,
     gatewayAccount: GatewayAccount,
@@ -159,7 +180,7 @@ class AdyenTask extends Task {
     const paymentCompleted = switchingCredential.state === 'VERIFIED_WITH_LIVE_PAYMENT'
 
     const status = paymentCompleted
-      ? TaskStatus.CANNOT_START
+      ? TaskStatus.COMPLETED
       : isVerified
         ? TaskStatus.NOT_STARTED
         : TaskStatus.CANNOT_START
@@ -233,6 +254,7 @@ export class AdyenTasks extends Tasks<AdyenTask> {
     ]
     const completeOrganisationDetailsTasks = [
       AdyenTask.bankDetailsTask(service, gatewayAccount, accountSetup, switchingCredential.externalId),
+      AdyenTask.sizeOfOrganisationTask(service, gatewayAccount, accountSetup, switchingCredential.externalId),
       AdyenTask.responsiblePersonTask(service, gatewayAccount, accountSetup, switchingCredential.externalId),
       AdyenTask.serviceDirectorTask(service, gatewayAccount, accountSetup, switchingCredential.externalId),
     ]

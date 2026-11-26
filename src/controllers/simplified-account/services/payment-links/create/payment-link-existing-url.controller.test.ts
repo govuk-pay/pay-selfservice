@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import GatewayAccountType from '@models/gateway-account/gateway-account-type'
 import { PaymentLinkCreationSession } from '@controllers/simplified-account/services/payment-links/create/constants'
 import { SlugifiedString } from '@utils/simplified-account/format/slugify-string'
-import { paymentLinkSchema } from '@utils/simplified-account/validation/payment-link.schema'
+import { paymentLinkSchema } from '@utils/simplified-account/validation/payments-links/payment-link.schema'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const GATEWAY_ACCOUNT_ID = 117

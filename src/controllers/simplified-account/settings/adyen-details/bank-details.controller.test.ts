@@ -61,31 +61,118 @@ describe('Controller: settings/adyen-details/bank-details', () => {
     })
   })
   describe('post', () => {
-    it('should complete the bank details task and redirect to the switch to adyen task list', async () => {
-      nextRequest({
-        body: {
-          sortCode: '090102',
-          accountNumber: '00000123',
-        },
+    afterEach(() => {
+      sinon.resetHistory()
+    })
+
+    describe('with valid bank details', () => {
+      it('should create the bank details', async () => {
+        nextRequest({
+          body: {
+            sortCode: '01-01-02',
+            accountNumber: '123456',
+          },
+        })
+
+        await call('post')
+
+        sinon.assert.calledOnceWithExactly(
+          createBankDetails,
+          sinon.match({ sortCode: '010102', accountNumber: '123456' }),
+          SERVICE_EXTERNAL_ID,
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+        )
       })
 
-      await call('post')
-      sinon.assert.calledOnceWithExactly(
-        markTaskAsComplete,
-        SERVICE_EXTERNAL_ID,
-        SERVICE_TYPE,
-        GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
-        'bankDetails'
-      )
+      it('should complete the bank details task and redirect to the switch to adyen task list', async () => {
+        nextRequest({
+          body: {
+            sortCode: '090102',
+            accountNumber: '00000123',
+          },
+        })
 
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          markTaskAsComplete,
           SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE
+          SERVICE_TYPE,
+          GATEWAY_ACCOUNT.getSwitchingCredential().externalId,
+          'bankDetails'
         )
-      )
+
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE
+          )
+        )
+      })
+    })
+
+    describe('with empty bank details', () => {
+      beforeEach(async () => {
+        nextRequest({ body: { sortCode: '', accountNumber: '' } })
+        await call('post')
+      })
+
+      it('should not create the bank details, complete the task or redirect', () => {
+        sinon.assert.notCalled(createBankDetails)
+        sinon.assert.notCalled(markTaskAsComplete)
+        sinon.assert.notCalled(res.redirect)
+      })
+
+      it('should show the page with an error for every field', () => {
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(
+          sinon.match.any,
+          sinon.match.any,
+          'simplified-account/settings/adyen-details/bank-details'
+        )
+        sinon.assert.match(mockResponse.firstCall.lastArg, {
+          errors: {
+            summary: [
+              { text: 'Enter a sort code', href: '#sort-code' },
+              { text: 'Enter an account number', href: '#account-number' },
+            ],
+            formErrors: {
+              sortCode: 'Enter a sort code',
+              accountNumber: 'Enter an account number',
+            },
+          },
+          sortCode: '',
+          accountNumber: '',
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE
+          ),
+        })
+      })
+    })
+
+    describe('with an invalid account number', () => {
+      beforeEach(async () => {
+        nextRequest({ body: { sortCode: '010102', accountNumber: '12345' } })
+        await call('post')
+      })
+
+      it('should not create the bank details', () => {
+        sinon.assert.notCalled(createBankDetails)
+      })
+
+      it('should render the template with the error and the submitted values', () => {
+        sinon.assert.match(mockResponse.firstCall.lastArg, {
+          errors: {
+            formErrors: { accountNumber: 'Account number must be between 6 and 8 digits long' },
+          },
+          sortCode: '010102',
+          accountNumber: '12345',
+        })
+      })
     })
   })
 })

@@ -13,7 +13,7 @@ import { CreateProductRequest } from '@models/products/CreateProductRequest.clas
 import { createProduct } from '@services/products.service'
 import { ProductType } from '@models/products/product-type'
 import { SESSION_KEY } from './constants'
-import { demoPaymentSchema } from '@utils/simplified-account/validation/demo-payment.schema'
+import { demoPaymentSchema } from '@utils/simplified-account/validation/demo-payment/demo-payment.schema'
 import { safeConvertPoundsStringToPence } from '@utils/currency-formatter'
 
 function get(req: ServiceRequest, res: ServiceResponse) {

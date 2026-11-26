@@ -693,14 +693,6 @@ describe('Adyen details service', () => {
       )
 
       sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
-        type: 'paybybank',
-        storeIds: [store.id],
-        businessLineId: 'BL123',
-        countries: ['GB'],
-        currencies: ['GBP'],
-      })
-
-      sinon.assert.calledWith(managementClientMock.requestPaymentMethod, 'MERCHANT123', {
         type: 'googlepay',
         storeIds: [store.id],
         businessLineId: 'BL123',
@@ -742,6 +734,49 @@ describe('Adyen details service', () => {
         timeZone: 'UTC',
       })
       expect(result).to.equal(balanceAccount)
+    })
+  })
+
+  describe('updateFinanceOrgDetails', () => {
+    beforeEach(() => {
+      legalEntityClientMock.getLegalEntity.resolves({
+        id: 'LE123',
+        type: 'organization',
+        organization: {
+          registeredAddress: { city: 'London', country: 'GB' },
+          legalName: 'A name which should be kept',
+        },
+      })
+    })
+
+    it('should update the legalEntity with the finance details', async () => {
+      const financeOrgDetails = {
+        annualTurnover: '500',
+        employeeCount: '250',
+        financeDay: '12',
+        financeMonth: '6',
+        financeYear: '2023',
+      }
+
+      await service.updateFinanceOrgDetails(financeOrgDetails, 'LE123')
+
+      sinon.assert.calledOnceWithExactly(legalEntityClientMock.updateLegalEntity, 'LE123', {
+        organization: {
+          legalName: 'A name which should be kept',
+          registeredAddress: {
+            city: 'London',
+            country: 'GB',
+          },
+          financialReports: [
+            {
+              annualTurnover: '500',
+              employeeCount: '250',
+              currencyOfFinancialData: 'GBP',
+              dateOfFinancialData: '2023-06-12',
+            },
+          ],
+        },
+      })
     })
   })
 })

@@ -318,6 +318,7 @@ module.exports = {
           address: '/settings/adyen-details/:credentialId/service-director/address',
           checkYourAnswers: '/settings/adyen-details/:credentialId/service-director/check-your-answers',
         },
+        financeOrgDetails: '/settings/adyen-details/:credentialId/finance-org-details',
         bankDetails: '/settings/adyen-details/:credentialId/bank-details',
         legalTerms: '/settings/adyen-details/:credentialId/legal-terms',
         organisationDetails: {

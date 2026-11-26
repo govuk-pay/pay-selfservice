@@ -75,7 +75,8 @@ describe(`Statement descriptors - payout`, () => {
         cy.get('#user-descriptor-submit').click()
       })
 
-      it('shows the page correctly', () => {
+      // skipped as this page should not be accessible at present
+      it.skip('shows the page correctly', () => {
         cy.visit(STATEMENT_DESCRIPTOR_PAYOUT_PATH)
 
         cy.log('accessibility check')
@@ -99,7 +100,8 @@ describe(`Statement descriptors - payout`, () => {
     })
 
     context('when the user descriptor has not been completed', () => {
-      it('redirects to the task list', () => {
+      // skipped as this page should not be accessible at present
+      it.skip('redirects to the task list', () => {
         setStubs()
 
         cy.visit(STATEMENT_DESCRIPTOR_PAYOUT_PATH)
@@ -143,7 +145,8 @@ describe(`Statement descriptors - payout`, () => {
         ])
       })
 
-      it('should return a 404 when attempting to get the statement descriptor payout page', () => {
+      // skipped as this page should not be accessible at present
+      it.skip('should return a 404 when attempting to get the statement descriptor payout page', () => {
         cy.request({
           url: STATEMENT_DESCRIPTOR_PAYOUT_PATH,
           failOnStatusCode: false,

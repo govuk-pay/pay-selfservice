@@ -5,7 +5,7 @@ import formatValidationErrors from '@utils/simplified-account/format/format-vali
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { FROM_REVIEW_QUERY_PARAM, PaymentLinkCreationSession } from './constants'
-import { paymentLinkSchema } from '@utils/simplified-account/validation/payment-link.schema'
+import { paymentLinkSchema } from '@utils/simplified-account/validation/payments-links/payment-link.schema'
 
 function get(req: ServiceRequest, res: ServiceResponse) {
   const { service, account } = req
