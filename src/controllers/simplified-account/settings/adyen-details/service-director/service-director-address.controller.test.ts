@@ -144,7 +144,6 @@ describe('Controller: settings/adyen-details/service-director/service-director-a
   describe('post', () => {
     beforeEach(() => {
       res.redirect.resetHistory()
-      mockResponse.resetHistory()
     })
 
     describe('with a valid address', () => {

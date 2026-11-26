@@ -4,7 +4,7 @@
 
 {% block settingsContent %}
   <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
-  <form id="responsible-person-address-form" method="post">
+  <form id="responsible-person-address-form" method="post" novalidate>
     <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
     {% call govukFieldset({}) %}
       <p class="govuk-body"

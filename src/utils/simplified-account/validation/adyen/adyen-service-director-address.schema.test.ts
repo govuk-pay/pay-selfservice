@@ -30,11 +30,7 @@ describe('adyenServiceDirectorAddressSchema', () => {
       const errors = validationResult(req)
 
       expect(errors.isEmpty()).to.be.false
-      expect(errors.array().map((error) => (error.type === 'field' ? error.path : undefined))).to.have.members([
-        'addressLine1',
-        'addressCity',
-        'addressPostcode',
-      ])
+      expect(errors.mapped()).to.have.all.keys(['addressLine1', 'addressCity', 'addressPostcode'])
     })
   })
 
