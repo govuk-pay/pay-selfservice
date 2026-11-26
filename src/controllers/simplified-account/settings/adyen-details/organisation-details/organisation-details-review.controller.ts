@@ -54,4 +54,3 @@ export function post(req: ServiceRequest, res: ServiceResponse) {
     )
   )
 }
-

@@ -188,7 +188,6 @@ describe(`Organisation details`, () => {
       cy.location('pathname').should('eq', TASK_LIST_PATH)
     })
 
-
     it('should walk through flow in sequence if not registered for VAT and does not have an organisation number', () => {
       describe('when the organisation details form is submitted empty', () => {
         const expectedErrors = [
@@ -202,7 +201,6 @@ describe(`Organisation details`, () => {
             message: 'Select yes if your organisation has a company registration number',
           },
         ]
-
 
         beforeEach(() => {
           setStubs()

@@ -149,4 +149,3 @@ describe('Controller: settings/adyen-details/reason-for-taking-payments', () => 
     })
   })
 })
-
