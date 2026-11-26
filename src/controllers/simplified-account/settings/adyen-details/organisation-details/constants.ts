@@ -37,6 +37,8 @@ export interface OrganisationDetailsBody {
   addressCity: string
   addressPostcode: string
   addressCountry: string
+  website: string
+  telephoneNumber: string
   email: string
 }
 
@@ -47,10 +49,12 @@ export class OrganisationDetailsSession {
   addressCity?: string
   addressPostcode?: string
   addressCountry?: string
+  website?: string
+  telephoneNumber?: string
+  email?: string
   hasCompanyRegistrationNumber?: string
   companyRegistrationNumber?: string
   vatRegistrationNumber?: string
-  email?: string
   governmentActivity?: GovernmentActivity
   registeredForVat?: string
   notRegisteredForVat?: VatAbsenceReason

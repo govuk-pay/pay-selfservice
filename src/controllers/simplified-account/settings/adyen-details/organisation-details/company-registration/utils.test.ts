@@ -92,7 +92,6 @@ describe('submitOrganisationDetails', () => {
       balanceAccountId: 'BA123',
       serviceName: SERVICE.name,
       statementDescriptor: 'TEST SERVICE',
-      telephoneNumber: TELEPHONE_NUMBER,
       organisationDetails: SESSION,
     })
   })
