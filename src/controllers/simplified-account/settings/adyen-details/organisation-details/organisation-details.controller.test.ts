@@ -121,34 +121,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
     }
 
     describe('with a valid body', () => {
-      it('should redirect to the company registration number page', async () => {
-        nextRequest({ body: VALID_BODY, session: {} })
-        await call('post')
-        sinon.assert.calledOnceWithExactly(
-          res.redirect,
-          formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-          )
-        )
-      })
-
-      it('should redirect to the VAT registration number page when there is no company registration number', async () => {
-        nextRequest({ body: { ...VALID_BODY, hasCompanyRegistrationNumber: 'false' }, session: {} })
-        await call('post')
-        sinon.assert.calledOnceWithExactly(
-          res.redirect,
-          formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-          )
-        )
-      })
-
       it('should not render the page with errors', async () => {
         nextRequest({ body: VALID_BODY, session: {} })
         await call('post')
@@ -156,6 +128,7 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
       })
 
       it('should redirect to the review page', async () => {
+        nextRequest({ body: VALID_BODY, session: {} })
         await call('post')
         sinon.assert.calledOnceWithExactly(
           res.redirect,
@@ -168,8 +141,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
         )
       })
     })
-
-
 
     describe('with an empty body', () => {
       beforeEach(async () => {
@@ -194,7 +165,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           addressCountry: 'Select a country',
           addressPostcode: 'Enter a postcode',
           email: 'Enter an email address',
-          hasCompanyRegistrationNumber: 'Select yes if your organisation has a company registration number',
         })
         sinon.assert.match(context.errors.summary, [
           { text: 'Enter an organisation name', href: '#organisation-name' },
@@ -203,10 +173,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           { text: 'Select a country', href: '#address-country' },
           { text: 'Enter a postcode', href: '#address-postcode' },
           { text: 'Enter an email address', href: '#email' },
-          {
-            text: 'Select yes if your organisation has a company registration number',
-            href: '#has-company-registration-number',
-          },
         ])
       })
     })

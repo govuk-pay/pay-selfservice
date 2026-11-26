@@ -122,11 +122,6 @@ const adyenOrganisationDetailsSchema = {
       .isEmail()
       .withMessage('Enter an email address in the correct format'),
   },
-  hasCompanyRegistrationNumber: {
-    validate: body('hasCompanyRegistrationNumber')
-      .isIn(['true', 'false'])
-      .withMessage('Select yes if your organisation has a company registration number'),
-  },
 }
 
 const ADYEN_ORGANISATION_DETAILS_VALIDATIONS: ValidationChain[] = [
@@ -137,7 +132,6 @@ const ADYEN_ORGANISATION_DETAILS_VALIDATIONS: ValidationChain[] = [
   adyenOrganisationDetailsSchema.organisationAddress.country.validate,
   adyenOrganisationDetailsSchema.organisationAddress.postcode.validate,
   adyenOrganisationDetailsSchema.email.validate,
-  adyenOrganisationDetailsSchema.hasCompanyRegistrationNumber.validate,
 ]
 
 export { adyenOrganisationDetailsSchema, ADYEN_ORGANISATION_DETAILS_VALIDATIONS }

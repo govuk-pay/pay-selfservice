@@ -488,40 +488,4 @@ describe('adyenOrganisationDetailsSchema', () => {
       })
     })
   })
-
-  describe('hasCompanyRegistrationNumber', () => {
-    it('should pass validation when hasCompanyRegistrationNumber is true', async () => {
-      const req = { body: { hasCompanyRegistrationNumber: 'true' } }
-
-      await adyenOrganisationDetailsSchema.hasCompanyRegistrationNumber.validate.run(req)
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.true
-    })
-
-    it('should pass validation when hasCompanyRegistrationNumber is false', async () => {
-      const req = { body: { hasCompanyRegistrationNumber: 'false' } }
-
-      await adyenOrganisationDetailsSchema.hasCompanyRegistrationNumber.validate.run(req)
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.true
-    })
-
-    it('should fail validation when hasCompanyRegistrationNumber is empty', async () => {
-      const req = { body: { hasCompanyRegistrationNumber: '' } }
-
-      await adyenOrganisationDetailsSchema.hasCompanyRegistrationNumber.validate.run(req)
-      const errors = validationResult(req)
-
-      expect(errors.isEmpty()).to.be.false
-      expect(errors.array()).to.deep.include({
-        type: 'field',
-        value: '',
-        msg: 'Select yes if your organisation has a company registration number',
-        path: 'hasCompanyRegistrationNumber',
-        location: 'body',
-      })
-    })
-  })
 })

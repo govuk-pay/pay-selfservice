@@ -181,40 +181,8 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
           },
         },
         vatRegistrationNumber: 'invalid-vat-number',
-      })
-    })
-
-    it('should set the backLink to organisation details when there is no company registration number', async () => {
-      nextRequest({
-        body: invalidBody,
-        session: {
-          pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'false' } },
-        },
-      })
-      await call('post')
-
-      sinon.assert.match(mockResponse.firstCall.lastArg, {
         backLink: formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.index,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-        ),
-      })
-    })
-
-    it('should set the backLink to company registration number when there is a company registration number', async () => {
-      nextRequest({
-        body: invalidBody,
-        session: {
-          pageData: { organisationDetails: { ...organisationDetails, hasCompanyRegistrationNumber: 'true' } },
-        },
-      })
-      await call('post')
-
-      sinon.assert.match(mockResponse.firstCall.lastArg, {
-        backLink: formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+          paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
           SERVICE_EXTERNAL_ID,
           SERVICE_TYPE,
           GATEWAY_ACCOUNT.getSwitchingCredential().externalId
@@ -223,3 +191,4 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
     })
   })
 })
+
