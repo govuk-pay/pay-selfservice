@@ -3,10 +3,21 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { FROM_REVIEW_QUERY_PARAM, ServiceDirectorSession } from './constants'
+import { validationResult } from 'express-validator'
+import { formatValidationErrors } from '@utils/simplified-account/format'
+import { ADYEN_SERVICE_DIRECTOR_ADDRESS_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-service-director-address.schema'
+
+function getBackLink(req: ServiceRequest<unknown>) {
+  const switchingCredentialId = req.account.getSwitchingCredential().externalId
+  const backPath =
+    req.query[FROM_REVIEW_QUERY_PARAM] === 'true'
+      ? paths.simplifiedAccount.settings.adyenDetails.serviceDirector.checkYourAnswers
+      : paths.simplifiedAccount.settings.adyenDetails.serviceDirector.details
+
+  return formatServiceAndAccountPathsFor(backPath, req.service.externalId, req.account.type, switchingCredentialId)
+}
 
 function get(req: ServiceRequest, res: ServiceResponse) {
-  const { account } = req
-  const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = ServiceDirectorSession.extract(req)
 
   if (currentSession.isEmpty()) {
@@ -26,24 +37,8 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     addressPostcode: currentSession.addressPostcode ?? '',
   }
 
-  const detailsLink = formatServiceAndAccountPathsFor(
-    paths.simplifiedAccount.settings.adyenDetails.serviceDirector.details,
-    req.service.externalId,
-    req.account.type,
-    switchingCredentialId
-  )
-
-  const reviewLink = formatServiceAndAccountPathsFor(
-    paths.simplifiedAccount.settings.adyenDetails.serviceDirector.checkYourAnswers,
-    req.service.externalId,
-    req.account.type,
-    switchingCredentialId
-  )
-
-  const backLink = req.query[FROM_REVIEW_QUERY_PARAM] === 'true' ? reviewLink : detailsLink
-
   return response(req, res, 'simplified-account/settings/adyen-details/service-director/address', {
-    backLink,
+    backLink: getBackLink(req),
     address,
   })
 }
@@ -55,10 +50,33 @@ interface ServiceDirectorAddressBody {
   addressPostcode: string
 }
 
-function post(req: ServiceRequest<ServiceDirectorAddressBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<ServiceDirectorAddressBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = ServiceDirectorSession.extract(req)
+
+  for (const validation of ADYEN_SERVICE_DIRECTOR_ADDRESS_VALIDATIONS) {
+    await validation.run(req)
+  }
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    const formattedErrors = formatValidationErrors(errors)
+
+    return response(req, res, 'simplified-account/settings/adyen-details/service-director/address', {
+      errors: {
+        summary: formattedErrors.errorSummary,
+        formErrors: formattedErrors.formErrors,
+      },
+      address: {
+        addressLine1: req.body.addressLine1,
+        addressLine2: req.body.addressLine2,
+        addressCity: req.body.addressCity,
+        addressPostcode: req.body.addressPostcode,
+      },
+      backLink: getBackLink(req),
+    })
+  }
 
   ServiceDirectorSession.set(req, currentSession, {
     addressLine1: req.body.addressLine1,
