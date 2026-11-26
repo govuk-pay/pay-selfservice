@@ -3,14 +3,14 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { markTaskAsComplete } from '@services/adyen-setup.service'
-import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
-import { OrganisationDetailsSession, GovernmentActivity } from './constants'
+import { OrganisationDetailsSession, GovernmentActivity, GOVERNMENT_ACTIVITY_OPTIONS } from './constants'
 import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
 import { PaymentProvider } from '@models/constants/payment-provider'
 import { InvalidConfigurationError } from '@root/errors'
 import { getStripeStatementDescriptor } from '@services/stripe-details.service'
+import { ADYEN_REASON_FOR_TAKING_PAYMENTS_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-reason-for-taking-payments.schema'
 
 interface ReasonForTakingPaymentsBody {
   governmentActivity: GovernmentActivity
@@ -54,6 +54,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
 
   return response(req, res, 'simplified-account/settings/adyen-details/reason-for-taking-payments', {
     backLink: getBackLink(req),
+    governmentActivityOptions: GOVERNMENT_ACTIVITY_OPTIONS,
   })
 }
 
@@ -62,9 +63,9 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = OrganisationDetailsSession.extract(req)
 
-  const validations = [adyenDetailsSchema.selectGovernmentActivity.validate]
-
-  await Promise.all(validations.map((validation) => validation.run(req)))
+  for (const validation of ADYEN_REASON_FOR_TAKING_PAYMENTS_VALIDATIONS) {
+    await validation.run(req)
+  }
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -76,6 +77,7 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
         formErrors: formattedErrors.formErrors,
       },
       backLink: getBackLink(req),
+      governmentActivityOptions: GOVERNMENT_ACTIVITY_OPTIONS,
     })
   }
 
