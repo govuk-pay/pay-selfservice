@@ -142,34 +142,95 @@ describe('Controller: settings/adyen-details/service-director/service-director-a
     })
   })
   describe('post', () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       res.redirect.resetHistory()
+    })
 
-      nextRequest({
-        session: {
-          pageData: {
-            serviceDirector: {},
+    describe('with a valid address', () => {
+      beforeEach(async () => {
+        nextRequest({
+          session: {
+            pageData: {
+              serviceDirector: {},
+            },
           },
-        },
-        body: {
-          addressLine1: '29 Acacia Road',
-          addressCity: 'London',
-          addressPostcode: 'W1 2AB',
-        },
+          body: {
+            addressLine1: '1 Test Street',
+            addressCity: 'Swansea',
+            addressPostcode: 'T3 5TT',
+          },
+        })
+
+        await call('post')
       })
 
-      await call('post')
-    })
-    it('should redirect to service director check your answers page', () => {
-      sinon.assert.calledOnceWithExactly(
-        res.redirect,
-        formatServiceAndAccountPathsFor(
-          paths.simplifiedAccount.settings.adyenDetails.serviceDirector.checkYourAnswers,
-          SERVICE_EXTERNAL_ID,
-          SERVICE_TYPE,
-          GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+      it('should redirect to service director check your answers page', () => {
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.serviceDirector.checkYourAnswers,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
         )
-      )
+      })
+    })
+
+    describe('with an empty address', () => {
+      beforeEach(async () => {
+        nextRequest({
+          session: {
+            pageData: {
+              serviceDirector: { firstName: 'Dan' },
+            },
+          },
+          body: {
+            addressLine1: '',
+            addressLine2: '',
+            addressCity: '',
+            addressPostcode: '',
+          },
+        })
+
+        await call('post')
+      })
+
+      it('should show the page with an error for every required field', () => {
+        sinon.assert.notCalled(res.redirect)
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(
+          sinon.match.any,
+          sinon.match.any,
+          'simplified-account/settings/adyen-details/service-director/address'
+        )
+        sinon.assert.match(mockResponse.firstCall.lastArg, {
+          errors: {
+            summary: [
+              { text: 'Enter address line 1', href: '#address-line1' },
+              { text: 'Enter a town or city', href: '#address-city' },
+              { text: 'Enter a postcode', href: '#address-postcode' },
+            ],
+            formErrors: {
+              addressLine1: 'Enter address line 1',
+              addressCity: 'Enter a town or city',
+              addressPostcode: 'Enter a postcode',
+            },
+          },
+          address: {
+            addressLine1: '',
+            addressLine2: '',
+            addressCity: '',
+            addressPostcode: '',
+          },
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.serviceDirector.details,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          ),
+        })
+      })
     })
   })
 })
