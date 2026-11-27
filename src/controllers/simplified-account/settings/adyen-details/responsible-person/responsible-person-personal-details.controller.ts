@@ -49,12 +49,9 @@ function get(req: ServiceRequest, res: ServiceResponse) {
 }
 
 const validations = [
-  adyenResponsiblePersonPersonalDetailsSchema.details.firstName.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.lastName.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dob.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dobMonth.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dobYear.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.firstName.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.lastName.validate,
+  adyenResponsiblePersonPersonalDetailsSchema.dob.validate,
 ]
 
 async function post(req: ServiceRequest<ResponsiblePersonPersonalDetailsBody>, res: ServiceResponse) {
@@ -62,7 +59,10 @@ async function post(req: ServiceRequest<ResponsiblePersonPersonalDetailsBody>, r
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = ResponsiblePersonSession.extract(req)
 
-  await Promise.all(validations.map((validation) => validation.run(req)))
+  for (const validation of validations) {
+    await validation.run(req)
+  }
+
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
