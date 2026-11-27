@@ -1,9 +1,9 @@
 import { GatewayAccountCredentialUpdateRequest } from '@models/gateway-account-credential/GatewayAccountCredentialUpdateRequest.class'
 import ConnectorClient from '@services/clients/pay/ConnectorClient.class'
 import {
-  GovernmentActivity,
   INDUSTRY_CODE_MAP,
   OrganisationDetailsSession,
+  VAT_ABSENCE_MAP,
 } from '@controllers/simplified-account/settings/adyen-details/organisation-details/constants'
 import { Types } from '@adyen/api-library'
 import { CreateBankDetailsBody } from '@controllers/simplified-account/settings/adyen-details/bank-details.controller'
@@ -40,7 +40,6 @@ export interface CreateStoreParams {
   balanceAccountId: string
   serviceName: string
   statementDescriptor: string
-  telephoneNumber: string
   organisationDetails: OrganisationDetailsSession
 }
 type AccountHolderInfo = Types.balancePlatform.AccountHolderInfo
@@ -90,6 +89,7 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
       postalCode: session.addressPostcode,
       country: session.addressCountry ?? '',
     },
+    email: session.email,
     registrationNumber: session.companyRegistrationNumber,
     vatNumber: ensureVatRegistrationPrefix(session.vatRegistrationNumber),
     doingBusinessAs: service.name,
@@ -97,12 +97,15 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
     support: {
       email: session.email,
       phone: {
-        number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
+        number: formatPhoneNumberWithCountryCode(session.telephoneNumber!),
       },
     },
     phone: {
-      number: formatPhoneNumberWithCountryCode(service.merchantDetails!.telephoneNumber),
+      number: formatPhoneNumberWithCountryCode(session.telephoneNumber!),
     },
+    ...(session.notRegisteredForVat && {
+      vatAbsenceReason: VAT_ABSENCE_MAP[session.notRegisteredForVat],
+    }),
   }
 
   const legalEntityInfo: LegalEntityInfoRequiredType = {
@@ -115,7 +118,6 @@ const createOrganisationLegalEntity = (session: OrganisationDetailsSession, serv
 
 const createOrganisation = async (
   session: OrganisationDetailsSession,
-  governmentActivity: GovernmentActivity,
   service: Service,
   accountType: string,
   switchingCredentialId: string,
@@ -124,15 +126,20 @@ const createOrganisation = async (
   if (!service.merchantDetails?.url) {
     throw new InvalidConfigurationError(`No URL set in merchant details [service_external_id: ${service.externalId}]`)
   }
+  if (!session.governmentActivity) {
+    throw new InvalidConfigurationError(
+      `No government activity set in session [service_external_id: ${service.externalId}]`
+    )
+  }
 
   const legalEntity = await createOrganisationLegalEntity(session, service)
 
   const businessLine = await AdyenLEMClient.createBusinessLine({
     service: BusinessLineInfo.ServiceEnum.PaymentProcessing,
-    industryCode: INDUSTRY_CODE_MAP[governmentActivity],
+    industryCode: INDUSTRY_CODE_MAP[session.governmentActivity],
     legalEntityId: legalEntity.id,
     salesChannels: ['eCommerce'],
-    webData: [{ webAddress: service.merchantDetails.url }],
+    webData: [{ webAddress: session.website }],
   })
   const accountHolder = await createAccountHolder(legalEntity.id, service.name)
   const balanceAccount = await createBalanceAccount(accountHolder.id, service.name)
@@ -535,7 +542,6 @@ const createStore = async ({
   balanceAccountId,
   serviceName,
   statementDescriptor,
-  telephoneNumber,
   organisationDetails,
 }: CreateStoreParams) => {
   const merchantId = process.env.ADYEN_LIVE_MERCHANT_ACCOUNT_ID
@@ -552,7 +558,7 @@ const createStore = async ({
     merchantId,
     description: serviceName,
     shopperStatement: statementDescriptor,
-    phoneNumber: toUkInternationalNumber(telephoneNumber),
+    phoneNumber: toUkInternationalNumber(organisationDetails.telephoneNumber!),
     address: {
       line1: organisationDetails.addressLine1,
       line2: organisationDetails.addressLine2,
@@ -571,6 +577,28 @@ const createStore = async ({
   await addPaymentMethodsToStore(store.id!, businessLineId, merchantId)
 
   return store
+}
+
+const uploadRegistrationDocument = async (legalEntityId: string, serviceName: string, encodedDocument: string) => {
+  const ownerEntity: Types.legalEntityManagement.OwnerEntity = {
+    id: legalEntityId,
+    type: 'legalEntity',
+  }
+
+  const attachment = {
+    content: encodedDocument,
+  } as Types.legalEntityManagement.Attachment
+
+  const document: Types.legalEntityManagement.Document = {
+    owner: ownerEntity,
+    attachments: [attachment],
+    description: `Registration document for service ${serviceName}`,
+    type: Types.legalEntityManagement.Document.TypeEnum.RegistrationDocument,
+  }
+
+  const documentId = (await AdyenLEMClient.uploadDocument(document)).id
+
+  logger.info(`Successfully uploaded a document: ${documentId}`)
 }
 
 interface OrganisationDetailsSummary {
@@ -691,5 +719,6 @@ export {
   getOrganisationDetailsSummary,
   getAccountHolder,
   isAccountHolderVerified,
+  uploadRegistrationDocument,
   updateFinanceOrgDetails,
 }

@@ -199,3 +199,15 @@ export function requestPaymentMethod(merchantId: string) {
     },
   }
 }
+
+export function uploadDocument() {
+  const path = `/lem/v4/documents`
+
+  return {
+    success: function (document: { id: string }) {
+      return stubBuilder('POST', path, 200, {
+        response: document,
+      })
+    },
+  }
+}

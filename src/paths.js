@@ -323,10 +323,17 @@ module.exports = {
         legalTerms: '/settings/adyen-details/:credentialId/legal-terms',
         organisationDetails: {
           index: '/settings/adyen-details/:credentialId/organisation-details/details',
+          review: '/settings/adyen-details/:credentialId/organisation-details/review',
+          hasCompanyRegistration:
+            '/settings/adyen-details/:credentialId/organisation-details/has-company-registration-number',
+          organisationRegistrationUpload:
+            '/settings/adyen-details/:credentialId/organisation-details/organisation-registration/upload',
           companyRegistration: '/settings/adyen-details/:credentialId/organisation-details/company-registration-number',
-          vatRegistration: '/settings/adyen-details/:credentialId/organisation-details/vat-number',
+          vatRegistrationNumber: '/settings/adyen-details/:credentialId/organisation-details/vat-number',
           reasonForTakingPayments:
             '/settings/adyen-details/:credentialId/organisation-details/reason-for-taking-payments',
+          registeredForVat: '/settings/adyen-details/:credentialId/organisation-details/registered-for-vat',
+          notRegisteredForVat: '/settings/adyen-details/:credentialId/organisation-details/not-registered-for-vat',
         },
         statementDescriptors: {
           user: '/settings/adyen-details/:credentialId/statement-descriptors/user',

@@ -44,7 +44,7 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
         mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
       })
 
-      it('should call the response method with blank organisation details, hasCompanyRegistrationNumber, countries and backLink', () => {
+      it('should call the response method with blank organisation details and backLink', () => {
         mockResponse.should.have.been.calledOnce
         const context = mockResponse.firstCall.lastArg as {
           organisationDetails: object
@@ -61,7 +61,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
             addressPostcode: '',
             addressCountry: 'GB',
           },
-          hasCompanyRegistrationNumber: '',
           countries: countries.govukFrontendFormatted('GB'),
           backLink: formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
@@ -83,7 +82,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
                 addressCity: 'swansea',
                 addressPostcode: 'T3 5TT',
                 addressCountry: 'GB',
-                hasCompanyRegistrationNumber: 'true',
               },
             },
           },
@@ -94,7 +92,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
       it('should call the response method with the session values', () => {
         const context = mockResponse.firstCall.lastArg as {
           organisationDetails: { organisationName: string }
-          hasCompanyRegistrationNumber: string
         }
         sinon.assert.match(context.organisationDetails, {
           organisationName: 'Test Organisation',
@@ -103,7 +100,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           addressPostcode: 'T3 5TT',
           addressCountry: 'GB',
         })
-        sinon.assert.match(context.hasCompanyRegistrationNumber, 'true')
       })
     })
   })
@@ -116,43 +112,30 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
       addressCity: 'swansea',
       addressPostcode: 'T3 5TT',
       addressCountry: 'GB',
+      telephoneNumber: '0161677677',
+      website: 'www.bbc.co.uk',
       email: 'test@example.com',
-      hasCompanyRegistrationNumber: 'true',
     }
 
     describe('with a valid body', () => {
-      it('should redirect to the company registration number page', async () => {
-        nextRequest({ body: VALID_BODY, session: {} })
-        await call('post')
-        sinon.assert.calledOnceWithExactly(
-          res.redirect,
-          formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-          )
-        )
-      })
-
-      it('should redirect to the VAT registration number page when there is no company registration number', async () => {
-        nextRequest({ body: { ...VALID_BODY, hasCompanyRegistrationNumber: 'false' }, session: {} })
-        await call('post')
-        sinon.assert.calledOnceWithExactly(
-          res.redirect,
-          formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-          )
-        )
-      })
-
       it('should not render the page with errors', async () => {
         nextRequest({ body: VALID_BODY, session: {} })
         await call('post')
         mockResponse.should.not.have.been.called
+      })
+
+      it('should redirect to the review page', async () => {
+        nextRequest({ body: VALID_BODY, session: {} })
+        await call('post')
+        sinon.assert.calledOnceWithExactly(
+          res.redirect,
+          formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
+          )
+        )
       })
     })
 
@@ -179,7 +162,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           addressCountry: 'Select a country',
           addressPostcode: 'Enter a postcode',
           email: 'Enter an email address',
-          hasCompanyRegistrationNumber: 'Select yes if your organisation has a company registration number',
         })
         sinon.assert.match(context.errors.summary, [
           { text: 'Enter an organisation name', href: '#organisation-name' },
@@ -188,10 +170,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           { text: 'Select a country', href: '#address-country' },
           { text: 'Enter a postcode', href: '#address-postcode' },
           { text: 'Enter an email address', href: '#email' },
-          {
-            text: 'Select yes if your organisation has a company registration number',
-            href: '#has-company-registration-number',
-          },
         ])
       })
     })
@@ -210,7 +188,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
         const context = mockResponse.firstCall.lastArg as {
           errors: { formErrors: Record<string, string> }
           organisationDetails: object
-          hasCompanyRegistrationNumber: string
           countries: unknown[]
           backLink: string
         }
@@ -225,7 +202,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
             addressCountry: 'GB',
             email: 'not-an-email',
           },
-          hasCompanyRegistrationNumber: 'false',
           countries: countries.govukFrontendFormatted('GB'),
           backLink: formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,

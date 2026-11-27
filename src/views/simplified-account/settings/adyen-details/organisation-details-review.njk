@@ -1,0 +1,95 @@
+{% extends "../settings-layout.njk" %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set settingsPageTitle = "Check your answers" %}
+
+
+{% set addressHtml %}
+  {%- for line in fullAddress -%}
+    {{ line }}{% if not loop.last %}<br />{% endif %}
+  {%- endfor -%}
+{% endset %}
+
+{% block settingsContent %}
+  <h1 class="govuk-heading-l">{{ settingsPageTitle }}</h1>
+
+  {{
+    govukSummaryList({
+      card: {
+        title: {
+          text: "Organisation details"
+        },
+        actions: {
+          items: [
+            {
+              href: backLink,
+              text: "Change",
+              visuallyHiddenText: "organisation details",
+              attributes: { 'data-cy' : 'edit-organisation-details'}
+            }
+          ]
+        }
+      },
+      rows: [
+        {
+          key: {
+            text: "Name"
+          },
+          value: {
+            html: currentSession.organisationName
+          }
+        },
+        {
+          key: {
+            text: "Address"
+          },
+          value: {
+            html: addressHtml
+          }
+        },
+        {
+          key: {
+            text: "Telephone Number"
+          },
+          value: {
+            html: currentSession.telephoneNumber
+          }
+        },
+        {
+          key: {
+            text: "Website address"
+          },
+          value: {
+            html: currentSession.website
+          }
+        },
+        {
+          key: {
+            text: "Email address"
+          },
+          value: {
+            html: currentSession.email
+          }
+        }
+      ]
+    })
+  }}
+
+  {{
+    govukWarningText({
+      text: "These details will be sent to Adyen to verify your organisation. Make sure they match your organisation's offical records.",
+      iconFallbackText: "Warning"
+    })
+  }}
+
+  <form id="organisation-details-review-form" method="post" class="govuk-!-margin-top-4" novalidate>
+    <input id="csrf" name="csrfToken" type="hidden" value="{{ csrf }}" />
+
+    {{
+      govukButton({
+        text: "Confirm",
+        id: "organisation-details-review-confirm"
+      })
+    }}
+  </form>
+{% endblock %}

@@ -18,7 +18,9 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
     addressCity: currentSession.addressCity ?? '',
     addressPostcode: currentSession.addressPostcode ?? '',
     addressCountry: currentSession.addressCountry ?? 'GB',
-    email: currentSession.email ?? '',
+    telephoneNumber: currentSession.telephoneNumber,
+    website: currentSession.website,
+    email: currentSession.email,
   }
 
   return response(req, res, 'simplified-account/settings/adyen-details/organisation-details', {
@@ -36,6 +38,7 @@ export function get(req: ServiceRequest, res: ServiceResponse) {
 export async function post(req: ServiceRequest<OrganisationDetailsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
+
   const existingSession = OrganisationDetailsSession.extract(req)
 
   // run sequentially so the error summary matches the order of fields on the page
@@ -78,27 +81,19 @@ export async function post(req: ServiceRequest<OrganisationDetailsBody>, res: Se
     addressCity: req.body.addressCity,
     addressPostcode: req.body.addressPostcode,
     addressCountry: req.body.addressCountry,
-    hasCompanyRegistrationNumber: req.body.hasCompanyRegistrationNumber,
+    telephoneNumber: req.body.telephoneNumber,
+    website: req.body.website,
     email: req.body.email,
   } as OrganisationDetailsSession
 
   OrganisationDetailsSession.set(req, existingSession, updatedSession)
 
-  const hasCompanyRegistrationNumber = req.body.hasCompanyRegistrationNumber === 'true'
-
-  const redirectPath = hasCompanyRegistrationNumber
-    ? formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
-    : formatServiceAndAccountPathsFor(
-        paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
-        req.service.externalId,
-        req.account.type,
-        switchingCredentialId
-      )
-
-  return res.redirect(redirectPath)
+  return res.redirect(
+    formatServiceAndAccountPathsFor(
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
+      req.service.externalId,
+      req.account.type,
+      switchingCredentialId
+    )
+  )
 }

@@ -2,41 +2,18 @@ import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
-import { markTaskAsComplete } from '@services/adyen-setup.service'
+import { OrganisationDetailsSession, GovernmentActivityBody, GOVERNMENT_ACTIVITY_OPTIONS } from './constants'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
-import { OrganisationDetailsSession, GovernmentActivity, GOVERNMENT_ACTIVITY_OPTIONS } from './constants'
-import { createOrganisation, createStore, setAdyenStoreId } from '@services/adyen-details.service'
-import { PaymentProvider } from '@models/constants/payment-provider'
-import { InvalidConfigurationError } from '@root/errors'
-import { getStripeStatementDescriptor } from '@services/stripe-details.service'
 import { ADYEN_REASON_FOR_TAKING_PAYMENTS_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-reason-for-taking-payments.schema'
 
-interface ReasonForTakingPaymentsBody {
-  governmentActivity: GovernmentActivity
-}
-
-function getBackLink(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
+function getBackLink(req: ServiceRequest<GovernmentActivityBody>) {
   return formatServiceAndAccountPathsFor(
-    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+    paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
     req.service.externalId,
     req.account.type,
     req.account.getSwitchingCredential().externalId
   )
-}
-
-async function getStoreDetailsForStripeMigration(req: ServiceRequest<ReasonForTakingPaymentsBody>) {
-  const telephoneNumber = req.service.merchantDetails?.telephoneNumber
-
-  if (!telephoneNumber) {
-    throw new InvalidConfigurationError(
-      `No telephone number set in merchant details [service_external_id: ${req.service.externalId}]`
-    )
-  }
-
-  const statementDescriptor = await getStripeStatementDescriptor(req.account)
-
-  return { telephoneNumber, statementDescriptor }
 }
 
 function get(req: ServiceRequest, res: ServiceResponse) {
@@ -53,15 +30,16 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   }
 
   return response(req, res, 'simplified-account/settings/adyen-details/reason-for-taking-payments', {
+    governmentActivity: currentSession.governmentActivity ?? '',
     backLink: getBackLink(req),
     governmentActivityOptions: GOVERNMENT_ACTIVITY_OPTIONS,
   })
 }
 
-async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: ServiceResponse) {
+async function post(req: ServiceRequest<GovernmentActivityBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
-  const currentSession = OrganisationDetailsSession.extract(req)
+  const existingSession = OrganisationDetailsSession.extract(req)
 
   for (const validation of ADYEN_REASON_FOR_TAKING_PAYMENTS_VALIDATIONS) {
     await validation.run(req)
@@ -81,50 +59,18 @@ async function post(req: ServiceRequest<ReasonForTakingPaymentsBody>, res: Servi
     })
   }
 
-  const companyRegistrationNumber =
-    currentSession.hasCompanyRegistrationNumber === 'true' ? currentSession.companyRegistrationNumber : '00000000'
+  const updatedSession = {
+    governmentActivity: req.body.governmentActivity,
+  } as OrganisationDetailsSession
 
-  const completeSession = new OrganisationDetailsSession({
-    ...currentSession,
-    companyRegistrationNumber,
-  })
-
-  const { governmentActivity } = req.body
-
-  const storeDetails =
-    req.account.paymentProvider === PaymentProvider.STRIPE ? await getStoreDetailsForStripeMigration(req) : undefined
-
-  if (!storeDetails) {
-    throw new Error(`Merchant details not returned from Stripe for [service_external_id: ${req.service.externalId}]`)
-  }
-
-  const { businessLine, balanceAccount } = await createOrganisation(
-    completeSession,
-    governmentActivity,
-    req.service,
-    req.account.type,
-    switchingCredentialId,
-    req.user.externalId
-  )
-
-  const store = await createStore({
-    ...storeDetails,
-    businessLineId: businessLine.id,
-    balanceAccountId: balanceAccount.id,
-    serviceName: req.service.name,
-    organisationDetails: completeSession,
-  })
-
-  await setAdyenStoreId(req.service.externalId, req.account.type, switchingCredentialId, req.user.externalId, store.id!)
-  await markTaskAsComplete(req.service.externalId, req.account.type, switchingCredentialId, 'organisationDetails')
-
-  OrganisationDetailsSession.clear(req)
+  OrganisationDetailsSession.set(req, existingSession, updatedSession)
 
   return res.redirect(
     formatServiceAndAccountPathsFor(
-      paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
+      paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
       req.service.externalId,
-      req.account.type
+      req.account.type,
+      switchingCredentialId
     )
   )
 }

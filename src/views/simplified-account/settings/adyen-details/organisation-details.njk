@@ -11,9 +11,10 @@
     {% set organisationNameHint %}
       <div>
         <p
-          >Do not enter the name of a local office or individual department unless that is the organisation's official
-          name.</p
-        >
+          >Enter the main name of your organisation, not your local office or individual department.<br />
+          <br />
+          Write the organisation name in full. Only use acronyms that are widely understood (for example, NHS).
+        </p>
       </div>
     {% endset %}
 
@@ -120,6 +121,56 @@
     {%
       call govukFieldset({
         legend: {
+          text: "Telephone number",
+          classes: "govuk-fieldset__legend--m",
+          isPageHeading: false
+        }
+      })
+    %}
+      {{
+        govukInput({
+          label: {
+            html: 'Include the country code for international numbers'
+          },
+          classes: "govuk-!-width-three-quarters",
+          id: "telephone-number",
+          name: "telephoneNumber",
+          value: organisationDetails.telephoneNumber,
+          type: "tel",
+          autocomplete: "tel",
+          errorMessage: { text: errors.formErrors['telephoneNumber'] } if errors.formErrors['telephoneNumber'] else false
+        })
+      }}
+    {% endcall %}
+
+    {%
+      call govukFieldset({
+        legend: {
+          text: "Organisation website address",
+          classes: "govuk-fieldset__legend--m",
+          isPageHeading: false
+        }
+      })
+    %}
+      {{
+        govukInput({
+          label: {
+            html: 'Enter the address in full like https://www.example.com'
+          },
+          classes: "govuk-!-width-three-quarters",
+          id: "website",
+          name: "website",
+          type: "url",
+          autocomplete: "url",
+          spellcheck: false,
+          value: organisationDetails.website
+        })
+      }}
+    {% endcall %}
+
+    {%
+      call govukFieldset({
+        legend: {
           text: "Organisation contact details",
           classes: "govuk-fieldset__legend--m",
           isPageHeading: false
@@ -142,38 +193,6 @@
         })
       }}
     {% endcall %}
-
-    {{
-      govukRadios({
-        idPrefix: "has-company-registration-number",
-        name: "hasCompanyRegistrationNumber",
-        fieldset: {
-          legend: {
-            text: "Does your organisation have a company registration number?",
-            classes: "govuk-fieldset__legend--m"
-          }
-        },
-        errorMessage: { text: errors.formErrors['hasCompanyRegistrationNumber'] } if errors.formErrors['hasCompanyRegistrationNumber'] else false,
-        items: [
-          {
-            value: "true",
-            text: "Yes",
-            checked: hasCompanyRegistrationNumber === "true",
-            attributes: {
-              "data-cy": "radio-yes"
-            }
-          },
-          {
-            value: "false",
-            text: "No",
-            checked: hasCompanyRegistrationNumber === "false",
-            attributes: {
-              "data-cy": "radio-no"
-            }
-          }
-        ]
-      })
-    }}
 
     {{
       govukButton({

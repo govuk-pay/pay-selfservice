@@ -1065,35 +1065,118 @@ simplifiedAccount.post(
 )
 
 simplifiedAccount.get(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.get
+  serviceSettingsController.adyenDetails.organisationDetails.review.get
 )
 
 simplifiedAccount.post(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.review,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.post
+  serviceSettingsController.adyenDetails.organisationDetails.review.post
 )
 
 simplifiedAccount.get(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.get
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.has.get
 )
 
 simplifiedAccount.post(
-  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistration,
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
   enforceLiveAccountOnly,
   restrictToSwitchingAccount(ADYEN),
   permission('stripe-account-details:update'),
-  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.post
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.has.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.number.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.companyRegistration,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.number.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.upload.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.organisationRegistrationUpload,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  [
+    upload.single(GOV_ENTITY_DOC_FORM_FIELD_NAME),
+    serviceSettingsController.adyenDetails.organisationDetails.companyRegistration.upload.post,
+  ]
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.registeredForVat.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.registeredForVat.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.vatRegistrationNumber.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.vatRegistrationNumber,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.vatRegistrationNumber.post
+)
+
+simplifiedAccount.get(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.notRegisteredForVat.get
+)
+
+simplifiedAccount.post(
+  paths.simplifiedAccount.settings.adyenDetails.organisationDetails.notRegisteredForVat,
+  enforceLiveAccountOnly,
+  restrictToSwitchingAccount(ADYEN),
+  permission('stripe-account-details:update'),
+  serviceSettingsController.adyenDetails.organisationDetails.vatRegistration.notRegisteredForVat.post
 )
 
 simplifiedAccount.get(
