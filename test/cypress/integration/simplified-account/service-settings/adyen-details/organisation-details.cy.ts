@@ -127,7 +127,6 @@ describe(`Organisation details`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
-
   describe('for a service that is migrating to adyen', () => {
     it('should walk through flow in sequence if registered for VAT and has an organisation number', () => {
       setStubs()
@@ -189,216 +188,157 @@ describe(`Organisation details`, () => {
     })
 
     it('should walk through flow in sequence if not registered for VAT and does not have an organisation number', () => {
-      describe('when the organisation details form is submitted empty', () => {
-        const expectedErrors = [
-          { field: '#organisation-name', message: 'Enter an organisation name' },
-          { field: '#address-line1', message: 'Enter address line 1' },
-          { field: '#address-city', message: 'Enter a town or city' },
-          { field: '#address-postcode', message: 'Enter a postcode' },
-          { field: '#email', message: 'Enter an email address' },
-          {
-            field: '#has-company-registration-number',
-            message: 'Select yes if your organisation has a company registration number',
-          },
-        ]
+      setStubs()
 
-        beforeEach(() => {
-          setStubs()
-          cy.visit(ORGANISATION_DETAILS_PATH)
-          cy.get('#organisation-details-submit').click()
+      // organisation details
+      cy.visit(ORGANISATION_DETAILS_PATH)
+      cy.a11yCheck()
+
+      checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
+      organisationDetailsFormFill()
+
+      // org details review
+      cy.location('pathname').should('eq', ORGANISATION_DETAILS_REVIEW_PATH)
+      cy.a11yCheck()
+      cy.get('h1').should('contain.text', 'Check your answers')
+      cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
+      cy.get('#organisation-details-review-confirm').click()
+
+      // reason for taking payments
+      reasonForTakingPaymentsFormFill()
+
+      // registered for VAT
+      registeredForVatFormFill(false)
+
+      // why not registered for VAT
+      cy.location('pathname').should('eq', NOT_REGISTERED_FOR_VAT_PATH)
+      cy.a11yCheck()
+      cy.get('h1').should('contain.text', 'Why is your organisation not registered for VAT?')
+      cy.get('.govuk-back-link').should('have.attr', 'href', REGISTERED_FOR_VAT_PATH)
+
+      cy.get('[data-cy="below-vat-threshold"]').should('exist')
+      cy.get('[data-cy="exempt"]').should('exist')
+
+      //// sad path
+      cy.get('#not-registered-for-vat-submit').click()
+      cy.get('.govuk-error-summary')
+        .should('be.visible')
+        .and('contain', 'There is a problem')
+        .and('contain', 'You must make a selection')
+      cy.get('#notRegisteredForVat-error').should('be.visible').and('contain', 'You must make a selection')
+
+      //// happy path
+      cy.get('[data-cy="exempt"]').check()
+      cy.get('#not-registered-for-vat-submit').click()
+
+      // has company registration number
+      hasCompanyRegistrationFormFill(NOT_REGISTERED_FOR_VAT_PATH, false)
+
+      // organisation registration upload
+      cy.location('pathname').should('eq', ORG_REGISTRATION_UPLOAD_PATH)
+      cy.a11yCheck()
+      cy.get('h1').should('contain.text', `Upload a document showing your organisation's registration`)
+      cy.get('.govuk-back-link').should('have.attr', 'href', HAS_COMPANY_REGISTRATION_PATH)
+
+      cy.get(`#government-entity-document`).selectFile('test/test-helpers/companydetails.png')
+      cy.get(`#company-registration-document-submit`).click()
+
+      cy.location('pathname').should('eq', TASK_LIST_PATH)
+    })
+  })
+
+  describe('for a service not migrating to Adyen', () => {
+    const paths = [
+      ORGANISATION_DETAILS_PATH,
+      TAKING_PAYMENTS_PATH,
+      REGISTERED_FOR_VAT_PATH,
+      NOT_REGISTERED_FOR_VAT_PATH,
+      HAS_COMPANY_REGISTRATION_PATH,
+      VAT_NUMBER_PATH,
+      ENTER_COMPANY_REGISTRATION_PATH,
+      ORG_REGISTRATION_UPLOAD_PATH,
+    ]
+
+    describe('where the service is not switching PSP', () => {
+      beforeEach(() => {
+        cy.task('clearStubs')
+        const adyenGatewayAccount = GatewayAccountFixture.forAdyen({
+          type: LIVE_ACCOUNT_TYPE,
         })
 
-        it('should stay on the organisation details page', () => {
-          cy.location('pathname').should('eq', ORGANISATION_DETAILS_PATH)
-          cy.a11yCheck()
+        const serviceFixture = new ServiceFixture({
+          externalId: SERVICE_EXTERNAL_ID,
+          gatewayAccountIds: [`${adyenGatewayAccount.id}`],
+          currentGoLiveStage: 'LIVE',
         })
+        const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
 
-        it('should prefix the page title with "Error:"', () => {
-          cy.title().should('match', /^Error: Organisation details - Settings - /)
-        })
-
-        it('should display an error summary', () => {
-          cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
-          cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
-          expectedErrors.forEach(({ field, message }, index) => {
-            cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
-          })
-        })
-
-        it('should display an error for every field', () => {
-          expectedErrors.forEach(({ field, message }) => {
-            cy.get(`${field}-error`).should('be.visible').and('contain', message)
-          })
-          // address line 2 is optional and country always has a value (defaults to GB)
-          cy.get('#address-line2-error').should('not.exist')
-          cy.get('#address-country-error').should('not.exist')
-        })
+        cy.task('setupStubs', [
+          getUser(USER_EXTERNAL_ID).success(userFixture),
+          GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
+            adyenGatewayAccount
+          ),
+        ])
+      })
+      beforeEach(() => {
+        cy.setEncryptedCookies(USER_EXTERNAL_ID)
       })
 
-      it('should walk through organisation details and VAT registration in sequence, without company registration', () => {
-        setStubs()
-
-        // organisation details
-        cy.visit(ORGANISATION_DETAILS_PATH)
-        cy.a11yCheck()
-
-        checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
-        organisationDetailsFormFill()
-
-        // org details review
-        cy.location('pathname').should('eq', ORGANISATION_DETAILS_REVIEW_PATH)
-        cy.a11yCheck()
-        cy.get('h1').should('contain.text', 'Check your answers')
-        cy.get('.govuk-back-link').should('have.attr', 'href', ORGANISATION_DETAILS_PATH)
-        cy.get('#organisation-details-review-confirm').click()
-
-        // reason for taking payments
-        reasonForTakingPaymentsFormFill()
-
-        // registered for VAT
-        registeredForVatFormFill(false)
-
-        // why not registered for VAT
-        cy.location('pathname').should('eq', NOT_REGISTERED_FOR_VAT_PATH)
-        cy.a11yCheck()
-        cy.get('h1').should('contain.text', 'Why is your organisation not registered for VAT?')
-        cy.get('.govuk-back-link').should('have.attr', 'href', REGISTERED_FOR_VAT_PATH)
-
-        cy.get('[data-cy="below-vat-threshold"]').should('exist')
-        cy.get('[data-cy="exempt"]').should('exist')
-
-        //// sad path
-        cy.get('#not-registered-for-vat-submit').click()
-        cy.get('.govuk-error-summary')
-          .should('be.visible')
-          .and('contain', 'There is a problem')
-          .and('contain', 'You must make a selection')
-        cy.get('#notRegisteredForVat-error').should('be.visible').and('contain', 'You must make a selection')
-
-        //// happy path
-        cy.get('[data-cy="exempt"]').check()
-        cy.get('#not-registered-for-vat-submit').click()
-
-        // has company registration number
-        hasCompanyRegistrationFormFill(NOT_REGISTERED_FOR_VAT_PATH, false)
-
-        // organisation registration upload
-        cy.location('pathname').should('eq', ORG_REGISTRATION_UPLOAD_PATH)
-        cy.a11yCheck()
-        cy.get('h1').should('contain.text', `Upload a document showing your organisation's registration`)
-        cy.get('.govuk-back-link').should('have.attr', 'href', HAS_COMPANY_REGISTRATION_PATH)
-
-        //// sad path
-        cy.get('#company-registration-document-submit').click()
-        cy.get('.govuk-error-summary')
-          .should('be.visible')
-          .and('contain', 'There is a problem')
-          .and('contain', 'Select a file to upload')
-        cy.get('#government-entity-document-error').should('be.visible').and('contain', 'Select a file to upload')
-
-        //// happy path
-        cy.get(`#government-entity-document`).selectFile('test/test-helpers/companydetails.png')
-        cy.get(`#company-registration-document-submit`).click()
-
-        cy.location('pathname').should('eq', TASK_LIST_PATH)
-        cy.get('.govuk-notification-banner')
-          .should('have.class', 'govuk-notification-banner--success')
-          .should('have.class', 'system-messages')
-          .contains('Information sent to Adyen')
-          .parent()
-          .parent()
-          .contains('Adyen is checking your information. We will contact you if there is a problem.')
+      it('should return a 404 for all pages', () => {
+        paths.forEach((path) => {
+          cy.request({
+            url: path,
+            failOnStatusCode: false,
+            followRedirect: false,
+          }).then((response) => {
+            expect(response.status).to.eq(404)
+          })
+        })
       })
     })
+    describe('where the service is switching to a different PSP', () => {
+      const WORLDPAY_CREDENTIAL_EXTERNAL_ID = 'worldpay-credential-123-abc'
 
-    describe('for a service not migrating to Adyen', () => {
-      const paths = [
-        ORGANISATION_DETAILS_PATH,
-        TAKING_PAYMENTS_PATH,
-        REGISTERED_FOR_VAT_PATH,
-        NOT_REGISTERED_FOR_VAT_PATH,
-        HAS_COMPANY_REGISTRATION_PATH,
-        VAT_NUMBER_PATH,
-        ENTER_COMPANY_REGISTRATION_PATH,
-        ORG_REGISTRATION_UPLOAD_PATH,
-      ]
+      beforeEach(() => {
+        cy.task('clearStubs')
+        cy.clearCookies()
 
-      describe('where the service is switching to a different PSP', () => {
-        const WORLDPAY_CREDENTIAL_EXTERNAL_ID = 'worldpay-credential-123-abc'
-
-        beforeEach(() => {
-          cy.task('clearStubs')
-
-          const gatewayAccountSwitchingToWorldpay = GatewayAccountFixture.forSwitchingPsp(
-            PaymentProvider.STRIPE,
-            PaymentProvider.WORLDPAY,
-            [],
-            [
-              {
-                externalId: WORLDPAY_CREDENTIAL_EXTERNAL_ID,
-              },
-            ],
+        const gatewayAccountSwitchingToWorldpay = GatewayAccountFixture.forSwitchingPsp(
+          PaymentProvider.STRIPE,
+          PaymentProvider.WORLDPAY,
+          [],
+          [
             {
-              id: GATEWAY_ACCOUNT_ID,
-              serviceId: SERVICE_EXTERNAL_ID,
-            }
-          )
-          const serviceFixture = new ServiceFixture({
-            externalId: SERVICE_EXTERNAL_ID,
-            gatewayAccountIds: [`${gatewayAccountSwitchingToWorldpay.id}`],
-            currentGoLiveStage: 'LIVE',
-          })
-          const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
-          cy.task('setupStubs', [
-            getUser(USER_EXTERNAL_ID).success(userFixture),
-            GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
-              gatewayAccountSwitchingToWorldpay
-            ),
-          ])
+              externalId: WORLDPAY_CREDENTIAL_EXTERNAL_ID,
+            },
+          ],
+          {
+            id: GATEWAY_ACCOUNT_ID,
+            serviceId: SERVICE_EXTERNAL_ID,
+          }
+        )
+        const serviceFixture = new ServiceFixture({
+          externalId: SERVICE_EXTERNAL_ID,
+          gatewayAccountIds: [`${gatewayAccountSwitchingToWorldpay.id}`],
+          currentGoLiveStage: 'LIVE',
         })
-
-        it('should return a 404 for all pages', () => {
-          paths.forEach((path) => {
-            cy.request({
-              url: path,
-              failOnStatusCode: false,
-            }).then((response) => {
-              expect(response.status).to.eq(404)
-            })
-          })
-        })
+        const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
+        cy.task('setupStubs', [
+          getUser(USER_EXTERNAL_ID).success(userFixture),
+          GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
+            gatewayAccountSwitchingToWorldpay
+          ),
+        ])
+        cy.setEncryptedCookies(USER_EXTERNAL_ID)
       })
 
-      describe('where the service is not switching PSP', () => {
-        beforeEach(() => {
-          cy.task('clearStubs')
-          const adyenGatewayAccount = GatewayAccountFixture.forAdyen({
-            type: LIVE_ACCOUNT_TYPE,
-          })
-
-          const serviceFixture = new ServiceFixture({
-            externalId: SERVICE_EXTERNAL_ID,
-            gatewayAccountIds: [`${adyenGatewayAccount.id}`],
-            currentGoLiveStage: 'LIVE',
-          })
-          const userFixture = UserFixture.asServiceAdmin([serviceFixture], { externalId: USER_EXTERNAL_ID })
-
-          cy.task('setupStubs', [
-            getUser(USER_EXTERNAL_ID).success(userFixture),
-            GatewayAccountStubs.getByServiceExternalIdAndAccountType(SERVICE_EXTERNAL_ID, LIVE_ACCOUNT_TYPE).success(
-              adyenGatewayAccount
-            ),
-          ])
-        })
-
-        it('should return a 404 for all pages', () => {
-          paths.forEach((path) => {
-            cy.request({
-              url: path,
-              failOnStatusCode: false,
-            }).then((response) => {
-              expect(response.status).to.eq(404)
-            })
+      it('should return a 404 for all pages', () => {
+        paths.forEach((path) => {
+          cy.request({
+            url: path,
+            failOnStatusCode: false,
+          }).then((response) => {
+            expect(response.status).to.eq(404)
           })
         })
       })
@@ -420,6 +360,32 @@ const organisationDetailsFormFill = () => {
   cy.get('#website').should('exist')
   cy.get('#email').should('exist')
 
+  // sad path
+  const expectedErrors = [
+    { field: '#organisation-name', message: 'Enter an organisation name' },
+    { field: '#address-line1', message: 'Enter address line 1' },
+    { field: '#address-city', message: 'Enter a town or city' },
+    { field: '#address-postcode', message: 'Enter a postcode' },
+    { field: '#email', message: 'Enter an email address' },
+  ]
+  cy.get('#organisation-details-submit').click()
+  cy.location('pathname').should('eq', ORGANISATION_DETAILS_PATH)
+  cy.title().should('match', /^Error: Organisation details - Settings - /)
+
+  cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
+  cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
+  expectedErrors.forEach(({ field, message }, index) => {
+    cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
+  })
+
+  expectedErrors.forEach(({ field, message }) => {
+    cy.get(`${field}-error`).should('be.visible').and('contain', message)
+  })
+  // address line 2 is optional and country always has a value (defaults to GB)
+  cy.get('#address-line2-error').should('not.exist')
+  cy.get('#address-country-error').should('not.exist')
+
+  // happy path
   cy.get('#organisation-name').type('Test Organisation')
   cy.get('#address-line1').type('1 Test Street')
   cy.get('#address-city').type('Testville')
