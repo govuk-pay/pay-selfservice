@@ -42,9 +42,13 @@ const { req, res, call, nextRequest } = new ControllerTestBuilder(
 const VALID_SESSION: Partial<OrganisationDetailsSession> = {
   organisationName: 'Test Organisation',
   addressLine1: '1 Test Street',
+  addressLine2: '',
   addressCity: 'swansea',
   addressPostcode: 'T3 5TT',
   addressCountry: 'GB',
+  telephoneNumber: '0161677677',
+  website: 'www.bbc.co.uk',
+  email: 'test@example.com',
 }
 
 describe('Controller: settings/adyen-details/organisation-details/organisation-details-review', () => {

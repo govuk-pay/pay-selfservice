@@ -48,12 +48,17 @@ const { res, call, nextRequest } = new ControllerTestBuilder(
 const VALID_SESSION: Partial<OrganisationDetailsSession> = {
   organisationName: 'Test Organisation',
   addressLine1: '1 Test Street',
+  addressLine2: '',
   addressCity: 'swansea',
   addressPostcode: 'T3 5TT',
   addressCountry: 'GB',
+  telephoneNumber: '0161677677',
+  website: 'www.bbc.co.uk',
+  email: 'test@example.com',
+  governmentActivity: 'general-local',
+  registeredForVat: 'true',
   vatRegistrationNumber: 'GB123456789',
   hasCompanyRegistrationNumber: 'true',
-  governmentActivity: 'general-local',
 }
 
 describe('Controller: settings/adyen-details/organisation-details/company-registration/company-registration', () => {
@@ -147,43 +152,87 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         )
       })
     })
-    describe('when the field is empty', () => {
-      beforeEach(() => {
+    describe('with an empty company registration number', () => {
+      let thisCall: Awaited<ReturnType<typeof call>>
+      beforeEach(async () => {
         nextRequest({
           body: { companyRegistrationNumber: '' },
-          session: {
-            otherSessionData: 'keep',
-            pageData: {
-              organisationDetails: VALID_SESSION,
-            },
-          },
+          session: { otherSessionData: 'keep', pageData: { organisationDetails: VALID_SESSION } },
         })
+        thisCall = await call('post')
       })
-      it('should not redirect', async () => {
-        await call('post')
+
+      it('should not redirect', () => {
         sinon.assert.notCalled(res.redirect)
       })
-      it('should re-render the company registration page with the backLink', async () => {
-        await call('post')
-        const expectedContext = {
+
+      it('should show the error and backLink', () => {
+        mockResponse.should.have.been.calledOnce
+        mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
+        const context = mockResponse.firstCall.lastArg as {
+          errors: { summary: { text: string; href: string }[]; formErrors: Record<string, string> }
+          companyRegistrationNumber: string
+          backLink: string
+        }
+        sinon.assert.match(context, {
           errors: {
-            formErrors: { companyRegistrationNumber: 'You must enter a company registration number' },
+            summary: [{ text: 'Enter a company registration number', href: '#company-registration-number' }],
+            formErrors: { companyRegistrationNumber: 'Enter a company registration number' },
           },
+          companyRegistrationNumber: '',
           backLink: formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
             SERVICE_EXTERNAL_ID,
             SERVICE_TYPE,
             GATEWAY_ACCOUNT.getSwitchingCredential().externalId
           ),
-        }
-        sinon.assert.calledOnceWithMatch(mockResponse, sinon.match.any, res, TEMPLATE_PATH, expectedContext)
+        })
       })
-      it('should not call submitOrganisationDetails', async () => {
-        await call('post')
+      it('should not call submitOrganisationDetails', () => {
         sinon.assert.notCalled(submitOrganisationDetails)
       })
-      it('should not clear the session organisation details', async () => {
-        const thisCall = await call('post')
+      it('should not clear the session organisation details', () => {
+        expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
+      })
+    })
+
+    describe('with a company registration number that is not 8 characters', () => {
+      let thisCall: Awaited<ReturnType<typeof call>>
+      beforeEach(async () => {
+        nextRequest({
+          body: { companyRegistrationNumber: '12345' },
+          session: { otherSessionData: 'keep', pageData: { organisationDetails: VALID_SESSION } },
+        })
+        thisCall = await call('post')
+      })
+
+      it('should not redirect', () => {
+        sinon.assert.notCalled(res.redirect)
+      })
+
+      it('should show the error, backlink and the submitted value', () => {
+        mockResponse.should.have.been.calledOnce
+        const context = mockResponse.firstCall.lastArg as {
+          errors: { formErrors: Record<string, string> }
+          companyRegistrationNumber: string
+        }
+        sinon.assert.match(context, {
+          errors: {
+            formErrors: { companyRegistrationNumber: 'Company registration number must be 8 characters long' },
+          },
+          companyRegistrationNumber: '12345',
+          backLink: formatServiceAndAccountPathsFor(
+            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
+            SERVICE_EXTERNAL_ID,
+            SERVICE_TYPE,
+            CREDENTIAL_ID
+          ),
+        })
+      })
+      it('should not call submitOrganisationDetails', () => {
+        sinon.assert.notCalled(submitOrganisationDetails)
+      })
+      it('should not clear the session organisation details', () => {
         expect(thisCall.req.session).to.deep.include({ pageData: { organisationDetails: VALID_SESSION } })
       })
     })

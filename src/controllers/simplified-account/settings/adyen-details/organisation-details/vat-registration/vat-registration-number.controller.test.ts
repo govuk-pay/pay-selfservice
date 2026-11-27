@@ -34,7 +34,21 @@ const { res, call, nextRequest } = new ControllerTestBuilder(
   })
   .build()
 
-describe('Controller: settings/adyen-details/organisation-details/vat-registration', () => {
+const VALID_SESSION: Partial<OrganisationDetailsSession> = {
+  organisationName: 'Test Organisation',
+  addressLine1: '1 Test Street',
+  addressLine2: '',
+  addressCity: 'swansea',
+  addressPostcode: 'T3 5TT',
+  addressCountry: 'GB',
+  telephoneNumber: '0161677677',
+  website: 'www.bbc.co.uk',
+  email: 'test@example.com',
+  governmentActivity: 'general-local',
+  registeredForVat: 'true',
+}
+
+describe('Controller: settings/adyen-details/organisation-details/vat-registration/vat-registration-number', () => {
   describe('get', () => {
     describe('with no organisation details in session', () => {
       beforeEach(async () => {
@@ -48,13 +62,13 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
       })
     })
 
-    describe('with organisation details already in session and no company number selected', () => {
+    describe('with organisation details already in session', () => {
       beforeEach(async () => {
         nextRequest({
           session: {
             pageData: {
               organisationDetails: {
-                organisationName: 'Test Organisation',
+                ...VALID_SESSION,
                 vatRegistrationNumber: 'GB123456789',
               },
             },
@@ -68,37 +82,7 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
         mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
       })
 
-      it('should call the response method with the registeredForVat and backLink', () => {
-        const context = mockResponse.firstCall.lastArg as { vatRegistrationNumber: string; backLink: string }
-        sinon.assert.match(context, {
-          vatRegistrationNumber: 'GB123456789',
-          backLink: formatServiceAndAccountPathsFor(
-            paths.simplifiedAccount.settings.adyenDetails.organisationDetails.registeredForVat,
-            SERVICE_EXTERNAL_ID,
-            SERVICE_TYPE,
-            GATEWAY_ACCOUNT.getSwitchingCredential().externalId
-          ),
-        })
-      })
-    })
-
-    describe('with organisation details already in session and company number selected', () => {
-      beforeEach(async () => {
-        nextRequest({
-          session: {
-            pageData: {
-              organisationDetails: {
-                organisationName: 'Test Organisation',
-                vatRegistrationNumber: 'GB123456789',
-                hasCompanyRegistrationNumber: 'true',
-              },
-            },
-          },
-        })
-        await call('get')
-      })
-
-      it('should call the response method with the registeredForVat and backLink', () => {
+      it('should call the response method with the vat registration number and backLink', () => {
         const context = mockResponse.firstCall.lastArg as { vatRegistrationNumber: string; backLink: string }
         sinon.assert.match(context, {
           vatRegistrationNumber: 'GB123456789',
@@ -118,14 +102,7 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
         body: { vatRegistrationNumber: 'GB123456789' },
         session: {
           pageData: {
-            organisationDetails: {
-              organisationName: 'Test Organisation',
-              addressLine1: '1 Test Street',
-              addressCity: 'swansea',
-              addressPostcode: 'T3 5TT',
-              addressCountry: 'GB',
-              hasCompanyRegistrationNumber: 'true',
-            },
+            organisationDetails: VALID_SESSION,
           },
         },
       })
@@ -141,11 +118,15 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
       sinon.assert.match(OrganisationDetailsSession.extract(req), {
         organisationName: 'Test Organisation',
         addressLine1: '1 Test Street',
+        addressLine2: '',
         addressCity: 'swansea',
         addressPostcode: 'T3 5TT',
         addressCountry: 'GB',
-        hasCompanyRegistrationNumber: 'true',
-        vatRegistrationNumber: 'GB123456789',
+        telephoneNumber: '0161677677',
+        website: 'www.bbc.co.uk',
+        email: 'test@example.com',
+        governmentActivity: 'general-local',
+        registeredForVat: 'true',
       })
 
       const nextPagePath = formatServiceAndAccountPathsFor(
@@ -191,4 +172,3 @@ describe('Controller: settings/adyen-details/organisation-details/vat-registrati
     })
   })
 })
-

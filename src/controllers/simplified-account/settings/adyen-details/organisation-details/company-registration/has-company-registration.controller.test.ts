@@ -6,6 +6,7 @@ import { ServiceFixture } from '@test/fixtures/service/service.fixture'
 import sinon from 'sinon'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
+import { OrganisationDetailsSession } from '../constants'
 
 const SERVICE_EXTERNAL_ID = 'service123abc'
 const SERVICE_TYPE = 'live'
@@ -31,6 +32,21 @@ const { req, res, call, nextRequest } = new ControllerTestBuilder(
   })
   .build()
 
+const VALID_SESSION: Partial<OrganisationDetailsSession> = {
+  organisationName: 'Test Organisation',
+  addressLine1: '1 Test Street',
+  addressLine2: '',
+  addressCity: 'swansea',
+  addressPostcode: 'T3 5TT',
+  addressCountry: 'GB',
+  telephoneNumber: '0161677677',
+  website: 'www.bbc.co.uk',
+  email: 'test@example.com',
+  governmentActivity: 'general-local',
+  registeredForVat: 'true',
+  vatRegistrationNumber: 'GB123456789',
+}
+
 describe('Controller: settings/adyen-details/organisation-details/company-registration/has-company-registration', () => {
   describe('get', () => {
     describe('with no organisation details in session', () => {
@@ -50,9 +66,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         nextRequest({
           session: {
             pageData: {
-              organisationDetails: {
-                organisationName: 'Test Organisation',
-              },
+              organisationDetails: VALID_SESSION,
             },
           },
         })
@@ -84,9 +98,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           query: { ['from']: 'not-registered' },
           session: {
             pageData: {
-              organisationDetails: {
-                organisationName: 'Test Organisation',
-              },
+              organisationDetails: VALID_SESSION,
             },
           },
         })
@@ -120,9 +132,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           body: { hasCompanyRegistrationNumber: 'true' },
           session: {
             pageData: {
-              organisationDetails: {
-                organisationName: 'Test Organisation',
-              },
+              organisationDetails: VALID_SESSION,
             },
           },
         })
@@ -145,9 +155,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
           body: { hasCompanyRegistrationNumber: 'false' },
           session: {
             pageData: {
-              organisationDetails: {
-                organisationName: 'Test Organisation',
-              },
+              organisationDetails: VALID_SESSION,
             },
           },
         })
@@ -169,9 +177,7 @@ describe('Controller: settings/adyen-details/organisation-details/company-regist
         nextRequest({
           body: {},
           session: {
-            organisationDetails: {
-              organisationName: 'Test Organisation',
-            },
+            organisationDetails: VALID_SESSION,
           },
         })
       })

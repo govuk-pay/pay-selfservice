@@ -44,7 +44,7 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
         mockResponse.should.have.been.calledWith(sinon.match.any, sinon.match.any, TEMPLATE_PATH)
       })
 
-      it('should call the response method with blank organisation details, hasCompanyRegistrationNumber, countries and backLink', () => {
+      it('should call the response method with blank organisation details and backLink', () => {
         mockResponse.should.have.been.calledOnce
         const context = mockResponse.firstCall.lastArg as {
           organisationDetails: object
@@ -61,7 +61,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
             addressPostcode: '',
             addressCountry: 'GB',
           },
-          hasCompanyRegistrationNumber: '',
           countries: countries.govukFrontendFormatted('GB'),
           backLink: formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,
@@ -83,7 +82,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
                 addressCity: 'swansea',
                 addressPostcode: 'T3 5TT',
                 addressCountry: 'GB',
-                hasCompanyRegistrationNumber: 'true',
               },
             },
           },
@@ -94,7 +92,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
       it('should call the response method with the session values', () => {
         const context = mockResponse.firstCall.lastArg as {
           organisationDetails: { organisationName: string }
-          hasCompanyRegistrationNumber: string
         }
         sinon.assert.match(context.organisationDetails, {
           organisationName: 'Test Organisation',
@@ -103,7 +100,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
           addressPostcode: 'T3 5TT',
           addressCountry: 'GB',
         })
-        sinon.assert.match(context.hasCompanyRegistrationNumber, 'true')
       })
     })
   })
@@ -116,8 +112,9 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
       addressCity: 'swansea',
       addressPostcode: 'T3 5TT',
       addressCountry: 'GB',
+      telephoneNumber: '0161677677',
+      website: 'www.bbc.co.uk',
       email: 'test@example.com',
-      hasCompanyRegistrationNumber: 'true',
     }
 
     describe('with a valid body', () => {
@@ -191,7 +188,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
         const context = mockResponse.firstCall.lastArg as {
           errors: { formErrors: Record<string, string> }
           organisationDetails: object
-          hasCompanyRegistrationNumber: string
           countries: unknown[]
           backLink: string
         }
@@ -206,7 +202,6 @@ describe('Controller: settings/adyen-details/organisation-details/organisation-d
             addressCountry: 'GB',
             email: 'not-an-email',
           },
-          hasCompanyRegistrationNumber: 'false',
           countries: countries.govukFrontendFormatted('GB'),
           backLink: formatServiceAndAccountPathsFor(
             paths.simplifiedAccount.settings.switchPsp.switchToAdyen.index,

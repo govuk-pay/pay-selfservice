@@ -4,7 +4,7 @@ import paths from '@root/paths'
 import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { CompanyRegistrationBody, OrganisationDetailsSession } from '../constants'
 import { submitOrganisationDetails } from './utils'
-import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
+import { ADYEN_COMPANY_REGISTRATION_NUMBER_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-organisation-company-number.schema'
 import { validationResult } from 'express-validator'
 import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
 
@@ -44,9 +44,9 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const existingSession = OrganisationDetailsSession.extract(req)
 
-  const validations = [adyenDetailsSchema.companyRegistrationNumber.validate]
-
-  await Promise.all(validations.map((validation) => validation.run(req)))
+  for (const validation of ADYEN_COMPANY_REGISTRATION_NUMBER_VALIDATIONS) {
+    await validation.run(req)
+  }
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -61,6 +61,7 @@ async function post(req: ServiceRequest<CompanyRegistrationBody>, res: ServiceRe
           summary: formattedErrors.errorSummary,
           formErrors: formattedErrors.formErrors,
         },
+        companyRegistrationNumber: req.body.companyRegistrationNumber,
         backLink: formatServiceAndAccountPathsFor(
           paths.simplifiedAccount.settings.adyenDetails.organisationDetails.hasCompanyRegistration,
           req.service.externalId,
