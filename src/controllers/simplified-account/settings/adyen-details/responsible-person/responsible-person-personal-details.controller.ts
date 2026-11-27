@@ -3,12 +3,18 @@ import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
 import { FROM_REVIEW_QUERY_PARAM, ResponsiblePersonSession } from './constants'
-import {
-  adyenResponsiblePersonPersonalDetailsSchema,
-  ResponsiblePersonPersonalDetailsBody,
-} from '@utils/simplified-account/validation/adyen/adyen-responsible-person-personal-details.schema'
 import { validationResult } from 'express-validator'
-import formatValidationErrors from '../../../../../utils/simplified-account/format/format-validation-errors'
+import { ADYEN_RESPONSIBLE_PERSON_PERSONAL_DETAILS_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-responsible-person-personal-details.schema'
+import formatValidationErrors from '@utils/simplified-account/format/format-validation-errors'
+import { transformDateOfBirthErrors } from '@utils/simplified-account/format/transform-date-of-birth-errors'
+
+export interface ResponsiblePersonPersonalDetailsBody {
+  firstName: string
+  lastName: string
+  dobDay: string
+  dobMonth: string
+  dobYear: string
+}
 
 function getBackLink(req: ServiceRequest<unknown>) {
   const switchToAdyenLink = formatServiceAndAccountPathsFor(
@@ -48,26 +54,20 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   })
 }
 
-const validations = [
-  adyenResponsiblePersonPersonalDetailsSchema.details.firstName.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.lastName.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dob.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dobDay.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dobMonth.validate,
-  adyenResponsiblePersonPersonalDetailsSchema.details.dobYear.validate,
-]
-
 async function post(req: ServiceRequest<ResponsiblePersonPersonalDetailsBody>, res: ServiceResponse) {
   const { account } = req
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const currentSession = ResponsiblePersonSession.extract(req)
 
-  await Promise.all(validations.map((validation) => validation.run(req)))
-  const errors = validationResult(req)
+  for (const validation of ADYEN_RESPONSIBLE_PERSON_PERSONAL_DETAILS_VALIDATIONS) {
+    await validation.run(req)
+  }
+
+  const errors = validationResult(req).formatWith(transformDateOfBirthErrors)
 
   if (!errors.isEmpty()) {
     const formattedErrors = formatValidationErrors(errors)
-    console.log(errors)
+    // console.log(errors)
 
     return response(req, res, 'simplified-account/settings/adyen-details/responsible-person/index', {
       errors: {

@@ -114,21 +114,39 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
         it('should call the response function with the template path', async () => {
           nextRequest({
             body: {
-              firstName: 'Sam Person',
+              firstName: '',
               lastName: '',
-              dobDay: '',
-              dobMonth: '12',
-              dobYear: '70',
+              dobDay: '31',
+              dobMonth: '04',
+              dobYear: '2002',
             },
           })
 
           await call('post')
 
           mockResponse.should.have.been.calledOnce
+
           mockResponse.should.have.been.calledWith(
             sinon.match.any,
             sinon.match.any,
-            'simplified-account/settings/adyen-details/responsible-person/index'
+            'simplified-account/settings/adyen-details/responsible-person/index',
+            sinon.match({
+              errors: {
+                summary: [
+                  { href: '#first-name', text: 'Enter the responsible person’s first name' },
+                  { href: '#last-name', text: 'Enter the responsible person’s last name' },
+                  { href: '#dob-day', text: 'Date of birth must be a real date' },
+                ],
+                formErrors: {
+                  firstName: 'Enter the responsible person’s first name',
+                  lastName: 'Enter the responsible person’s last name',
+                  dob: 'Date of birth must be a real date',
+                },
+              },
+              backLink: '/service/service123abc/account/live/settings/switch-psp/switch-to-adyen',
+              name: { firstName: '', lastName: '' },
+              dob: { dobDay: '31', dobMonth: '04', dobYear: '2002' },
+            })
           )
         })
       })

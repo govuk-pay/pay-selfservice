@@ -2,10 +2,10 @@ import type { ServiceRequest, ServiceResponse } from '@utils/types/express'
 import { response } from '@utils/response'
 import formatServiceAndAccountPathsFor from '@utils/simplified-account/format/format-service-and-account-paths-for'
 import paths from '@root/paths'
-import { adyenDetailsSchema } from '@utils/simplified-account/validation/adyen-details.schema'
+import { OrganisationDetailsSession, GovernmentActivityBody, GOVERNMENT_ACTIVITY_OPTIONS } from './constants'
 import { validationResult } from 'express-validator'
 import { formatValidationErrors } from '@utils/simplified-account/format'
-import { OrganisationDetailsSession, GovernmentActivityBody } from './constants'
+import { ADYEN_REASON_FOR_TAKING_PAYMENTS_VALIDATIONS } from '@utils/simplified-account/validation/adyen/adyen-reason-for-taking-payments.schema'
 
 function getBackLink(req: ServiceRequest<GovernmentActivityBody>) {
   return formatServiceAndAccountPathsFor(
@@ -32,6 +32,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
   return response(req, res, 'simplified-account/settings/adyen-details/reason-for-taking-payments', {
     governmentActivity: currentSession.governmentActivity ?? '',
     backLink: getBackLink(req),
+    governmentActivityOptions: GOVERNMENT_ACTIVITY_OPTIONS,
   })
 }
 
@@ -40,9 +41,9 @@ async function post(req: ServiceRequest<GovernmentActivityBody>, res: ServiceRes
   const switchingCredentialId = account.getSwitchingCredential().externalId
   const existingSession = OrganisationDetailsSession.extract(req)
 
-  const validations = [adyenDetailsSchema.selectGovernmentActivity.validate]
-
-  await Promise.all(validations.map((validation) => validation.run(req)))
+  for (const validation of ADYEN_REASON_FOR_TAKING_PAYMENTS_VALIDATIONS) {
+    await validation.run(req)
+  }
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
@@ -54,6 +55,7 @@ async function post(req: ServiceRequest<GovernmentActivityBody>, res: ServiceRes
         formErrors: formattedErrors.formErrors,
       },
       backLink: getBackLink(req),
+      governmentActivityOptions: GOVERNMENT_ACTIVITY_OPTIONS,
     })
   }
 

@@ -47,40 +47,22 @@ const setStubs = (additionalStubs = []) => {
   ])
 }
 
-describe(`Responsible person - details`, () => {
+describe(`Responsible person - personal details`, () => {
   beforeEach(() => {
     cy.setEncryptedCookies(USER_EXTERNAL_ID)
   })
 
-  it('accessibility check', () => {
-    setStubs()
-
-    cy.visit(RESPONSIBLE_PERSON_DETAILS_PATH)
-    cy.a11yCheck()
-  })
-
-  it('should display correct page title and headings', () => {
-    setStubs()
-
-    cy.visit(RESPONSIBLE_PERSON_DETAILS_PATH)
-
-    checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
-    cy.get('h1').should('contain.text', `Responsible person’s personal details`)
-  })
-
   describe('for a service that is migrating to adyen', () => {
-    it('should display a back link to the switch-to-adyen task list', () => {
+    it('should display the page correctly', () => {
       setStubs()
 
       cy.visit(RESPONSIBLE_PERSON_DETAILS_PATH)
 
+      cy.a11yCheck()
       cy.get('.govuk-back-link').should('have.attr', 'href', TASK_LIST_PATH)
-    })
 
-    it('should display first name, last name and date of birth inputs', () => {
-      setStubs()
-
-      cy.visit(RESPONSIBLE_PERSON_DETAILS_PATH)
+      checkServiceNavigation('Switch provider to Adyen now', TASK_LIST_PATH)
+      cy.get('h1').should('contain.text', `Responsible person’s personal details`)
 
       cy.get('#first-name').should('exist')
       cy.get('#last-name').should('exist')
@@ -88,12 +70,34 @@ describe(`Responsible person - details`, () => {
       cy.get('#dob-day').should('exist')
       cy.get('#dob-month').should('exist')
       cy.get('#dob-year').should('exist')
-    })
 
-    it('should redirect to the responsible person address page when continue is pressed', () => {
-      setStubs()
+      cy.log('Should display page correctly when there are errors')
+
+      const expectedErrors = [
+        { field: '#first-name', message: 'Enter the responsible person’s first name' },
+        { field: '#last-name', message: 'Enter the responsible person’s last name' },
+        { field: '#dob-day', message: 'Enter the date of birth' },
+      ]
 
       cy.visit(RESPONSIBLE_PERSON_DETAILS_PATH)
+      cy.get('#responsible-person-details-submit').click()
+
+      cy.log('the page title has error prefix')
+      cy.title().should('match', /^Error: Responsible person’s personal details - /)
+
+      cy.log('the error summary is present')
+      cy.get('.govuk-error-summary').should('be.visible').and('contain', 'There is a problem')
+
+      cy.log('the correct errors are shown')
+
+      cy.get('.govuk-error-summary__list li').should('have.length', expectedErrors.length)
+      expectedErrors.forEach(({ field, message }, index) => {
+        cy.get('.govuk-error-summary__list li').eq(index).find(`a[href="${field}"]`).should('contain', message)
+      })
+
+      cy.location('pathname').should('eq', RESPONSIBLE_PERSON_DETAILS_PATH)
+
+      cy.log('should redirect to the responsible person address page when continue is pressed')
 
       cy.get('#first-name').type('John')
       cy.get('#last-name').type('McClane')
