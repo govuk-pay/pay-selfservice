@@ -58,7 +58,7 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
         mockResponse.should.have.been.calledWith(
           sinon.match.any,
           sinon.match.any,
-          'simplified-account/settings/adyen-details/responsible-person/index'
+          'simplified-account/settings/adyen-details/responsible-person/personal-details'
         )
       })
 
@@ -129,7 +129,7 @@ describe('Controller: settings/adyen-details/responsible-person/responsible-pers
           mockResponse.should.have.been.calledWith(
             sinon.match.any,
             sinon.match.any,
-            'simplified-account/settings/adyen-details/responsible-person/index',
+            'simplified-account/settings/adyen-details/responsible-person/personal-details',
             sinon.match({
               errors: {
                 summary: [
