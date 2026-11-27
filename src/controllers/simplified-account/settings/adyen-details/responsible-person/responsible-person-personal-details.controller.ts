@@ -47,7 +47,7 @@ function get(req: ServiceRequest, res: ServiceResponse) {
     dobYear: currentSession.dobYear ?? '',
   }
 
-  return response(req, res, 'simplified-account/settings/adyen-details/responsible-person/index', {
+  return response(req, res, 'simplified-account/settings/adyen-details/responsible-person/personal-details', {
     backLink: getBackLink(req),
     name,
     dob,
@@ -69,7 +69,7 @@ async function post(req: ServiceRequest<ResponsiblePersonPersonalDetailsBody>, r
     const formattedErrors = formatValidationErrors(errors)
     // console.log(errors)
 
-    return response(req, res, 'simplified-account/settings/adyen-details/responsible-person/index', {
+    return response(req, res, 'simplified-account/settings/adyen-details/responsible-person/personal-details', {
       errors: {
         summary: formattedErrors.errorSummary,
         formErrors: formattedErrors.formErrors,
