@@ -12,21 +12,67 @@
       href="https://gds.blog.gov.uk/2026/06/02/building-for-the-future-making-change-simple-on-gov-uk-pay/"
     >
       GDS has procured a payment provider to replace Stripe</a
-    >. This means your payment provider is changing to Adyen. We’re doing everything we can to minimise disruption and
-    make sure there is as little as possible that you need to do.
+    >. This means your payment provider is changing to Adyen. We’re doing everything we can to minimise disruption.
   </p>
 
   <p class="govuk-body">
     Nothing will change for paying users. You do not need to contact them or tell them anything because the change will
-    be invisible for them and there is nothing they need to do. We will make sure that there will be no loss of data or
-    features.
+    be invisible for them and there is nothing they need to do.
   </p>
 
-  <h2 class="govuk-heading-m">Switching to Adyen</h2>
-  <p class="govuk-body"> All services will move to Adyen. We will tell you when switching opens. </p>
+  <h2 class="govuk-heading-m">Payment and refund reports</h2>
+  <p class="govuk-body"
+    >You'll still be able to download CSV files with details fo payments and refunds, including transaction fees.</p
+  >
+
+  <p class="govuk-body"
+    >The structure and labelling of the CSV files will be a little different once you switch to Adyen. For example, to
+    reflect changes to how fees are structured. Because of the way GOV.UK Pay receives data from Adyen, it may take a
+    few minutes from when a payment is confirmed for all the data relating to that payment to be reflected in the
+    reports.</p
+  >
+
+  <p class="govuk-body"
+    >If you're importing the data from the CSV files into any of your systems, you'll need to check whether any
+    technical work is needed on your systems to reflect the changes. See the `Arrange any technical work needed` section
+    below for details.</p
+  >
+
+  <p class="govuk-body"
+    >To see what the new CSV files will look like, you can
+    <a class="govuk-link" href="">download a CSV file with sample Adyen transactions</a>.</p
+  >
+
+  <h2 class="govuk-heading-m">Fees</h2>
+  <p class="govuk-body"
+    >Adyen's fees are similar to Stripe's but are slightly different in some areas. For example, the most common type of
+    card used on GOV.UK Pay is a UK debit card. Stripe charges a flat rate of a few pence plus a percentage of the value
+    of the transaction. Adyen charges a higher flat rate but the percentage is lower. However, credit card fees, Amex
+    fees, non-European card fees and chargebacks (also known as disputes) are cheaper. The exact change depends on your
+    service's transactions.</p
+  >
+
   <p class="govuk-body">
-    Services already live will need to provide similar information to when you went live with Stripe.
+    <a id="download-adyen-fee-link" class="govuk-link" href="{{ feesPath }}">
+      Download information about Adyen's fees (PDF)
+    </a>
   </p>
+
+  <h2 class="govuk-heading-m">Getting ready to switch to Adyen</h2>
+  <p class="govuk-body">
+    All services currently using Stripe will need to move to Adyen in order to keep taking payments.
+  </p>
+  <p class="govuk-body">
+    We will contact service admins when onboarding with Adyen opens. In the meantime, there's some steps you can take to
+    prepare.
+  </p>
+
+  <h3 class="govuk-heading-s">1. Prepare to complete the onboarding form</h3>
+
+  <p class="govuk-body">
+    You'll need to complete an onboarding form for each of your services in order to switch them to Adyen.</p
+  >
+  <p class="govuk-body"> The onboarding form will ask for similar information to when you went live with Stripe.</p>
   <p class="govuk-body"> You will need: </p>
   <ul class="govuk-list govuk-list--bullet">
     <li>your organisation’s bank details</li>
@@ -76,20 +122,56 @@
     fill in and upload.
   </p>
 
-  <h2 class="govuk-heading-m">Fees</h2>
-  <p class="govuk-body">
-    <a id="download-adyen-fee-link" class="govuk-link" href="{{ feesPath }}">
-      Information about Adyen’s fees is now available
-    </a>
-  </p>
+  <h3 class="govuk-heading-s">2. Prepare to agree to the revised GOV.UK agreement and Adyen terms</h3>
+  <p class="govuk-body">When you complete the onboarding form, you'll be asked to agree to:</p>
+  <p class="govuk-body"
+    >- the
+    <a
+      class="govuk-link"
+      href="https://selfservice.payments.service.gov.uk/policy/agreement-for-crown-and-non-crown-bodies"
+      >revised GOV.UK Pay agreement</a
+    ></p
+  >
+  <p class="govuk-body"
+    >- the
+    <a class="govuk-link" href="https://selfservice.payments.service.gov.uk/policy/agreement-schedule-7-adyen"
+      >Adyen terms and conditions</a
+    ></p
+  >
 
-  <p class="govuk-body">
-    Adyen’s fees are similar to Stripe but are slightly different in some areas. For example, the most common type of
-    card used on GOV.UK Pay is a UK debit card. Stripe charge a flat rate of a few pence plus a percentage of the value
-    of the transaction. Adyen charge a higher flat rate but the percentage is lower. However, credit card fees, Amex
-    fees, non-European card fees and chargebacks (also known as disputes) are cheaper. The exact change depends on your
-    service’s transactions.
+  <h3 class="govuk-heading-s">3. Arrange any technical work needed</h3>
+  <p class="govuk-body"
+    >If any of your systems are receiving data from GOV.UK Pay - either because you're importing CSV files downloading
+    from the GOV.UK Pay admin tool, or receiving data through the GOV.UK Pay API - the technical team looking after the
+    system may need to make changes to reflect differences in the structure of the data and timing of when it's
+    received.
   </p>
+  <p class="govuk-body"
+    >We recommend sharing these documents with your technical team as soon as possible, so they can assess how much work
+    they'll need to do:</p
+  >
+  <p class="govuk-body"
+    >-
+    <a
+      class="govuk-link"
+      href="https://docs.payments.service.gov.uk/switch_payment_service_provider/check_stripe_to_adyen_integration/"
+      >overview of technical changes to the GOV.UK Pay API</a
+    ></p
+  >
+  <p class="govuk-body">- <a class="govuk-link">summary of API and technical changes</a></p>
+  <p class="govuk-body"
+    >-
+    <a class="govuk-link" href="https://docs.payments.service.gov.uk/testing_govuk_pay/#mock-card-numbers-for-adyen"
+      >mock card numbers for use in Adyen testing</a
+    ></p
+  >
+
+  <p class="govuk-body"
+    >To request an Adyen test service, contact GOV.UK Pay support at
+    <a class="govuk-link" href="mailto:govuk-pay-support@digital.cabinet-office.gov.uk"
+      >govuk-pay-support@digital.cabinet-office.gov.uk</a
+    ></p
+  >
 
   <h2 class="govuk-heading-m">Questions and support</h2>
   <p class="govuk-body">
